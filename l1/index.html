@@ -1,0 +1,1644 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Лекция 1: Введение в стратегию внедрения ИИ</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            purple: '#7c3aed',
+                            orange: '#f97316',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            user-select: none;
+            overflow: hidden;
+            background-color: #ffffff;
+            margin: 0;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .slide-container {
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .gradient-text {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-image: linear-gradient(to right, #7c3aed, #f97316);
+        }
+
+        .gradient-bg {
+            background-image: linear-gradient(135deg, #7c3aed, #f97316);
+        }
+
+        .bg-glow-1 {
+            position: absolute;
+            top: -20%;
+            left: -10%;
+            width: 80vw;
+            height: 80vw;
+            max-width: 800px;
+            max-height: 800px;
+            background: radial-gradient(circle, rgba(124,58,237,0.04) 0%, rgba(255,255,255,0) 70%);
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        .bg-glow-2 {
+            position: absolute;
+            bottom: -20%;
+            right: -10%;
+            width: 60vw;
+            height: 60vw;
+            max-width: 600px;
+            max-height: 600px;
+            background: radial-gradient(circle, rgba(249,115,22,0.04) 0%, rgba(255,255,255,0) 70%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .content-z {
+            position: relative;
+            z-index: 10;
+        }
+
+        @keyframes pulse-slow {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+        .animate-pulse-slow {
+            animation: pulse-slow 4s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* Утилита для скрытия скроллбара в длинных списках */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="text-gray-900 font-sans">
+
+    <!-- Декоративный фон -->
+    <div class="bg-glow-1"></div>
+    <div class="bg-glow-2"></div>
+
+    <!-- Индикатор прогресса -->
+    <div class="absolute bottom-0 left-0 h-1.5 bg-gray-100 w-full z-50">
+        <div id="progress-bar" class="h-full gradient-bg w-0 transition-all duration-300"></div>
+    </div>
+
+    <!-- СЛАЙД 1: Title -->
+    <div class="slide-container items-center p-6 md:p-12 opacity-100 translate-y-0" id="slide-0">
+        <div class="content-z text-center w-full max-w-6xl px-4 flex flex-col items-center justify-center h-full">
+            
+            <h1 class="text-4xl md:text-6xl lg:text-[80px] font-black mb-6 leading-[1.1] tracking-tight text-gray-900 drop-shadow-sm">
+                Автоматизация бизнес-процессов <br class="hidden lg:block">
+                <span class="gradient-text">с помощью ИИ-агентов</span>
+            </h1>
+            
+            <div class="bg-gradient-to-r from-purple-50 to-orange-50 border border-purple-100 rounded-2xl p-6 md:p-8 max-w-3xl w-full shadow-lg mb-12">
+                <p class="text-purple-600 font-bold uppercase tracking-widest text-sm mb-2"><i class="ph-fill ph-book-open"></i> Лекция 1</p>
+                <h2 class="text-2xl md:text-3xl font-black text-gray-900 leading-tight">Введение в разработку стратегии внедрения ИИ в бизнес-процессы компании</h2>
+            </div>
+
+            <div class="border-t-2 border-gray-100 pt-8 w-full max-w-2xl text-center">
+                <div class="text-xl md:text-3xl text-gray-800 font-bold">
+                    Андрей Кузьминых
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 2: Курс из 8 занятий -->
+    <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-1">
+        <div class="content-z w-full max-w-6xl">
+            <h2 class="text-3xl md:text-5xl font-black mb-8 text-center text-gray-900">Путь <span class="gradient-text">трансформации</span></h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <!-- Текущая лекция -->
+                <div class="bg-white border-2 border-purple-500 rounded-xl p-5 shadow-xl shadow-purple-500/10 relative transform scale-105 z-10">
+                    <div class="absolute -top-3 -right-3 w-8 h-8 gradient-bg rounded-full text-white flex items-center justify-center font-bold shadow-md animate-pulse-slow">1</div>
+                    <i class="ph-fill ph-map-trifold text-3xl text-purple-600 mb-3"></i>
+                    <h3 class="font-bold text-gray-900 text-lg leading-tight mb-2">Стратегия и зрелость</h3>
+                    <p class="text-sm text-gray-600">Агенты, AI-First, индексы</p>
+                </div>
+                <!-- Остальные -->
+                <div class="bg-gray-50 border border-gray-200 rounded-xl p-5 opacity-70">
+                    <div class="absolute top-3 right-3 text-gray-400 font-bold">2</div>
+                    <i class="ph-duotone ph-git-branch text-3xl text-gray-500 mb-3"></i>
+                    <h3 class="font-bold text-gray-800 text-lg leading-tight mb-2">Анализ процессов</h3>
+                    <p class="text-sm text-gray-500">Моделирование и точки автоматизации</p>
+                </div>
+                <div class="bg-gray-50 border border-gray-200 rounded-xl p-5 opacity-70">
+                    <div class="absolute top-3 right-3 text-gray-400 font-bold">3</div>
+                    <i class="ph-duotone ph-cpu text-3xl text-gray-500 mb-3"></i>
+                    <h3 class="font-bold text-gray-800 text-lg leading-tight mb-2">Создание агентов</h3>
+                    <p class="text-sm text-gray-500">Разработка и промтинг</p>
+                </div>
+                <div class="bg-gray-50 border border-gray-200 rounded-xl p-5 opacity-70">
+                    <div class="absolute top-3 right-3 text-gray-400 font-bold">4</div>
+                    <i class="ph-duotone ph-network text-3xl text-gray-500 mb-3"></i>
+                    <h3 class="font-bold text-gray-800 text-lg leading-tight mb-2">Мультиагентность</h3>
+                    <p class="text-sm text-gray-500">RAG, MCP, A2A</p>
+                </div>
+                <div class="bg-gray-50 border border-gray-200 rounded-xl p-5 opacity-70">
+                    <div class="absolute top-3 right-3 text-gray-400 font-bold">5</div>
+                    <i class="ph-duotone ph-magic-wand text-3xl text-gray-500 mb-3"></i>
+                    <h3 class="font-bold text-gray-800 text-lg leading-tight mb-2">Продвинутый ИИ</h3>
+                    <p class="text-sm text-gray-500">Генерация кода и фронтенд</p>
+                </div>
+                <div class="bg-gray-50 border border-gray-200 rounded-xl p-5 opacity-70">
+                    <div class="absolute top-3 right-3 text-gray-400 font-bold">6</div>
+                    <i class="ph-duotone ph-shield-check text-3xl text-gray-500 mb-3"></i>
+                    <h3 class="font-bold text-gray-800 text-lg leading-tight mb-2">AgentOps</h3>
+                    <p class="text-sm text-gray-500">Тестирование и мониторинг</p>
+                </div>
+                <div class="bg-gray-50 border border-gray-200 rounded-xl p-5 opacity-70">
+                    <div class="absolute top-3 right-3 text-gray-400 font-bold">7</div>
+                    <i class="ph-duotone ph-users-three text-3xl text-gray-500 mb-3"></i>
+                    <h3 class="font-bold text-gray-800 text-lg leading-tight mb-2">Управление изменениями</h3>
+                    <p class="text-sm text-gray-500">Новые роли и культура</p>
+                </div>
+                <div class="bg-orange-50 border border-orange-200 rounded-xl p-5">
+                    <div class="absolute top-3 right-3 text-orange-400 font-bold">8</div>
+                    <i class="ph-fill ph-flag-checkered text-3xl text-orange-500 mb-3"></i>
+                    <h3 class="font-bold text-gray-900 text-lg leading-tight mb-2">Защита проекта</h3>
+                    <p class="text-sm text-gray-700">Экономика, ROI и масштабирование</p>
+                </div>
+            </div>
+
+            <div class="bg-gray-900 text-white rounded-2xl p-4 text-center">
+                <p class="text-lg md:text-xl font-medium tracking-wide">
+                    От анализа процесса <i class="ph-bold ph-arrow-right text-purple-400 mx-2 align-middle"></i> 
+                    к агенту <i class="ph-bold ph-arrow-right text-purple-400 mx-2 align-middle"></i> 
+                    к внедрению <i class="ph-bold ph-arrow-right text-orange-400 mx-2 align-middle"></i> 
+                    <span class="text-orange-400 font-bold">к экономическому эффекту</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 3: Критерии оценки -->
+    <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-2">
+        <div class="content-z w-full max-w-6xl flex flex-col md:flex-row gap-8 lg:gap-12 items-center">
+            <div class="w-full md:w-[60%]">
+                <h2 class="text-3xl md:text-5xl font-black mb-8 text-gray-900">Критерии <span class="gradient-text">оценки</span></h2>
+                <div class="flex flex-col gap-3">
+                    <div class="bg-white border-l-4 border-gray-300 p-4 rounded-r-xl shadow-sm flex items-center gap-4">
+                        <div class="text-3xl font-black text-gray-300 w-16 shrink-0">20%</div>
+                        <div>
+                            <h4 class="font-bold text-gray-900 text-lg">Описание процесса</h4>
+                            <p class="text-sm text-gray-500">Детальная AS-IS и TO-BE модель</p>
+                        </div>
+                    </div>
+                    <div class="bg-white border-l-4 border-purple-400 p-4 rounded-r-xl shadow-sm flex items-center gap-4">
+                        <div class="text-3xl font-black text-purple-400 w-16 shrink-0">25%</div>
+                        <div>
+                            <h4 class="font-bold text-gray-900 text-lg">Работающий агент</h4>
+                            <p class="text-sm text-gray-500">Реализация логики и интеграций</p>
+                        </div>
+                    </div>
+                    <div class="bg-white border-l-4 border-orange-400 p-4 rounded-r-xl shadow-sm flex items-center gap-4">
+                        <div class="text-3xl font-black text-orange-400 w-16 shrink-0">25%</div>
+                        <div>
+                            <h4 class="font-bold text-gray-900 text-lg">Дашборд работы</h4>
+                            <p class="text-sm text-gray-500">Мониторинг метрик агента</p>
+                        </div>
+                    </div>
+                    <div class="bg-white border-l-4 border-purple-600 p-4 rounded-r-xl shadow-sm flex items-center gap-4">
+                        <div class="text-3xl font-black text-purple-600 w-16 shrink-0">30%</div>
+                        <div>
+                            <h4 class="font-bold text-gray-900 text-lg">Финальный проект</h4>
+                            <p class="text-sm text-gray-500">Защита стратегии и эффекта</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="w-full md:w-[40%] bg-gradient-to-br from-gray-900 to-gray-800 text-white p-8 rounded-3xl shadow-2xl relative overflow-hidden">
+                <i class="ph-duotone ph-medal text-[120px] text-white opacity-5 absolute -right-6 -bottom-6"></i>
+                <h3 class="text-2xl font-black mb-6 text-orange-400">Что значит высокий балл?</h3>
+                <ul class="space-y-4">
+                    <li class="flex items-center gap-3"><i class="ph-fill ph-check-circle text-purple-400 text-xl"></i> Системное мышление</li>
+                    <li class="flex items-center gap-3"><i class="ph-fill ph-check-circle text-purple-400 text-xl"></i> Глубокий бизнес-контекст</li>
+                    <li class="flex items-center gap-3"><i class="ph-fill ph-check-circle text-purple-400 text-xl"></i> Реалистичность внедрения</li>
+                    <li class="flex items-center gap-3"><i class="ph-fill ph-check-circle text-purple-400 text-xl"></i> Масштабируемость архитектуры</li>
+                    <li class="flex items-center gap-3"><i class="ph-fill ph-check-circle text-orange-400 text-xl"></i> <b class="text-white">Измеримый экономический эффект</b></li>
+                </ul>
+                <div class="mt-8 pt-6 border-t border-gray-700 text-sm text-gray-400">
+                    <span class="text-white font-bold block mb-1">Оценка 10 =</span> зрелое, готовое к внедрению и масштабируемое решение.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 4: 4 промышленная революция -->
+    <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-3">
+        <div class="content-z w-full max-w-6xl">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Эволюция <span class="gradient-text">промышленности</span></h2>
+            
+            <div class="flex flex-col md:flex-row gap-4 lg:gap-6 justify-between items-stretch mb-12 relative">
+                <!-- Линия таймлайна -->
+                <div class="hidden md:block absolute top-1/2 left-0 w-full h-1 bg-gray-200 -z-10 transform -translate-y-1/2"></div>
+                
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex-1 flex flex-col items-center text-center">
+                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4 text-gray-400"><i class="ph-fill ph-engine text-3xl"></i></div>
+                    <h3 class="font-bold text-gray-900 text-lg mb-2">Механическая</h3>
+                    <p class="text-sm text-gray-500">Автоматизация физического труда (пар, вода)</p>
+                </div>
+                
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex-1 flex flex-col items-center text-center">
+                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4 text-gray-400"><i class="ph-fill ph-lightning text-3xl"></i></div>
+                    <h3 class="font-bold text-gray-900 text-lg mb-2">Электрическая</h3>
+                    <p class="text-sm text-gray-500">Массовое производство, конвейеры</p>
+                </div>
+                
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex-1 flex flex-col items-center text-center">
+                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4 text-gray-500"><i class="ph-fill ph-desktop text-3xl"></i></div>
+                    <h3 class="font-bold text-gray-900 text-lg mb-2">Цифровая</h3>
+                    <p class="text-sm text-gray-500">Компьютеры, IT, автоматизация данных</p>
+                </div>
+                
+                <div class="gradient-bg p-[2px] rounded-2xl flex-1 transform scale-105 shadow-xl">
+                    <div class="bg-white h-full p-6 rounded-[14px] flex flex-col items-center text-center">
+                        <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-4 text-purple-600"><i class="ph-fill ph-brain text-3xl"></i></div>
+                        <h3 class="font-black gradient-text text-xl mb-2">Интеллектуальная</h3>
+                        <p class="text-sm text-gray-800 font-medium">Автоматизация мышления и принятия решений</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-orange-50 border-l-4 border-orange-500 p-6 rounded-r-xl w-full max-w-4xl mx-auto text-center">
+                <p class="text-xl md:text-2xl text-gray-800 font-medium">
+                    Теперь мы автоматизируем <span class="font-black text-gray-900">часть когнитивной работы.</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 5: Кто такие ИИ агенты -->
+    <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-4">
+        <div class="content-z w-full max-w-6xl flex flex-col items-center">
+            <h2 class="text-3xl md:text-5xl font-black mb-4 text-gray-900">Кто такие <span class="gradient-text">ИИ-агенты?</span></h2>
+            <p class="text-lg md:text-xl text-gray-600 mb-12 text-center max-w-3xl">
+                Субъект, который воспринимает среду, рассуждает, принимает решения и <b>действует</b> для достижения цели.
+            </p>
+            
+            <div class="flex flex-col md:flex-row items-center justify-center gap-4 lg:gap-8 w-full">
+                <!-- Perception -->
+                <div class="bg-white border border-gray-200 rounded-2xl p-6 w-full md:w-1/3 shadow-sm flex flex-col items-center text-center relative">
+                    <div class="w-12 h-12 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mb-4"><i class="ph-fill ph-eye text-2xl"></i></div>
+                    <h3 class="font-black text-xl text-gray-900 mb-4">Восприятие</h3>
+                    <ul class="text-sm text-gray-500 space-y-2 text-left w-full bg-gray-50 p-4 rounded-xl">
+                        <li>• Текст / Email</li>
+                        <li>• Изображения / Vision</li>
+                        <li>• API / Webhooks</li>
+                        <li>• Сенсоры</li>
+                    </ul>
+                </div>
+                
+                <i class="ph-bold ph-arrow-right text-3xl text-gray-300 hidden md:block rotate-90 md:rotate-0"></i>
+                
+                <!-- Reasoning -->
+                <div class="bg-gradient-to-b from-purple-50 to-white border-2 border-purple-200 rounded-2xl p-6 w-full md:w-1/3 shadow-lg transform scale-105 flex flex-col items-center text-center z-10">
+                    <div class="absolute -top-4 bg-purple-500 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wide">Ядро (LLM)</div>
+                    <div class="w-16 h-16 gradient-bg text-white rounded-full flex items-center justify-center mb-4 mt-2"><i class="ph-fill ph-brain text-3xl"></i></div>
+                    <h3 class="font-black text-2xl text-purple-700 mb-4">Мышление</h3>
+                    <ul class="text-sm text-gray-700 font-medium space-y-2 text-left w-full bg-white border border-purple-100 p-4 rounded-xl">
+                        <li>• Анализ контекста</li>
+                        <li>• Планирование шагов</li>
+                        <li>• Логика и правила</li>
+                        <li>• Память (RAG)</li>
+                    </ul>
+                </div>
+
+                <i class="ph-bold ph-arrow-right text-3xl text-gray-300 hidden md:block rotate-90 md:rotate-0"></i>
+
+                <!-- Action -->
+                <div class="bg-white border border-gray-200 rounded-2xl p-6 w-full md:w-1/3 shadow-sm flex flex-col items-center text-center">
+                    <div class="w-12 h-12 bg-orange-50 text-orange-500 rounded-full flex items-center justify-center mb-4"><i class="ph-fill ph-hand-pointing text-2xl"></i></div>
+                    <h3 class="font-black text-xl text-gray-900 mb-4">Действие</h3>
+                    <ul class="text-sm text-gray-500 space-y-2 text-left w-full bg-gray-50 p-4 rounded-xl">
+                        <li>• Генерация ответа</li>
+                        <li>• Вызов API / Инструментов</li>
+                        <li>• Изменение данных (CRM)</li>
+                        <li>• Написание кода</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="mt-12 bg-gray-900 text-white px-8 py-4 rounded-full font-bold tracking-wide">
+                2025–2026 — переход от ассистентов <span class="text-orange-400">к автономным участникам процессов</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 6: Свойства ИИ агентов -->
+    <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-5">
+        <div class="content-z w-full max-w-5xl">
+            <h2 class="text-3xl md:text-5xl font-black mb-10 text-center text-gray-900">Свойства <span class="gradient-text">ИИ-агентов</span></h2>
+            
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mb-10">
+                <div class="bg-white border border-gray-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+                    <i class="ph-duotone ph-steering-wheel text-3xl text-purple-500 mb-3"></i>
+                    <h3 class="font-bold text-gray-900 text-lg mb-1">Автономность</h3>
+                    <p class="text-sm text-gray-500">Работает без постоянного контроля человека.</p>
+                </div>
+                <div class="bg-white border border-gray-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+                    <i class="ph-duotone ph-lightning text-3xl text-orange-500 mb-3"></i>
+                    <h3 class="font-bold text-gray-900 text-lg mb-1">Реактивность</h3>
+                    <p class="text-sm text-gray-500">Реагирует на изменения в среде и триггеры.</p>
+                </div>
+                <div class="bg-white border border-gray-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+                    <i class="ph-duotone ph-trend-up text-3xl text-purple-500 mb-3"></i>
+                    <h3 class="font-bold text-gray-900 text-lg mb-1">Проактивность</h3>
+                    <p class="text-sm text-gray-500">Инициирует действия для достижения цели.</p>
+                </div>
+                <div class="bg-white border border-gray-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+                    <i class="ph-duotone ph-graduation-cap text-3xl text-orange-500 mb-3"></i>
+                    <h3 class="font-bold text-gray-900 text-lg mb-1">Обучаемость</h3>
+                    <p class="text-sm text-gray-500">Улучшается на основе опыта и фидбека (Memory).</p>
+                </div>
+                <div class="bg-white border border-gray-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+                    <i class="ph-duotone ph-users-three text-3xl text-purple-500 mb-3"></i>
+                    <h3 class="font-bold text-gray-900 text-lg mb-1">Взаимодействие</h3>
+                    <p class="text-sm text-gray-500">Общается с людьми, системами и другими агентами.</p>
+                </div>
+                <div class="bg-white border border-gray-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+                    <i class="ph-duotone ph-image text-3xl text-orange-500 mb-3"></i>
+                    <h3 class="font-bold text-gray-900 text-lg mb-1">Мультимодальность</h3>
+                    <p class="text-sm text-gray-500">Понимает текст, голос, изображения, таблицы.</p>
+                </div>
+            </div>
+
+            <div class="bg-purple-50 border border-purple-200 p-6 rounded-2xl flex items-start gap-4">
+                <div class="bg-purple-200 text-purple-700 p-2 rounded-lg shrink-0"><i class="ph-fill ph-briefcase text-2xl"></i></div>
+                <div>
+                    <h4 class="font-bold text-gray-900 mb-1">Пример: Организация командировки</h4>
+                    <p class="text-gray-600 text-sm md:text-base">
+                        Ассистент: Вы просите найти билеты, он выдает список. <br>
+                        <b class="text-purple-700">Агент:</b> Знает расписание, бюджет и предпочтения. Сам мониторит цены, бронирует оптимальный вариант, добавляет событие в календарь и пишет письмо с деталями.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 7: История ИИ агентов -->
+    <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-6">
+        <div class="content-z w-full max-w-5xl">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Эволюция ИИ: <span class="gradient-text">Путь к агентам</span></h2>
+            
+            <div class="relative border-l-4 border-purple-200 ml-4 md:ml-12 space-y-8 pb-4">
+                <div class="relative pl-8 md:pl-12">
+                    <div class="absolute -left-[14px] top-1 w-6 h-6 bg-white border-4 border-gray-300 rounded-full"></div>
+                    <span class="text-gray-400 font-bold tracking-widest text-sm mb-1 block">1950</span>
+                    <h3 class="text-xl font-bold text-gray-900">Тест Тьюринга</h3>
+                    <p class="text-gray-500">Концепция машинного интеллекта, неотличимого от человека.</p>
+                </div>
+                
+                <div class="relative pl-8 md:pl-12">
+                    <div class="absolute -left-[14px] top-1 w-6 h-6 bg-white border-4 border-gray-300 rounded-full"></div>
+                    <span class="text-gray-400 font-bold tracking-widest text-sm mb-1 block">1960-80е</span>
+                    <h3 class="text-xl font-bold text-gray-900">Экспертные системы</h3>
+                    <p class="text-gray-500">Жесткие правила (IF-THEN). Первые "реактивные агенты".</p>
+                </div>
+                
+                <div class="relative pl-8 md:pl-12">
+                    <div class="absolute -left-[14px] top-1 w-6 h-6 bg-white border-4 border-gray-300 rounded-full"></div>
+                    <span class="text-gray-400 font-bold tracking-widest text-sm mb-1 block">1997 / 2016</span>
+                    <h3 class="text-xl font-bold text-gray-900">Победы над человеком</h3>
+                    <p class="text-gray-500">Deep Blue (шахматы) и AlphaGo (го). ИИ решает узкие сложные задачи.</p>
+                </div>
+                
+                <div class="relative pl-8 md:pl-12">
+                    <div class="absolute -left-[14px] top-1 w-6 h-6 bg-white border-4 border-purple-400 rounded-full shadow-[0_0_10px_rgba(124,58,237,0.5)]"></div>
+                    <span class="text-purple-500 font-bold tracking-widest text-sm mb-1 block">2017 - 2022</span>
+                    <h3 class="text-xl font-bold text-gray-900">Трансформеры и LLM</h3>
+                    <p class="text-gray-500">Понимание контекста, языка и генерация текста (ChatGPT).</p>
+                </div>
+                
+                <div class="relative pl-8 md:pl-12">
+                    <div class="absolute -left-[18px] top-0 w-8 h-8 gradient-bg rounded-full border-4 border-white shadow-lg"></div>
+                    <span class="text-orange-500 font-black tracking-widest text-sm mb-1 block">2023 - НАСТОЯЩЕЕ ВРЕМЯ</span>
+                    <h3 class="text-2xl font-black text-gray-900 gradient-text">Мультимодальные агенты</h3>
+                    <p class="text-gray-700 font-medium">Модели получили "руки" (API) и "память". Переход к действиям.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 8: Эволюция ИИ агентов (Уровни) -->
+    <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-7">
+        <div class="content-z w-full max-w-6xl">
+            <h2 class="text-3xl md:text-5xl font-black mb-16 text-center text-gray-900">Лестница <span class="gradient-text">зрелости агентов</span></h2>
+            
+            <div class="flex flex-col md:flex-row items-end justify-center h-64 gap-2 mb-12">
+                <!-- Уровень 1 -->
+                <div class="w-full md:w-1/5 bg-gray-100 rounded-t-xl p-4 border border-gray-200 flex flex-col items-center justify-start h-[30%]">
+                    <span class="text-gray-400 font-bold text-xs uppercase">Уровень 1</span>
+                    <h3 class="font-bold text-gray-700 text-center text-sm md:text-base mt-2">Болталки</h3>
+                </div>
+                <!-- Уровень 2 -->
+                <div class="w-full md:w-1/5 bg-purple-50 rounded-t-xl p-4 border border-purple-100 flex flex-col items-center justify-start h-[45%]">
+                    <span class="text-purple-400 font-bold text-xs uppercase">Уровень 2</span>
+                    <h3 class="font-bold text-purple-900 text-center text-sm md:text-base mt-2">Рассуждающие</h3>
+                </div>
+                <!-- Уровень 3 -->
+                <div class="w-full md:w-1/5 bg-purple-100 rounded-t-xl p-4 border border-purple-200 flex flex-col items-center justify-start h-[60%] shadow-lg transform scale-105 z-10 relative">
+                    <div class="absolute -top-8 bg-purple-600 text-white text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">Мы здесь</div>
+                    <span class="text-purple-600 font-bold text-xs uppercase">Уровень 3</span>
+                    <h3 class="font-black text-gray-900 text-center text-base md:text-lg mt-2">Автономные</h3>
+                </div>
+                <!-- Уровень 4 -->
+                <div class="w-full md:w-1/5 bg-orange-50 rounded-t-xl p-4 border border-orange-100 flex flex-col items-center justify-start h-[75%] opacity-70">
+                    <span class="text-orange-400 font-bold text-xs uppercase">Уровень 4</span>
+                    <h3 class="font-bold text-orange-900 text-center text-sm md:text-base mt-2">Креативные</h3>
+                </div>
+                <!-- Уровень 5 -->
+                <div class="w-full md:w-1/5 gradient-bg rounded-t-xl p-4 flex flex-col items-center justify-start h-[90%] opacity-80 text-white shadow-xl">
+                    <span class="text-white/80 font-bold text-xs uppercase">Уровень 5</span>
+                    <h3 class="font-black text-center text-base md:text-lg mt-2 drop-shadow-md">Мультиагентные системы</h3>
+                </div>
+            </div>
+
+            <div class="text-center bg-white border border-gray-200 p-6 rounded-2xl shadow-sm max-w-3xl mx-auto">
+                <p class="text-lg text-gray-600">
+                    Рынок прямо сейчас переходит от <b class="text-purple-600">рассуждений (промптинга)</b> к <b class="text-orange-500">автономному выполнению end-to-end задач</b>.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 9: RUN - CHANGE - DISRUPT -->
+    <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-8">
+        <div class="content-z w-full max-w-6xl">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Модель <span class="gradient-text">создания ценности</span></h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                <!-- RUN -->
+                <div class="bg-white border-2 border-purple-500 p-6 md:p-8 rounded-3xl shadow-xl transform md:-translate-y-4 relative">
+                    <div class="absolute -top-4 right-6 bg-purple-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase">Фокус курса</div>
+                    <div class="text-purple-500 mb-4"><i class="ph-fill ph-gear-six text-5xl"></i></div>
+                    <h3 class="font-black text-3xl text-gray-900 mb-2">RUN</h3>
+                    <p class="text-sm font-bold text-gray-400 uppercase tracking-wide mb-4">Стабильные процессы</p>
+                    <div class="space-y-3 text-sm text-gray-600">
+                        <p><b>Задача:</b> Эффективность, снижение костов, скорость.</p>
+                        <p><b>Неопределенность:</b> Низкая.</p>
+                        <p><b>Роль ИИ:</b> Автоматизация рутины, агенты-исполнители, контроль качества.</p>
+                    </div>
+                </div>
+                
+                <!-- CHANGE -->
+                <div class="bg-white border border-gray-200 p-6 md:p-8 rounded-3xl shadow-sm opacity-80">
+                    <div class="text-orange-400 mb-4"><i class="ph-fill ph-arrows-merge text-5xl"></i></div>
+                    <h3 class="font-black text-3xl text-gray-900 mb-2">CHANGE</h3>
+                    <p class="text-sm font-bold text-gray-400 uppercase tracking-wide mb-4">Трансформация</p>
+                    <div class="space-y-3 text-sm text-gray-600">
+                        <p><b>Задача:</b> Создание новых продуктов, улучшение клиентского опыта.</p>
+                        <p><b>Неопределенность:</b> Средняя.</p>
+                        <p><b>Роль ИИ:</b> R&D ассистенты, анализ трендов, персонализация.</p>
+                    </div>
+                </div>
+                
+                <!-- DISRUPT -->
+                <div class="bg-gray-50 border border-gray-200 p-6 md:p-8 rounded-3xl shadow-sm opacity-60">
+                    <div class="text-gray-400 mb-4"><i class="ph-fill ph-rocket text-5xl"></i></div>
+                    <h3 class="font-black text-3xl text-gray-900 mb-2">DISRUPT</h3>
+                    <p class="text-sm font-bold text-gray-400 uppercase tracking-wide mb-4">Инновации</p>
+                    <div class="space-y-3 text-sm text-gray-600">
+                        <p><b>Задача:</b> Новые бизнес-модели, смена парадигмы рынка.</p>
+                        <p><b>Неопределенность:</b> Высокая.</p>
+                        <p><b>Роль ИИ:</b> AI-Native продукты, полностью автономные сервисы.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <p class="text-center text-gray-500 font-medium">В этом курсе мы фокусируемся на измеримом эффекте в <b class="text-purple-600">RUN-процессах</b>.</p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 10: Где ИИ создает наибольшую ценность -->
+    <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-9">
+        <div class="content-z w-full max-w-6xl">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Карта <span class="gradient-text">ИИ-ценности</span> компании</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-fr">
+                <div class="bg-white border border-gray-100 p-4 rounded-xl shadow-sm flex items-start gap-4 hover:border-purple-300 transition-colors">
+                    <div class="bg-purple-50 text-purple-600 p-2 rounded-lg"><i class="ph-fill ph-headset text-2xl"></i></div>
+                    <div>
+                        <h4 class="font-bold text-gray-900">Поддержка</h4>
+                        <p class="text-xs text-gray-500">Автономное решение тикетов (L1/L2)</p>
+                    </div>
+                </div>
+                <div class="bg-white border border-gray-100 p-4 rounded-xl shadow-sm flex items-start gap-4 hover:border-orange-300 transition-colors">
+                    <div class="bg-orange-50 text-orange-500 p-2 rounded-lg"><i class="ph-fill ph-code text-2xl"></i></div>
+                    <div>
+                        <h4 class="font-bold text-gray-900">IT / Dev</h4>
+                        <p class="text-xs text-gray-500">Генерация кода, ревью, автотесты</p>
+                    </div>
+                </div>
+                <div class="bg-white border border-gray-100 p-4 rounded-xl shadow-sm flex items-start gap-4 hover:border-purple-300 transition-colors">
+                    <div class="bg-purple-50 text-purple-600 p-2 rounded-lg"><i class="ph-fill ph-megaphone text-2xl"></i></div>
+                    <div>
+                        <h4 class="font-bold text-gray-900">Маркетинг</h4>
+                        <p class="text-xs text-gray-500">Генерация контента, гиперперсонализация</p>
+                    </div>
+                </div>
+                <div class="bg-white border border-gray-100 p-4 rounded-xl shadow-sm flex items-start gap-4 hover:border-orange-300 transition-colors">
+                    <div class="bg-orange-50 text-orange-500 p-2 rounded-lg"><i class="ph-fill ph-currency-dollar text-2xl"></i></div>
+                    <div>
+                        <h4 class="font-bold text-gray-900">Продажи</h4>
+                        <p class="text-xs text-gray-500">Скоринг лидов, ИИ-ассистенты сейлзов</p>
+                    </div>
+                </div>
+                <div class="bg-white border border-gray-100 p-4 rounded-xl shadow-sm flex items-start gap-4 hover:border-purple-300 transition-colors">
+                    <div class="bg-purple-50 text-purple-600 p-2 rounded-lg"><i class="ph-fill ph-users text-2xl"></i></div>
+                    <div>
+                        <h4 class="font-bold text-gray-900">HR</h4>
+                        <p class="text-xs text-gray-500">Скрининг резюме, онбординг агенты</p>
+                    </div>
+                </div>
+                <div class="bg-white border border-gray-100 p-4 rounded-xl shadow-sm flex items-start gap-4 hover:border-orange-300 transition-colors">
+                    <div class="bg-orange-50 text-orange-500 p-2 rounded-lg"><i class="ph-fill ph-scales text-2xl"></i></div>
+                    <div>
+                        <h4 class="font-bold text-gray-900">Юристы</h4>
+                        <p class="text-xs text-gray-500">Анализ договоров, комплаенс-контроль</p>
+                    </div>
+                </div>
+                <div class="bg-white border border-gray-100 p-4 rounded-xl shadow-sm flex items-start gap-4 hover:border-purple-300 transition-colors">
+                    <div class="bg-purple-50 text-purple-600 p-2 rounded-lg"><i class="ph-fill ph-coins text-2xl"></i></div>
+                    <div>
+                        <h4 class="font-bold text-gray-900">Финансы</h4>
+                        <p class="text-xs text-gray-500">Сверка документов, прогнозирование</p>
+                    </div>
+                </div>
+                <div class="bg-white border border-gray-100 p-4 rounded-xl shadow-sm flex items-start gap-4 hover:border-orange-300 transition-colors">
+                    <div class="bg-orange-50 text-orange-500 p-2 rounded-lg"><i class="ph-fill ph-chart-bar text-2xl"></i></div>
+                    <div>
+                        <h4 class="font-bold text-gray-900">Аналитика / BI</h4>
+                        <p class="text-xs text-gray-500">SQL по запросу, поиск инсайтов</p>
+                    </div>
+                </div>
+                <div class="bg-gray-900 p-4 rounded-xl shadow-lg flex items-center justify-center col-span-1 md:col-span-2 lg:col-span-1">
+                    <p class="text-white text-sm font-bold text-center">
+                        ИИ наиболее ценен там, где есть узкие места и <b>ручной анализ данных</b>.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 11: Эволюция операционных моделей -->
+    <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-10">
+        <div class="content-z w-full max-w-6xl">
+            <h2 class="text-3xl md:text-5xl font-black mb-16 text-center text-gray-900">Эволюция <span class="gradient-text">управления</span></h2>
+            
+            <div class="flex flex-col md:flex-row gap-8 items-center justify-center relative">
+                <!-- Соединительная линия -->
+                <div class="hidden md:block absolute top-[40%] left-[10%] w-[80%] h-1 bg-gray-200 -z-10"></div>
+                
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl w-full md:w-1/3 flex flex-col items-center text-center shadow-sm relative">
+                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4 border-4 border-white shadow-sm"><i class="ph-fill ph-users-three text-3xl text-gray-500"></i></div>
+                    <h3 class="font-black text-xl text-gray-900 mb-1">Agile</h3>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-4">Изменение формы работы</p>
+                    <ul class="text-sm text-gray-600 text-left w-full space-y-2">
+                        <li><b>Суть:</b> От иерархии к командам</li>
+                        <li><b>Актив:</b> Люди и таланты</li>
+                    </ul>
+                </div>
+                
+                <i class="ph-bold ph-arrow-right text-3xl text-gray-300 hidden md:block"></i>
+                
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl w-full md:w-1/3 flex flex-col items-center text-center shadow-sm relative">
+                    <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-4 border-4 border-white shadow-sm"><i class="ph-fill ph-database text-3xl text-blue-500"></i></div>
+                    <h3 class="font-black text-xl text-gray-900 mb-1">Digital</h3>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-4">Инфраструктура данных</p>
+                    <ul class="text-sm text-gray-600 text-left w-full space-y-2">
+                        <li><b>Суть:</b> От процессов к данным</li>
+                        <li><b>Актив:</b> Big Data, платформы</li>
+                    </ul>
+                </div>
+                
+                <i class="ph-bold ph-arrow-right text-3xl text-purple-300 hidden md:block"></i>
+                
+                <div class="gradient-bg p-1 rounded-2xl w-full md:w-1/3 shadow-xl transform scale-105 z-10 relative">
+                    <div class="bg-white h-full p-6 rounded-[12px] flex flex-col items-center text-center">
+                        <div class="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mb-4 border-4 border-white shadow-md animate-pulse-slow"><i class="ph-fill ph-brain text-4xl text-purple-600"></i></div>
+                        <h3 class="font-black text-2xl text-gray-900 mb-1">AI-First</h3>
+                        <p class="text-xs font-bold text-purple-500 uppercase tracking-wide mb-4">Логика принятия решений</p>
+                        <ul class="text-sm text-gray-800 font-medium text-left w-full space-y-2">
+                            <li><b>Суть:</b> От данных к действиям</li>
+                            <li><b>Актив:</b> Модели и Агенты</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 12: Виды AI компаний -->
+    <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-11">
+        <div class="content-z w-full max-w-6xl">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Типы <span class="gradient-text">AI-компаний</span></h2>
+            
+            <div class="flex flex-col lg:flex-row gap-6 items-center lg:items-stretch justify-center">
+                
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl w-full lg:w-[30%] shadow-sm opacity-80 flex flex-col">
+                    <h3 class="font-bold text-xl text-gray-900 mb-4 border-b pb-2">AI-Driven</h3>
+                    <div class="space-y-4 text-sm text-gray-600 flex-grow">
+                        <div><span class="font-bold text-gray-800 block">Роль ИИ:</span> Инструмент (как Excel)</div>
+                        <div><span class="font-bold text-gray-800 block">Роль человека:</span> Делает работу, использует ИИ для ускорения.</div>
+                        <div><span class="font-bold text-gray-800 block">Интеграция:</span> Точечная (Copilots).</div>
+                        <div class="pt-2 text-xs italic">Пример: Дизайнер использует Midjourney.</div>
+                    </div>
+                </div>
+                
+                <div class="bg-gradient-to-b from-purple-50 to-white border-2 border-purple-400 p-8 rounded-3xl w-full lg:w-[40%] shadow-2xl transform lg:scale-110 z-10 flex flex-col relative">
+                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-purple-600 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wide shadow-md whitespace-nowrap">Цель трансформации</div>
+                    <h3 class="font-black text-3xl text-purple-700 mb-4 border-b border-purple-200 pb-2 text-center">AI-First</h3>
+                    <div class="space-y-4 text-base text-gray-800 font-medium flex-grow">
+                        <div><span class="font-bold text-purple-900 block">Роль ИИ:</span> Операционная модель.</div>
+                        <div><span class="font-bold text-purple-900 block">Роль человека:</span> Архитектор процесса, контролер ИИ-агентов.</div>
+                        <div><span class="font-bold text-purple-900 block">Интеграция:</span> Системная (Агенты в процессах).</div>
+                        <div class="pt-2 text-sm text-purple-700">Пример: Клиентская поддержка полностью работает на ИИ, люди разбирают только сложные эскалации.</div>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 border border-gray-200 p-6 rounded-2xl w-full lg:w-[30%] shadow-sm opacity-80 flex flex-col">
+                    <h3 class="font-bold text-xl text-gray-900 mb-4 border-b pb-2">AI-Native</h3>
+                    <div class="space-y-4 text-sm text-gray-600 flex-grow">
+                        <div><span class="font-bold text-gray-800 block">Роль ИИ:</span> Ядро бизнеса.</div>
+                        <div><span class="font-bold text-gray-800 block">Роль человека:</span> Создатель алгоритмов.</div>
+                        <div><span class="font-bold text-gray-800 block">Интеграция:</span> Изначальная, бизнес невозможен без ИИ.</div>
+                        <div class="pt-2 text-xs italic">Пример: OpenAI, Perplexity, ИИ-стартапы.</div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 13: Оценка ИИ-зрелости компании -->
+    <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-12">
+        <div class="content-z w-full max-w-6xl flex flex-col md:flex-row items-center gap-12">
+            <div class="w-full md:w-1/2">
+                <h2 class="text-3xl md:text-5xl font-black mb-6 text-gray-900 leading-tight">Индекс <span class="gradient-text">ИИ-зрелости</span></h2>
+                <p class="text-lg text-gray-600 mb-8">Рентген вашей компании перед ИИ-трансформацией. Помогает перейти от разрозненных пилотов к системной модели и задать дорожную карту.</p>
+                
+                <ul class="space-y-3">
+                    <li class="flex items-center gap-3 text-lg font-bold text-purple-700"><div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">1</div> Стратегия и управление</li>
+                    <li class="flex items-center gap-3 text-lg font-bold text-gray-700"><div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">2</div> Люди и культура</li>
+                    <li class="flex items-center gap-3 text-lg font-bold text-gray-700"><div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">3</div> Инфраструктура</li>
+                    <li class="flex items-center gap-3 text-lg font-bold text-gray-700"><div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">4</div> Данные</li>
+                    <li class="flex items-center gap-3 text-lg font-bold text-gray-700"><div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">5</div> Модели</li>
+                    <li class="flex items-center gap-3 text-lg font-bold text-gray-700"><div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">6</div> Внедрение</li>
+                    <li class="flex items-center gap-3 text-lg font-bold text-gray-700"><div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">7</div> R&D</li>
+                </ul>
+            </div>
+            
+            <div class="w-full md:w-1/2 flex justify-center relative">
+                <!-- Стилизованный Radar Chart на CSS -->
+                <div class="w-[300px] h-[300px] lg:w-[400px] lg:h-[400px] rounded-full border-2 border-gray-200 relative flex items-center justify-center">
+                    <div class="w-[75%] h-[75%] rounded-full border border-gray-200 absolute"></div>
+                    <div class="w-[50%] h-[50%] rounded-full border border-gray-200 absolute"></div>
+                    <div class="w-[25%] h-[25%] rounded-full border border-gray-200 absolute"></div>
+                    
+                    <!-- Оси -->
+                    <div class="absolute w-full h-px bg-gray-200 rotate-0"></div>
+                    <div class="absolute w-full h-px bg-gray-200 rotate-45"></div>
+                    <div class="absolute w-full h-px bg-gray-200 rotate-90"></div>
+                    <div class="absolute w-full h-px bg-gray-200 -rotate-45"></div>
+                    
+                    <!-- Заполненная область (имитация) -->
+                    <svg class="absolute inset-0 w-full h-full" viewBox="0 0 100 100">
+                        <polygon points="50,15 80,30 85,60 60,85 25,75 15,40 30,20" fill="rgba(124,58,237,0.2)" stroke="#7c3aed" stroke-width="2"/>
+                        <circle cx="50" cy="15" r="2" fill="#7c3aed"/>
+                        <circle cx="80" cy="30" r="2" fill="#7c3aed"/>
+                        <circle cx="85" cy="60" r="2" fill="#7c3aed"/>
+                        <circle cx="60" cy="85" r="2" fill="#7c3aed"/>
+                        <circle cx="25" cy="75" r="2" fill="#7c3aed"/>
+                        <circle cx="15" cy="40" r="2" fill="#7c3aed"/>
+                        <circle cx="30" cy="20" r="2" fill="#7c3aed"/>
+                    </svg>
+                    
+                    <!-- Иконки на осях -->
+                    <div class="absolute top-[-20px] bg-white p-1 rounded-full shadow-sm text-purple-600"><i class="ph-fill ph-target text-xl"></i></div>
+                    <div class="absolute right-[5%] top-[10%] bg-white p-1 rounded-full shadow-sm text-gray-500"><i class="ph-fill ph-users text-xl"></i></div>
+                    <div class="absolute right-[-20px] top-[45%] bg-white p-1 rounded-full shadow-sm text-gray-500"><i class="ph-fill ph-server text-xl"></i></div>
+                    <div class="absolute right-[10%] bottom-[10%] bg-white p-1 rounded-full shadow-sm text-gray-500"><i class="ph-fill ph-database text-xl"></i></div>
+                    <div class="absolute bottom-[-20px] bg-white p-1 rounded-full shadow-sm text-gray-500"><i class="ph-fill ph-brain text-xl"></i></div>
+                    <div class="absolute left-[10%] bottom-[10%] bg-white p-1 rounded-full shadow-sm text-gray-500"><i class="ph-fill ph-rocket text-xl"></i></div>
+                    <div class="absolute left-[-20px] top-[45%] bg-white p-1 rounded-full shadow-sm text-gray-500"><i class="ph-fill ph-flask text-xl"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Макро-компонент для слайдов 14-20 (Измерения зрелости) -->
+    <!-- СЛАЙД 14: Стратегия (1/7) -->
+    <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-13">
+        <div class="content-z w-full max-w-5xl bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100 flex flex-col md:flex-row h-[80vh] md:h-auto max-h-[600px]">
+            <div class="w-full md:w-1/2 p-8 lg:p-12 bg-gray-50 flex flex-col justify-center">
+                <span class="text-purple-600 font-bold tracking-[0.2em] uppercase text-sm mb-2 block">Измерение 1 / 7</span>
+                <h2 class="text-3xl lg:text-4xl font-black text-gray-900 mb-6">Стратегия и управление</h2>
+                <ul class="space-y-4 text-gray-700 font-medium">
+                    <li class="flex items-start gap-3"><i class="ph-fill ph-check-circle text-purple-500 text-xl shrink-0 mt-0.5"></i> Понятная ИИ-стратегия</li>
+                    <li class="flex items-start gap-3"><i class="ph-fill ph-check-circle text-purple-500 text-xl shrink-0 mt-0.5"></i> Вовлеченность C-level</li>
+                    <li class="flex items-start gap-3"><i class="ph-fill ph-check-circle text-purple-500 text-xl shrink-0 mt-0.5"></i> Четкие KPI внедрения</li>
+                    <li class="flex items-start gap-3"><i class="ph-fill ph-check-circle text-purple-500 text-xl shrink-0 mt-0.5"></i> Структура управления (Center of Excellence)</li>
+                </ul>
+            </div>
+            <div class="w-full md:w-1/2 p-8 lg:p-12 flex flex-col justify-center items-center gradient-bg text-white text-center relative overflow-hidden">
+                <i class="ph-duotone ph-chess-knight text-[150px] opacity-20 absolute -right-10 -top-10"></i>
+                <div class="z-10 bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20">
+                    <p class="text-xl md:text-2xl font-bold leading-tight">
+                        ИИ-трансформация начинается не с технологий, а со <span class="text-yellow-300 font-black">стратегии.</span>
+                    </p>
+                </div>
+                <p class="mt-6 text-sm text-white/80 z-10">Без стратегии ИИ остается набором пилотов без масштаба.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 15: Люди (2/7) -->
+    <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-14">
+        <div class="content-z w-full max-w-5xl bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100 flex flex-col md:flex-row h-[80vh] md:h-auto max-h-[600px]">
+            <div class="w-full md:w-1/2 p-8 lg:p-12 bg-gray-50 flex flex-col justify-center">
+                <span class="text-orange-500 font-bold tracking-[0.2em] uppercase text-sm mb-2 block">Измерение 2 / 7</span>
+                <h2 class="text-3xl lg:text-4xl font-black text-gray-900 mb-6">Люди и культура</h2>
+                <ul class="space-y-4 text-gray-700 font-medium">
+                    <li class="flex items-start gap-3"><i class="ph-fill ph-check-circle text-orange-500 text-xl shrink-0 mt-0.5"></i> AI talent management</li>
+                    <li class="flex items-start gap-3"><i class="ph-fill ph-check-circle text-orange-500 text-xl shrink-0 mt-0.5"></i> Продуктивность ИИ-команд</li>
+                    <li class="flex items-start gap-3"><i class="ph-fill ph-check-circle text-orange-500 text-xl shrink-0 mt-0.5"></i> Культура: человек + ИИ</li>
+                    <li class="flex items-start gap-3"><i class="ph-fill ph-check-circle text-orange-500 text-xl shrink-0 mt-0.5"></i> Повсеместное обучение</li>
+                </ul>
+            </div>
+            <div class="w-full md:w-1/2 p-8 lg:p-12 flex flex-col justify-center items-center bg-gray-900 text-white text-center relative overflow-hidden">
+                <i class="ph-duotone ph-users text-[150px] text-orange-500 opacity-20 absolute -left-10 -bottom-10"></i>
+                <div class="z-10 bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10">
+                    <p class="text-xl md:text-2xl font-bold leading-tight">
+                        Зрелость — это когда сотрудники <span class="text-orange-400 font-black">не боятся ИИ</span>, а умеют с ним работать.
+                    </p>
+                </div>
+                <p class="mt-6 text-sm text-gray-400 z-10">AI-First компания строится на новой культуре мышления.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 16: Инфраструктура (3/7) -->
+    <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-15">
+        <div class="content-z w-full max-w-5xl bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100 flex flex-col md:flex-row h-[80vh] md:h-auto max-h-[600px]">
+            <div class="w-full md:w-1/2 p-8 lg:p-12 bg-gray-50 flex flex-col justify-center">
+                <span class="text-purple-600 font-bold tracking-[0.2em] uppercase text-sm mb-2 block">Измерение 3 / 7</span>
+                <h2 class="text-3xl lg:text-4xl font-black text-gray-900 mb-6">Инфраструктура</h2>
+                <ul class="space-y-4 text-gray-700 font-medium">
+                    <li class="flex items-start gap-3"><i class="ph-fill ph-check-circle text-purple-500 text-xl shrink-0 mt-0.5"></i> Готовность к AI-нагрузкам (GPU)</li>
+                    <li class="flex items-start gap-3"><i class="ph-fill ph-check-circle text-purple-500 text-xl shrink-0 mt-0.5"></i> Доступность для команд</li>
+                    <li class="flex items-start gap-3"><i class="ph-fill ph-check-circle text-purple-500 text-xl shrink-0 mt-0.5"></i> Инструменты разработки (Dev Tools)</li>
+                    <li class="flex items-start gap-3"><i class="ph-fill ph-check-circle text-purple-500 text-xl shrink-0 mt-0.5"></i> Инфобез и доступы</li>
+                </ul>
+            </div>
+            <div class="w-full md:w-1/2 p-8 lg:p-12 flex flex-col justify-center items-center bg-gray-100 border-l border-gray-200 text-center relative overflow-hidden">
+                <div class="w-full max-w-xs flex flex-col gap-2 mb-6">
+                    <div class="bg-white p-3 rounded-lg border border-gray-300 shadow-sm font-bold text-gray-600">Внедрение</div>
+                    <div class="bg-white p-3 rounded-lg border border-gray-300 shadow-sm font-bold text-gray-600">Модели</div>
+                    <div class="bg-white p-3 rounded-lg border border-gray-300 shadow-sm font-bold text-gray-600">Данные</div>
+                    <div class="bg-purple-100 p-3 rounded-lg border-2 border-purple-400 shadow-md font-black text-purple-700">Инфраструктура (Фундамент)</div>
+                </div>
+                <p class="text-sm text-gray-500 font-medium">Без фундамента ИИ не выходит в промышленную эксплуатацию.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 17: Данные (4/7) -->
+    <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-16">
+        <div class="content-z w-full max-w-5xl bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100 flex flex-col md:flex-row h-[80vh] md:h-auto max-h-[600px]">
+            <div class="w-full md:w-1/2 p-8 lg:p-12 bg-gray-50 flex flex-col justify-center">
+                <span class="text-orange-500 font-bold tracking-[0.2em] uppercase text-sm mb-2 block">Измерение 4 / 7</span>
+                <h2 class="text-3xl lg:text-4xl font-black text-gray-900 mb-6">Данные</h2>
+                <ul class="space-y-4 text-gray-700 font-medium">
+                    <li class="flex items-start gap-3"><i class="ph-fill ph-check-circle text-orange-500 text-xl shrink-0 mt-0.5"></i> Data Governance</li>
+                    <li class="flex items-start gap-3"><i class="ph-fill ph-check-circle text-orange-500 text-xl shrink-0 mt-0.5"></i> Единая платформа (DWH/Data Lake)</li>
+                    <li class="flex items-start gap-3"><i class="ph-fill ph-check-circle text-orange-500 text-xl shrink-0 mt-0.5"></i> Контроль качества данных</li>
+                    <li class="flex items-start gap-3"><i class="ph-fill ph-check-circle text-orange-500 text-xl shrink-0 mt-0.5"></i> Данные готовы для ML</li>
+                </ul>
+            </div>
+            <div class="w-full md:w-1/2 p-8 lg:p-12 flex flex-col justify-center items-center gradient-bg text-white text-center relative overflow-hidden">
+                 <i class="ph-duotone ph-database text-[150px] opacity-20 absolute -right-10 -top-10"></i>
+                <div class="flex items-center gap-2 mb-6 text-2xl font-bold">
+                    <i class="ph-bold ph-database"></i> <i class="ph-bold ph-arrow-right text-orange-300"></i> <i class="ph-bold ph-brain text-4xl transform scale-125"></i>
+                </div>
+                <div class="z-10 bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20">
+                    <p class="text-xl md:text-2xl font-bold leading-tight">
+                        Если ИИ — это мозг компании, то данные — ее <span class="text-orange-300 font-black">кровеносная система.</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 18: Модели (5/7) -->
+    <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-17">
+        <div class="content-z w-full max-w-5xl bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100 flex flex-col md:flex-row h-[80vh] md:h-auto max-h-[600px]">
+            <div class="w-full md:w-1/2 p-8 lg:p-12 bg-gray-50 flex flex-col justify-center">
+                <span class="text-purple-600 font-bold tracking-[0.2em] uppercase text-sm mb-2 block">Измерение 5 / 7</span>
+                <h2 class="text-3xl lg:text-4xl font-black text-gray-900 mb-6">Модели</h2>
+                <ul class="space-y-4 text-gray-700 font-medium">
+                    <li class="flex items-start gap-3"><i class="ph-fill ph-check-circle text-purple-500 text-xl shrink-0 mt-0.5"></i> Доля моделей в продакшене</li>
+                    <li class="flex items-start gap-3"><i class="ph-fill ph-check-circle text-purple-500 text-xl shrink-0 mt-0.5"></i> Time-to-market</li>
+                    <li class="flex items-start gap-3"><i class="ph-fill ph-check-circle text-purple-500 text-xl shrink-0 mt-0.5"></i> Системный мониторинг</li>
+                    <li class="flex items-start gap-3"><i class="ph-fill ph-check-circle text-purple-500 text-xl shrink-0 mt-0.5"></i> Инженерное качество (MLOps)</li>
+                </ul>
+            </div>
+            <div class="w-full md:w-1/2 p-8 lg:p-12 flex flex-col justify-center items-center bg-gray-900 text-white text-center relative overflow-hidden">
+                <div class="flex gap-4 mb-6 opacity-70">
+                    <div class="bg-gray-800 p-2 rounded text-xs">Experiment</div>
+                    <i class="ph-bold ph-arrow-right self-center"></i>
+                    <div class="bg-gray-800 p-2 rounded text-xs border border-purple-500">Deploy</div>
+                    <i class="ph-bold ph-arrow-right self-center"></i>
+                    <div class="bg-gray-800 p-2 rounded text-xs">Monitor</div>
+                </div>
+                <div class="z-10 bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10">
+                    <p class="text-lg md:text-xl font-bold leading-tight">
+                        Зрелость = <span class="text-purple-400 font-black">не количество экспериментов</span>, а количество надежных моделей в проде.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 19: Внедрение (6/7) -->
+    <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-18">
+        <div class="content-z w-full max-w-5xl bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100 flex flex-col md:flex-row h-[80vh] md:h-auto max-h-[600px]">
+            <div class="w-full md:w-1/2 p-8 lg:p-12 bg-gray-50 flex flex-col justify-center">
+                <span class="text-orange-500 font-bold tracking-[0.2em] uppercase text-sm mb-2 block">Измерение 6 / 7</span>
+                <h2 class="text-3xl lg:text-4xl font-black text-gray-900 mb-6">Внедрение</h2>
+                <ul class="space-y-4 text-gray-700 font-medium">
+                    <li class="flex items-start gap-3"><i class="ph-fill ph-check-circle text-orange-500 text-xl shrink-0 mt-0.5"></i> Доля процессов с ИИ</li>
+                    <li class="flex items-start gap-3"><i class="ph-fill ph-check-circle text-orange-500 text-xl shrink-0 mt-0.5"></i> Охват клиентских путей агентами</li>
+                    <li class="flex items-start gap-3"><i class="ph-fill ph-check-circle text-orange-500 text-xl shrink-0 mt-0.5"></i> Удовлетворенность сотрудников</li>
+                </ul>
+            </div>
+            <div class="w-full md:w-1/2 p-8 lg:p-12 flex flex-col justify-center items-center bg-orange-50 text-center relative overflow-hidden">
+                <div class="grid grid-cols-3 gap-2 w-full max-w-xs mb-6 opacity-80">
+                    <div class="h-8 bg-orange-200 rounded"></div>
+                    <div class="h-8 bg-orange-500 rounded"></div>
+                    <div class="h-8 bg-orange-300 rounded"></div>
+                    <div class="h-8 bg-orange-400 rounded"></div>
+                    <div class="h-8 bg-gray-200 rounded"></div>
+                    <div class="h-8 bg-orange-600 rounded"></div>
+                </div>
+                <div class="z-10 bg-white p-6 rounded-2xl shadow-md border border-orange-100">
+                    <p class="text-lg md:text-xl font-bold leading-tight text-gray-800">
+                        ИИ должен становиться <span class="text-orange-600 font-black">частью рабочего дня</span>, а не оставаться демонстрацией на пилоте.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 20: R&D (7/7) -->
+    <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-19">
+        <div class="content-z w-full max-w-5xl bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100 flex flex-col md:flex-row h-[80vh] md:h-auto max-h-[600px]">
+            <div class="w-full md:w-1/2 p-8 lg:p-12 bg-gray-50 flex flex-col justify-center">
+                <span class="text-purple-600 font-bold tracking-[0.2em] uppercase text-sm mb-2 block">Измерение 7 / 7</span>
+                <h2 class="text-3xl lg:text-4xl font-black text-gray-900 mb-6">Исследования (R&D)</h2>
+                <ul class="space-y-4 text-gray-700 font-medium">
+                    <li class="flex items-start gap-3"><i class="ph-fill ph-check-circle text-purple-500 text-xl shrink-0 mt-0.5"></i> Партнерства с ВУЗами</li>
+                    <li class="flex items-start gap-3"><i class="ph-fill ph-check-circle text-purple-500 text-xl shrink-0 mt-0.5"></i> Доля research-инициатив</li>
+                    <li class="flex items-start gap-3"><i class="ph-fill ph-check-circle text-purple-500 text-xl shrink-0 mt-0.5"></i> Применимость результатов в бизнесе</li>
+                </ul>
+            </div>
+            <div class="w-full md:w-1/2 p-8 lg:p-12 flex flex-col justify-center items-center gradient-bg text-white text-center relative overflow-hidden">
+                <div class="flex items-center gap-2 mb-6 opacity-80 text-sm font-bold bg-white/20 px-4 py-2 rounded-full">
+                    Research <i class="ph-bold ph-arrows-clockwise"></i> Product
+                </div>
+                <div class="z-10 bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20">
+                    <p class="text-lg md:text-xl font-bold leading-tight">
+                        R&D — это не абстрактная наука, а <span class="text-yellow-300 font-black">конкурентоспособность компании</span> завтра.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 21: Стратегия внедрения (SWOT) -->
+    <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-20">
+        <div class="content-z w-full max-w-6xl">
+            <h2 class="text-3xl md:text-5xl font-black mb-4 text-center text-gray-900">Разработка <span class="gradient-text">стратегии</span></h2>
+            <p class="text-center text-gray-600 font-bold mb-10 text-lg">Стратегия = понять, где вы сейчас, и куда ИИ должен вас привести.</p>
+
+            <div class="flex flex-col lg:flex-row gap-8 items-center justify-center">
+                <!-- SWOT Grid -->
+                <div class="grid grid-cols-2 gap-4 w-full max-w-2xl">
+                    <div class="bg-green-50 border border-green-200 p-5 rounded-xl">
+                        <h4 class="font-bold text-green-700 text-xl mb-2 flex items-center gap-2">S <span class="text-sm font-normal text-green-600">Strengths (Силы)</span></h4>
+                        <p class="text-xs text-gray-600">Наши уникальные данные, сильная IT-команда.</p>
+                    </div>
+                    <div class="bg-red-50 border border-red-200 p-5 rounded-xl">
+                        <h4 class="font-bold text-red-700 text-xl mb-2 flex items-center gap-2">W <span class="text-sm font-normal text-red-600">Weaknesses (Слабости)</span></h4>
+                        <p class="text-xs text-gray-600">Разрозненные системы, сопротивление сотрудников.</p>
+                    </div>
+                    <div class="bg-blue-50 border border-blue-200 p-5 rounded-xl">
+                        <h4 class="font-bold text-blue-700 text-xl mb-2 flex items-center gap-2">O <span class="text-sm font-normal text-blue-600">Opportunities (Возможности)</span></h4>
+                        <p class="text-xs text-gray-600">Новые LLM, доступные API, отставание конкурентов.</p>
+                    </div>
+                    <div class="bg-yellow-50 border border-yellow-200 p-5 rounded-xl">
+                        <h4 class="font-bold text-yellow-700 text-xl mb-2 flex items-center gap-2">T <span class="text-sm font-normal text-yellow-600">Threats (Угрозы)</span></h4>
+                        <p class="text-xs text-gray-600">Утечка данных, ошибки галлюцинаций, регуляторика.</p>
+                    </div>
+                </div>
+
+                <i class="ph-bold ph-arrow-right text-4xl text-purple-400 hidden lg:block"></i>
+                <i class="ph-bold ph-arrow-down text-4xl text-purple-400 lg:hidden my-4"></i>
+
+                <div class="gradient-bg p-[2px] rounded-2xl w-full max-w-sm">
+                    <div class="bg-white h-full p-6 rounded-[14px] flex flex-col items-center justify-center text-center shadow-inner">
+                        <i class="ph-fill ph-map-trifold text-4xl text-orange-500 mb-3"></i>
+                        <h3 class="font-black text-2xl text-gray-900 mb-2">Roadmap</h3>
+                        <p class="text-sm text-gray-600">Дорожная карта внедрения, основанная на реальности компании.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 22: Три уровня внедрения -->
+    <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-21">
+        <div class="content-z w-full max-w-6xl">
+            <h2 class="text-3xl md:text-5xl font-black mb-16 text-center text-gray-900">3 уровня <span class="gradient-text">внедрения</span> агентов</h2>
+            
+            <div class="flex flex-col gap-4 max-w-4xl mx-auto">
+                <!-- Ступень 1 -->
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex items-center gap-6 ml-0 w-[80%]">
+                    <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center font-black text-xl text-gray-400 shrink-0">1</div>
+                    <div>
+                        <h3 class="font-bold text-xl text-gray-900">ИИ-ассистенты</h3>
+                        <p class="text-sm text-gray-500 mt-1">10–20% улучшения отдельных задач (написать письмо, саммари).</p>
+                    </div>
+                </div>
+                
+                <!-- Ступень 2 -->
+                <div class="bg-purple-50 border border-purple-200 p-6 rounded-2xl shadow-md flex items-center gap-6 ml-[10%] w-[80%] relative z-10">
+                    <div class="w-12 h-12 bg-purple-200 rounded-full flex items-center justify-center font-black text-xl text-purple-600 shrink-0">2</div>
+                    <div>
+                        <h3 class="font-bold text-xl text-purple-900">Вертикальные ИИ-агенты</h3>
+                        <p class="text-sm text-purple-700 mt-1">40–60% роста продуктивности конкретной роли (агент-аналитик).</p>
+                    </div>
+                </div>
+                
+                <!-- Ступень 3 -->
+                <div class="gradient-bg p-1 rounded-2xl shadow-xl flex items-center gap-6 ml-[20%] w-[80%] transform scale-105 z-20">
+                    <div class="bg-white w-full h-full p-6 rounded-[14px] flex items-center gap-6">
+                        <div class="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center font-black text-2xl text-orange-500 shrink-0 shadow-inner">3</div>
+                        <div>
+                            <h3 class="font-black text-2xl text-gray-900">ИИ-процессы</h3>
+                            <p class="text-base font-medium text-gray-800 mt-1">Системный корпоративный интеллект. Агенты общаются между собой.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 23: Принципы построения ИИ-стратегии -->
+    <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-22">
+        <div class="content-z w-full max-w-6xl">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Принципы <span class="gradient-text">архитектуры ИИ</span></h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <div class="bg-white border-t-4 border-purple-500 p-6 rounded-b-2xl shadow-md text-center">
+                    <h3 class="font-bold text-lg text-gray-900 mb-3 bg-purple-50 py-1 rounded">Основные процессы</h3>
+                    <i class="ph-duotone ph-code text-4xl text-purple-500 mb-3"></i>
+                    <p class="text-sm text-gray-600">Выгодно <b>строить свои</b> ИИ-решения (конкурентное преимущество).</p>
+                </div>
+                
+                <div class="bg-white border-t-4 border-gray-400 p-6 rounded-b-2xl shadow-sm text-center">
+                    <h3 class="font-bold text-lg text-gray-900 mb-3 bg-gray-100 py-1 rounded">Поддерживающие</h3>
+                    <i class="ph-duotone ph-shopping-cart text-4xl text-gray-500 mb-3"></i>
+                    <p class="text-sm text-gray-600">Эффективнее использовать <b>готовые платформы</b> (SaaS) и API.</p>
+                </div>
+                
+                <div class="bg-white border-t-4 border-orange-500 p-6 rounded-b-2xl shadow-md text-center">
+                    <h3 class="font-bold text-lg text-gray-900 mb-3 bg-orange-50 py-1 rounded">Управленческие</h3>
+                    <i class="ph-duotone ph-user-gear text-4xl text-orange-500 mb-3"></i>
+                    <p class="text-sm text-gray-600">Подход <b>Human-in-the-loop</b> (человек принимает финальное решение).</p>
+                </div>
+            </div>
+
+            <div class="bg-gray-900 text-white rounded-3xl p-8 text-center max-w-4xl mx-auto shadow-2xl relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-orange-500/20"></div>
+                <h3 class="text-2xl md:text-3xl font-black relative z-10 leading-tight">
+                    Главный KPI ИИ-стратегии — не число агентов, а <br><span class="text-orange-400">изменение ключевых метрик бизнеса.</span>
+                </h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 24: Фреймворк AgentOps -->
+    <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-23">
+        <div class="content-z w-full max-w-6xl flex flex-col items-center">
+            <h2 class="text-3xl md:text-5xl font-black mb-4 text-center text-gray-900">Жизненный цикл <span class="gradient-text">AgentOps</span></h2>
+            <p class="text-gray-600 text-lg mb-12">Превращает ИИ из эксперимента в управляемую систему.</p>
+            
+            <div class="relative w-[320px] h-[320px] md:w-[450px] md:h-[450px] lg:w-[500px] lg:h-[500px]">
+                <!-- Центральный круг -->
+                <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-40 md:w-56 md:h-56 bg-white rounded-full border-[6px] border-purple-100 shadow-xl flex flex-col items-center justify-center text-center z-10 p-4">
+                    <i class="ph-fill ph-arrows-clockwise text-4xl text-purple-500 mb-2"></i>
+                    <span class="font-black text-sm md:text-base text-gray-800 leading-tight">Управляемый цикл<br>агента</span>
+                </div>
+
+                <!-- Элементы по кругу (CSS positioning) -->
+                <!-- 1 -->
+                <div class="absolute top-[5%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white border-2 border-orange-300 rounded-xl p-3 shadow-md w-40 text-center z-20 flex flex-col items-center justify-center">
+                    <div class="text-orange-500 mb-1"><i class="ph-fill ph-target text-3xl"></i></div>
+                    <span class="text-xs font-bold text-gray-800 leading-tight">1. Метрики и цели</span>
+                </div>
+                <!-- 2 -->
+                <div class="absolute top-[25%] left-[85%] transform -translate-x-1/2 -translate-y-1/2 bg-white border-2 border-purple-300 rounded-xl p-3 shadow-md w-40 text-center z-20 flex flex-col items-center justify-center">
+                    <div class="text-purple-500 mb-1"><i class="ph-fill ph-code text-3xl"></i></div>
+                    <span class="text-xs font-bold text-gray-800 leading-tight">2. Разработка</span>
+                </div>
+                <!-- 3 -->
+                <div class="absolute top-[75%] left-[85%] transform -translate-x-1/2 -translate-y-1/2 bg-white border-2 border-gray-300 rounded-xl p-3 shadow-md w-40 text-center z-20 flex flex-col items-center justify-center">
+                    <div class="text-gray-500 mb-1"><i class="ph-fill ph-plugs text-3xl"></i></div>
+                    <span class="text-xs font-bold text-gray-800 leading-tight">3. Интеграция & Разметка</span>
+                </div>
+                <!-- 4 -->
+                <div class="absolute top-[95%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white border-2 border-purple-300 rounded-xl p-3 shadow-md w-40 text-center z-20 flex flex-col items-center justify-center">
+                    <div class="text-purple-500 mb-1"><i class="ph-fill ph-brain text-3xl"></i></div>
+                    <span class="text-xs font-bold text-gray-800 leading-tight">4. Дообучение</span>
+                </div>
+                <!-- 5 -->
+                <div class="absolute top-[75%] left-[15%] transform -translate-x-1/2 -translate-y-1/2 bg-white border-2 border-orange-300 rounded-xl p-3 shadow-md w-40 text-center z-20 flex flex-col items-center justify-center">
+                    <div class="text-orange-500 mb-1"><i class="ph-fill ph-scales text-3xl"></i></div>
+                    <span class="text-xs font-bold text-gray-800 leading-tight">5. A/B тесты</span>
+                </div>
+                <!-- 6 -->
+                <div class="absolute top-[25%] left-[15%] transform -translate-x-1/2 -translate-y-1/2 bg-white border-2 border-gray-300 rounded-xl p-3 shadow-md w-40 text-center z-20 flex flex-col items-center justify-center">
+                    <div class="text-gray-500 mb-1"><i class="ph-fill ph-chart-line-up text-3xl"></i></div>
+                    <span class="text-xs font-bold text-gray-800 leading-tight">6. Поддержка & Мониторинг</span>
+                </div>
+
+                <!-- Соединительное кольцо -->
+                <svg class="absolute inset-0 w-full h-full" viewBox="0 0 500 500" style="z-index: 0;">
+                    <circle cx="250" cy="250" r="180" fill="none" stroke="#e5e7eb" stroke-width="4" stroke-dasharray="10 10"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 25: Метрики -->
+    <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-24">
+        <div class="content-z w-full max-w-6xl">
+            <h2 class="text-3xl md:text-5xl font-black mb-4 text-center text-gray-900">Метрики: <span class="gradient-text">Что измеряем?</span></h2>
+            <p class="text-center text-gray-600 mb-12">Нельзя управлять тем, что не измеряется.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+                <!-- Бизнесовые -->
+                <div class="bg-white border-2 border-purple-100 p-8 rounded-3xl shadow-lg relative">
+                    <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-purple-500 text-white p-3 rounded-xl shadow-md"><i class="ph-fill ph-briefcase text-2xl"></i></div>
+                    <h3 class="font-black text-2xl text-center text-gray-900 mb-6 mt-4">Бизнес-метрики</h3>
+                    <ul class="space-y-4 text-gray-700">
+                        <li class="flex items-center gap-3"><i class="ph-fill ph-check text-purple-500"></i> Cycle time (скорость процесса)</li>
+                        <li class="flex items-center gap-3"><i class="ph-fill ph-check text-purple-500"></i> % ошибок и возвратов</li>
+                        <li class="flex items-center gap-3"><i class="ph-fill ph-check text-purple-500"></i> ROI (возврат инвестиций)</li>
+                        <li class="flex items-center gap-3"><i class="ph-fill ph-check text-purple-500"></i> NPS / CSI (клиентский опыт)</li>
+                        <li class="flex items-center gap-3"><i class="ph-fill ph-check text-purple-500"></i> Производительность на 1 сотрудника</li>
+                    </ul>
+                </div>
+                
+                <!-- Технические -->
+                <div class="bg-white border-2 border-orange-100 p-8 rounded-3xl shadow-lg relative">
+                    <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-orange-500 text-white p-3 rounded-xl shadow-md"><i class="ph-fill ph-terminal text-2xl"></i></div>
+                    <h3 class="font-black text-2xl text-center text-gray-900 mb-6 mt-4">Технические</h3>
+                    <ul class="space-y-4 text-gray-700">
+                        <li class="flex items-center gap-3"><i class="ph-fill ph-check text-orange-500"></i> Precision / Recall / F1 (качество)</li>
+                        <li class="flex items-center gap-3"><i class="ph-fill ph-check text-orange-500"></i> Latency (скорость ответа)</li>
+                        <li class="flex items-center gap-3"><i class="ph-fill ph-check text-orange-500"></i> Стабильность (Uptime)</li>
+                        <li class="flex items-center gap-3"><i class="ph-fill ph-check text-orange-500"></i> Надежность под нагрузкой</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-center gap-6 max-w-2xl mx-auto bg-gray-50 border border-gray-200 p-4 rounded-2xl">
+                <div class="text-center">
+                    <span class="text-xs font-bold text-gray-400 uppercase">Сначала фиксируем</span>
+                    <p class="font-black text-xl text-gray-700">Baseline (Как есть)</p>
+                </div>
+                <i class="ph-bold ph-arrow-right text-3xl text-purple-400"></i>
+                <div class="text-center">
+                    <span class="text-xs font-bold text-gray-400 uppercase">Оцениваем эффект</span>
+                    <p class="font-black text-xl text-purple-600">Target (Как стало)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 26: Архитектура агента -->
+    <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-25">
+        <div class="content-z w-full max-w-6xl">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Анатомия <span class="gradient-text">ИИ-агента</span></h2>
+            
+            <div class="bg-white border border-gray-200 p-8 rounded-3xl shadow-xl flex flex-col md:flex-row items-stretch gap-6">
+                <!-- Input -->
+                <div class="w-full md:w-[20%] bg-gray-50 rounded-2xl p-4 border border-gray-100 flex flex-col items-center justify-center">
+                    <span class="text-xs font-bold text-gray-400 uppercase mb-4">Input</span>
+                    <div class="space-y-2 w-full">
+                        <div class="bg-white p-2 rounded text-sm text-center shadow-sm">Контекст (Prompt)</div>
+                        <div class="bg-white p-2 rounded text-sm text-center shadow-sm">Роль / Персона</div>
+                        <div class="bg-white p-2 rounded text-sm text-center shadow-sm">Интерфейсы</div>
+                    </div>
+                </div>
+                
+                <i class="ph-bold ph-arrow-right text-3xl text-gray-300 self-center hidden md:block"></i>
+                
+                <!-- Core -->
+                <div class="w-full md:w-[40%] gradient-bg rounded-2xl p-6 text-white flex flex-col items-center relative shadow-lg transform scale-105 z-10">
+                    <div class="absolute -top-3 bg-white text-purple-600 px-3 py-1 rounded-full text-xs font-bold uppercase border border-purple-200 shadow-sm">Reasoning Core</div>
+                    <i class="ph-fill ph-brain text-5xl mb-4"></i>
+                    <h3 class="font-black text-xl mb-4">LLM / Модель</h3>
+                    <div class="grid grid-cols-2 gap-2 w-full">
+                        <div class="bg-white/20 p-2 rounded text-xs text-center font-bold">Память (Short/Long)</div>
+                        <div class="bg-white/20 p-2 rounded text-xs text-center font-bold">Логика действий</div>
+                        <div class="bg-white/20 p-2 rounded text-xs text-center font-bold">Планирование</div>
+                        <div class="bg-white/20 p-2 rounded text-xs text-center font-bold">Границы (Safety)</div>
+                    </div>
+                </div>
+                
+                <i class="ph-bold ph-arrow-right text-3xl text-gray-300 self-center hidden md:block"></i>
+                
+                <!-- Output / Tools -->
+                <div class="w-full md:w-[30%] bg-gray-50 rounded-2xl p-4 border border-gray-100 flex flex-col items-center justify-center">
+                    <span class="text-xs font-bold text-gray-400 uppercase mb-4">Tools & Action</span>
+                    <div class="space-y-2 w-full">
+                        <div class="bg-white p-2 rounded text-sm text-center shadow-sm border-l-4 border-orange-400">Взаимодействие с API</div>
+                        <div class="bg-white p-2 rounded text-sm text-center shadow-sm border-l-4 border-purple-400">Вызов других агентов</div>
+                        <div class="bg-white p-2 rounded text-sm text-center shadow-sm border-l-4 border-gray-400">Логирование</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 text-center text-gray-600 font-medium">
+                Агент — это не просто текст промпта, а <b>целостная архитектура поведения</b>.
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 27: Интеграция и разметка -->
+    <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-26">
+        <div class="content-z w-full max-w-6xl">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Интеграция и <span class="gradient-text">Human-in-the-loop</span></h2>
+            
+            <div class="bg-white border border-gray-200 p-8 pb-16 rounded-3xl shadow-sm flex flex-col md:flex-row items-center justify-between gap-4 relative">
+                
+                <!-- Системы -->
+                <div class="flex flex-col items-center w-full md:w-1/4">
+                    <i class="ph-duotone ph-database text-4xl text-gray-400 mb-2"></i>
+                    <h4 class="font-bold text-gray-700 text-center mb-2">Корп. системы</h4>
+                    <div class="flex flex-wrap gap-2 justify-center text-xs text-gray-500">
+                        <span class="bg-gray-100 px-2 py-1 rounded">ERP</span>
+                        <span class="bg-gray-100 px-2 py-1 rounded">CRM</span>
+                        <span class="bg-gray-100 px-2 py-1 rounded">HRM</span>
+                    </div>
+                </div>
+                
+                <div class="flex flex-col items-center justify-center hidden md:flex"><i class="ph-bold ph-arrow-right text-purple-400"></i><span class="text-[10px] text-gray-400">Данные</span></div>
+                
+                <!-- Агент -->
+                <div class="bg-purple-50 border border-purple-200 p-4 rounded-2xl w-full md:w-1/4 flex flex-col items-center shadow-md relative">
+                    <div class="absolute -top-2 -right-2 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
+                    <i class="ph-fill ph-robot text-5xl text-purple-600 mb-2"></i>
+                    <h4 class="font-black text-gray-900 text-center">Агент</h4>
+                    <span class="text-[10px] text-purple-500 font-bold uppercase text-center mt-1">В реальном процессе</span>
+                </div>
+                
+                <div class="flex flex-col items-center justify-center hidden md:flex"><i class="ph-bold ph-arrow-right text-orange-400"></i><span class="text-[10px] text-gray-400">Результат</span></div>
+                
+                <!-- Оператор -->
+                <div class="bg-orange-50 border border-orange-200 p-4 rounded-2xl w-full md:w-1/4 flex flex-col items-center shadow-md z-10 relative">
+                    <i class="ph-fill ph-user-gear text-5xl text-orange-500 mb-2"></i>
+                    <h4 class="font-bold text-gray-900 text-center">Оператор ИИ</h4>
+                    <p class="text-[10px] text-gray-600 text-center mt-1">Разметка ошибок,<br>корректировка</p>
+                </div>
+                
+                <!-- Обратная связь (Стрелка от оператора к агенту) -->
+                <div class="hidden md:block absolute bottom-8 right-[15%] w-[35%] h-12 border-b-2 border-l-2 border-orange-400 border-dashed rounded-bl-xl z-0">
+                    <div class="absolute -left-[11px] -top-[12px] text-orange-500"><i class="ph-fill ph-caret-up text-2xl"></i></div>
+                    <div class="absolute -bottom-3 left-1/2 transform -translate-x-1/2 text-orange-500 font-bold text-xs whitespace-nowrap bg-white px-3 py-0.5 rounded border border-orange-100">Human Feedback (Размеченные данные)</div>
+                </div>
+            </div>
+
+            <div class="mt-12 text-center text-xl font-bold text-gray-800 bg-gray-50 py-4 rounded-xl relative z-10">
+                Это этап, на котором рождается <span class="text-purple-600">доверие</span> к агенту.
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 28: Дообучение -->
+    <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-27">
+        <div class="content-z w-full max-w-6xl flex flex-col items-center">
+            <h2 class="text-3xl md:text-5xl font-black mb-8 text-center text-gray-900">Дообучение <span class="gradient-text">(Fine-Tuning)</span></h2>
+            
+            <div class="bg-gray-900 text-white p-6 rounded-3xl max-w-2xl text-center mb-8 shadow-2xl">
+                <p class="text-lg md:text-2xl font-medium">
+                    От универсальной модели <i class="ph-bold ph-arrow-right text-orange-400 mx-2 align-middle"></i> к интеллекту, понимающему <b class="text-purple-400">вашу организацию</b>
+                </p>
+            </div>
+
+            <div class="relative w-[300px] h-[340px] md:w-[600px] md:h-[400px] flex justify-center items-center">
+                <!-- Cycle -->
+                <svg class="absolute inset-0 w-full h-full" viewBox="0 0 800 400" preserveAspectRatio="none">
+                    <path d="M 150 200 L 650 200" stroke="#e5e7eb" stroke-width="4" fill="none" stroke-dasharray="10 10"/>
+                    <path d="M 150 200 Q 400 0 650 200" stroke="#7c3aed" stroke-width="4" fill="none"/>
+                    <path d="M 650 200 Q 400 400 150 200" stroke="#f97316" stroke-width="4" fill="none"/>
+                    
+                    <polygon points="400,100 385,115 415,115" fill="#7c3aed" transform="rotate(90 400 100) translate(0 -10)"/>
+                    <polygon points="400,300 385,285 415,285" fill="#f97316" transform="rotate(-90 400 300) translate(0 10)"/>
+                </svg>
+
+                <div class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white border-2 border-gray-200 p-4 rounded-2xl text-center shadow-sm w-36 md:w-40 z-10">
+                    <i class="ph-fill ph-play-circle text-3xl text-gray-500 mb-2"></i>
+                    <h4 class="font-bold text-sm">Production</h4>
+                </div>
+                
+                <div class="absolute top-[25%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white border-2 border-purple-200 p-4 rounded-2xl text-center shadow-md w-36 md:w-40 z-20">
+                    <i class="ph-fill ph-list-checks text-3xl text-purple-500 mb-2"></i>
+                    <h4 class="font-bold text-sm text-purple-900">Labeled Data</h4>
+                    <p class="text-[10px] text-gray-500 mt-1">Ошибки и термины</p>
+                </div>
+
+                <div class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white border-2 border-orange-200 p-4 rounded-2xl text-center shadow-md w-36 md:w-40 z-10">
+                    <i class="ph-fill ph-brain text-3xl text-orange-500 mb-2"></i>
+                    <h4 class="font-bold text-sm text-orange-900">Better Model</h4>
+                    <p class="text-[10px] text-gray-500 mt-1">Адаптация под культуру</p>
+                </div>
+                
+                 <div class="absolute bottom-[25%] left-1/2 transform -translate-x-1/2 translate-y-1/2 bg-white border-2 border-gray-200 p-4 rounded-2xl text-center shadow-md w-36 md:w-40 z-20">
+                    <i class="ph-fill ph-gear text-3xl text-gray-500 mb-2"></i>
+                    <h4 class="font-bold text-sm">Fine-tuning</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 29: A/B тестирование -->
+    <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-28">
+        <div class="content-z w-full max-w-6xl">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Валидация: <span class="gradient-text">A/B тесты</span></h2>
+            
+            <div class="flex flex-col md:flex-row gap-8 mb-10 items-center">
+                <!-- Control -->
+                <div class="bg-gray-50 border border-gray-200 p-8 rounded-3xl w-full md:w-[45%] shadow-inner relative opacity-70">
+                    <h3 class="font-black text-2xl text-gray-600 mb-6 text-center">Контрольная (Без ИИ)</h3>
+                    <div class="space-y-4 text-sm font-medium text-gray-500">
+                        <div class="flex justify-between items-center border-b pb-2"><span>Скорость ответа:</span> <span class="text-gray-900">2 часа</span></div>
+                        <div class="flex justify-between items-center border-b pb-2"><span>Кол-во ошибок:</span> <span class="text-gray-900">5%</span></div>
+                        <div class="flex justify-between items-center border-b pb-2"><span>Удовлетворенность:</span> <span class="text-gray-900">4.2/5</span></div>
+                        <div class="flex justify-between items-center"><span>Нагрузка на людей:</span> <span class="text-gray-900">Высокая</span></div>
+                    </div>
+                </div>
+                
+                <div class="w-[10%] flex justify-center text-4xl font-black text-gray-300">VS</div>
+                
+                <!-- Experiment -->
+                <div class="bg-white border-2 border-purple-400 p-8 rounded-3xl w-full md:w-[45%] shadow-xl relative transform scale-105">
+                    <div class="absolute -top-4 -right-4 bg-orange-500 text-white px-4 py-1 rounded-full text-xs font-bold uppercase shadow-lg transform rotate-12">Эксперимент</div>
+                    <h3 class="font-black text-2xl text-purple-700 mb-6 text-center">Тестовая (С ИИ-агентом)</h3>
+                    <div class="space-y-4 text-sm font-bold text-gray-800">
+                        <div class="flex justify-between items-center border-b border-purple-100 pb-2"><span>Скорость ответа:</span> <span class="text-green-500">2 мин <i class="ph-bold ph-arrow-down ml-1"></i></span></div>
+                        <div class="flex justify-between items-center border-b border-purple-100 pb-2"><span>Кол-во ошибок:</span> <span class="text-green-500">2% <i class="ph-bold ph-arrow-down ml-1"></i></span></div>
+                        <div class="flex justify-between items-center border-b border-purple-100 pb-2"><span>Удовлетворенность:</span> <span class="text-green-500">4.7/5 <i class="ph-bold ph-arrow-up ml-1"></i></span></div>
+                        <div class="flex justify-between items-center"><span>Нагрузка на людей:</span> <span class="text-green-500">Снижена</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center text-lg text-gray-600 bg-orange-50 border border-orange-200 p-4 rounded-xl inline-block mx-auto">
+                Успех = улучшает хотя бы один параметр <b class="text-gray-900">без деградации остальных</b>.
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 30: Мониторинг (Dashboard) -->
+    <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-29">
+        <div class="content-z w-full max-w-6xl">
+            <h2 class="text-3xl md:text-5xl font-black mb-8 text-center text-gray-900">Поддержка: <span class="gradient-text">Командный центр</span></h2>
+            
+            <div class="bg-gray-900 p-6 rounded-3xl shadow-2xl border-4 border-gray-800">
+                <!-- Header Dash -->
+                <div class="flex justify-between items-center border-b border-gray-700 pb-4 mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-3 h-3 bg-green-500 rounded-full shadow-[0_0_10px_#22c55e] animate-pulse"></div>
+                        <span class="text-white font-bold tracking-widest uppercase text-sm">AgentOps Production</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="bg-gray-800 text-gray-300 px-3 py-1 rounded text-xs font-bold">Uptime: 99.9%</span>
+                        <span class="bg-gray-800 text-gray-300 px-3 py-1 rounded text-xs font-bold">SLA: Met</span>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-4 gap-4 mb-4">
+                    <div class="bg-gray-800 p-4 rounded-xl border border-gray-700">
+                        <span class="text-gray-400 text-xs font-bold uppercase block mb-1">Total Requests</span>
+                        <span class="text-white text-2xl font-black">14,205</span>
+                        <span class="text-green-400 text-xs ml-2"><i class="ph-bold ph-arrow-up"></i> 12%</span>
+                    </div>
+                    <div class="bg-gray-800 p-4 rounded-xl border border-gray-700">
+                        <span class="text-gray-400 text-xs font-bold uppercase block mb-1">Avg Latency</span>
+                        <span class="text-orange-400 text-2xl font-black">1.4s</span>
+                    </div>
+                    <div class="bg-gray-800 p-4 rounded-xl border border-gray-700">
+                        <span class="text-gray-400 text-xs font-bold uppercase block mb-1">Success Rate</span>
+                        <span class="text-green-400 text-2xl font-black">98.2%</span>
+                    </div>
+                    <div class="bg-purple-900/50 p-4 rounded-xl border border-purple-500">
+                        <span class="text-purple-300 text-xs font-bold uppercase block mb-1">Est. ROI (Daily)</span>
+                        <span class="text-white text-2xl font-black">+$4,500</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4 h-40">
+                    <div class="col-span-2 bg-gray-800 rounded-xl border border-gray-700 p-4 flex flex-col justify-end relative overflow-hidden">
+                        <span class="text-gray-400 text-xs font-bold uppercase absolute top-4 left-4">Load Trend</span>
+                        <!-- Fake graph -->
+                        <div class="flex items-end gap-1 h-2/3 opacity-50">
+                            <div class="w-full bg-blue-500 rounded-t h-[40%]"></div>
+                            <div class="w-full bg-blue-500 rounded-t h-[50%]"></div>
+                            <div class="w-full bg-blue-500 rounded-t h-[30%]"></div>
+                            <div class="w-full bg-blue-500 rounded-t h-[70%]"></div>
+                            <div class="w-full bg-blue-500 rounded-t h-[60%]"></div>
+                            <div class="w-full bg-purple-500 rounded-t h-[90%]"></div>
+                            <div class="w-full bg-blue-500 rounded-t h-[50%]"></div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-800 rounded-xl border border-gray-700 p-4 overflow-hidden">
+                        <span class="text-gray-400 text-xs font-bold uppercase block mb-2">Recent Incidents</span>
+                        <ul class="text-xs space-y-2">
+                            <li class="flex gap-2 text-gray-300"><span class="text-red-500">●</span> API Timeout (CRM)</li>
+                            <li class="flex gap-2 text-gray-300"><span class="text-yellow-500">●</span> High latency detected</li>
+                            <li class="flex gap-2 text-gray-300"><span class="text-green-500">●</span> Model update deployed</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+             <p class="text-center text-gray-500 mt-6 font-medium">Агент — часть корпоративной ИТ-инфраструктуры. <b class="text-gray-900">AI Governance, доступы, инциденты.</b></p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 31: Стек технологий -->
+    <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-30">
+        <div class="content-z w-full max-w-6xl">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Инфраструктура <span class="gradient-text">AI-First</span></h2>
+            
+            <div class="flex flex-col gap-3 max-w-3xl mx-auto items-center">
+                <!-- Слой 6 -->
+                <div class="w-[70%] bg-gray-800 text-white p-3 rounded-lg text-center shadow-lg transform -translate-y-4">
+                    <h4 class="font-bold text-sm uppercase tracking-wide">6. Дашборды (AgentOps)</h4>
+                    <p class="text-xs text-gray-400">Grafana, Prometheus, Power BI</p>
+                </div>
+                <!-- Слой 5 -->
+                <div class="w-[80%] bg-purple-600 text-white p-3 rounded-lg text-center shadow-lg transform -translate-y-2 z-10">
+                    <h4 class="font-bold text-sm uppercase tracking-wide">5. Оркестрация (A2A)</h4>
+                    <p class="text-xs text-purple-200">Мультиагентность, роутинг задач</p>
+                </div>
+                <!-- Слой 4 -->
+                <div class="w-[90%] bg-orange-500 text-white p-3 rounded-lg text-center shadow-lg z-20">
+                    <h4 class="font-bold text-sm uppercase tracking-wide">4. Интеграция (MCP)</h4>
+                    <p class="text-xs text-orange-200">Управляемое действие через API инструменты</p>
+                </div>
+                <!-- Слой 3 -->
+                <div class="w-[90%] bg-white border border-gray-300 p-3 rounded-lg text-center shadow-md z-30">
+                    <h4 class="font-bold text-sm text-gray-800 uppercase tracking-wide">3. Память (RAG)</h4>
+                    <p class="text-xs text-gray-500">Vector DB, Graph DB, SQL</p>
+                </div>
+                <!-- Слой 2 -->
+                <div class="w-[100%] bg-gray-100 border border-gray-300 p-3 rounded-lg text-center shadow-sm z-40">
+                    <h4 class="font-bold text-sm text-gray-800 uppercase tracking-wide">2. Фреймворки</h4>
+                    <p class="text-xs text-gray-500">LangChain, LangGraph, n8n</p>
+                </div>
+                <!-- Слой 1 -->
+                <div class="w-[100%] gradient-bg p-[2px] rounded-lg shadow-sm z-50">
+                    <div class="bg-white p-3 rounded-md text-center">
+                        <h4 class="font-black text-sm text-gray-900 uppercase tracking-wide">1. Фундамент (Модели)</h4>
+                        <p class="text-xs text-gray-600">LLM, MLLM (OpenAI, Anthropic, Open-source)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 32: Ключевые роли -->
+    <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-31">
+        <div class="content-z w-full max-w-6xl">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Новые роли: <span class="gradient-text">Центр ИИ-компетенций</span></h2>
+            
+            <div class="flex flex-col items-center">
+                <!-- Top Level -->
+                <div class="bg-gray-900 text-white p-4 rounded-xl shadow-lg w-64 text-center z-10 relative">
+                    <h3 class="font-black text-lg text-orange-400 mb-1">Chief AI Officer (CAIO)</h3>
+                    <p class="text-xs text-gray-300">Стратегия и AI Governance</p>
+                    <div class="absolute -bottom-6 left-1/2 w-0.5 h-6 bg-gray-300"></div>
+                </div>
+                
+                <div class="w-full max-w-4xl h-0.5 bg-gray-300 mt-6 relative">
+                    <div class="absolute top-0 left-[12.5%] w-0.5 h-6 bg-gray-300"></div>
+                    <div class="absolute top-0 left-[37.5%] w-0.5 h-6 bg-gray-300"></div>
+                    <div class="absolute top-0 left-[62.5%] w-0.5 h-6 bg-gray-300"></div>
+                    <div class="absolute top-0 left-[87.5%] w-0.5 h-6 bg-gray-300"></div>
+                </div>
+                
+                <!-- Second Level -->
+                <div class="flex justify-between w-full max-w-4xl mt-6 gap-4">
+                    <div class="bg-white border-t-4 border-purple-500 p-4 rounded-b-xl shadow-sm text-center flex-1">
+                        <h4 class="font-bold text-gray-900 text-sm mb-1">AI Product Manager</h4>
+                        <p class="text-[10px] text-gray-500">Продукт и поиск Value</p>
+                    </div>
+                    <div class="bg-white border-t-4 border-purple-400 p-4 rounded-b-xl shadow-sm text-center flex-1">
+                        <h4 class="font-bold text-gray-900 text-sm mb-1">ИИ-консультант</h4>
+                        <p class="text-[10px] text-gray-500">Диагностика процессов</p>
+                    </div>
+                    <div class="bg-white border-t-4 border-orange-400 p-4 rounded-b-xl shadow-sm text-center flex-1">
+                        <h4 class="font-bold text-gray-900 text-sm mb-1">AI Automation Eng.</h4>
+                        <p class="text-[10px] text-gray-500">Процессы и интеграция</p>
+                    </div>
+                    <div class="bg-white border-t-4 border-orange-500 p-4 rounded-b-xl shadow-sm text-center flex-1">
+                        <h4 class="font-bold text-gray-900 text-sm mb-1">ИИ-инженер</h4>
+                        <p class="text-[10px] text-gray-500">Модели и инфраструктура</p>
+                    </div>
+                </div>
+
+                <!-- Bottom Level (Operators) -->
+                <div class="mt-8 bg-gray-50 border border-gray-200 p-4 rounded-xl text-center w-full max-w-lg shadow-sm">
+                    <i class="ph-duotone ph-users-three text-2xl text-gray-400 mb-1"></i>
+                    <h4 class="font-bold text-gray-700 text-sm">Операторы ИИ-систем</h4>
+                    <p class="text-[11px] text-gray-500 mt-1">Эксплуатация, сбор feedback, разметка данных для обучения.</p>
+                </div>
+            </div>
+            
+            <div class="mt-8 text-center">
+                <p class="text-xl font-bold text-gray-800">
+                    AI-First компания строится вокруг <span class="gradient-text">Центра ИИ-компетенций (CoE).</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 33: Заключение -->
+    <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-32">
+        <div class="content-z w-full max-w-5xl text-center bg-white p-12 rounded-3xl border border-gray-200 shadow-2xl relative overflow-hidden">
+            
+            <h2 class="text-4xl md:text-6xl font-black mb-10 tracking-tight leading-tight text-gray-900">
+                Новая форма <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-orange-500">бизнеса</span>
+            </h2>
+            
+            <div class="space-y-6 text-lg md:text-2xl text-gray-700 font-medium mb-12 text-left max-w-3xl mx-auto relative z-10">
+                <p class="flex gap-4 items-start">
+                    <i class="ph-fill ph-check-circle text-purple-500 text-2xl mt-1 shrink-0"></i> 
+                    <span>ИИ-агенты — это <b class="text-gray-900">новый слой</b> операционной модели.</span>
+                </p>
+                <p class="flex gap-4 items-start">
+                    <i class="ph-fill ph-check-circle text-orange-500 text-2xl mt-1 shrink-0"></i> 
+                    <span>AI-First требует стратегии, зрелости процессов и <b class="text-gray-900">AgentOps</b>.</span>
+                </p>
+                <p class="flex gap-4 items-start">
+                    <i class="ph-fill ph-check-circle text-purple-500 text-2xl mt-1 shrink-0"></i> 
+                    <span>Роль человека меняется: от исполнителя к <b class="text-gray-900">архитектору интеллектуальной системы</b>.</span>
+                </p>
+            </div>
+            
+            <div class="bg-gray-50 border border-gray-200 p-8 rounded-2xl shadow-sm relative z-10">
+                <p class="text-2xl md:text-3xl font-black text-gray-900 leading-snug">
+                    Ваша задача — научиться видеть компанию как <span class="text-orange-500">сеть процессов</span> и строить вокруг нее новый <span class="text-purple-600">интеллектуальный контур.</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const totalSlides = 33; // Обновленное количество слайдов
+            let currentSlide = 0;
+            const progressBar = document.getElementById('progress-bar');
+
+            function updateSlides() {
+                for (let i = 0; i < totalSlides; i++) {
+                    const slide = document.getElementById(`slide-${i}`);
+                    if (!slide) continue;
+
+                    if (i === currentSlide) {
+                        slide.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-8', '-translate-y-8');
+                        slide.classList.add('opacity-100', 'translate-y-0');
+                    } else if (i < currentSlide) {
+                        slide.classList.remove('opacity-100', 'translate-y-0', 'translate-y-8');
+                        slide.classList.add('opacity-0', 'pointer-events-none', '-translate-y-8');
+                    } else {
+                        slide.classList.remove('opacity-100', 'translate-y-0', '-translate-y-8');
+                        slide.classList.add('opacity-0', 'pointer-events-none', 'translate-y-8');
+                    }
+                }
+
+                if (progressBar) {
+                    const progress = ((currentSlide + 1) / totalSlides) * 100;
+                    progressBar.style.width = `${progress}%`;
+                }
+            }
+
+            function nextSlide() {
+                if (currentSlide < totalSlides - 1) {
+                    currentSlide++;
+                    updateSlides();
+                }
+            }
+
+            function prevSlide() {
+                if (currentSlide > 0) {
+                    currentSlide--;
+                    updateSlides();
+                }
+            }
+
+            // Клавиатура
+            window.addEventListener('keydown', (e) => {
+                if (['ArrowRight', ' ', 'Enter', 'PageDown'].includes(e.key)) {
+                    nextSlide();
+                } else if (['ArrowLeft', 'PageUp', 'Backspace'].includes(e.key)) {
+                    prevSlide();
+                }
+            });
+
+            // Клик мышью
+            window.addEventListener('mousedown', (e) => {
+                if (e.button === 0) nextSlide(); // ЛКМ = Вперед
+                if (e.button === 2) prevSlide(); // ПКМ = Назад
+            });
+            window.addEventListener('contextmenu', e => e.preventDefault());
+
+            // Свайпы для мобильных
+            let touchStartX = 0;
+            window.addEventListener('touchstart', e => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, {passive: true});
+
+            window.addEventListener('touchend', e => {
+                let touchEndX = e.changedTouches[0].screenX;
+                const swipeThreshold = 50;
+                if (touchStartX - touchEndX > swipeThreshold) {
+                    nextSlide(); 
+                } else if (touchEndX - touchStartX > swipeThreshold) {
+                    prevSlide(); 
+                }
+            }, {passive: true});
+
+            // Инициализация
+            updateSlides();
+        });
+    </script>
+</body>
+</html>
