@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AI-Agents: Трансформация бизнеса</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            purple: '#7c3aed',
+                            orange: '#f97316',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            user-select: none;
+            overflow: hidden;
+            background-color: #fcfcfd;
+            margin: 0;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .slide-container {
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .slide-container::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .slide-container {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .content-z {
+            position: relative;
+            z-index: 10;
+            margin: auto;
+            width: 100%;
+            padding: 1.5rem 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .content-z {
+                padding: 2rem 2rem;
+            }
+        }
+
+        .gradient-text {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-image: linear-gradient(to right, #7c3aed, #f97316);
+        }
+
+        .gradient-bg {
+            background-image: linear-gradient(135deg, #7c3aed, #f97316);
+        }
+
+        .bg-glow-1 {
+            position: fixed;
+            top: -20%;
+            left: -10%;
+            width: 80vw;
+            height: 80vw;
+            max-width: 800px;
+            max-height: 800px;
+            background: radial-gradient(circle, rgba(124,58,237,0.06) 0%, rgba(255,255,255,0) 70%);
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        .bg-glow-2 {
+            position: fixed;
+            bottom: -20%;
+            right: -10%;
+            width: 60vw;
+            height: 60vw;
+            max-width: 600px;
+            max-height: 600px;
+            background: radial-gradient(circle, rgba(249,115,22,0.06) 0%, rgba(255,255,255,0) 70%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Анимации для сети на 1 слайде */
+        .node-network {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            z-index: -1;
+            opacity: 0.5;
+        }
+        
+        .node {
+            position: absolute;
+            background: linear-gradient(135deg, #7c3aed, #f97316);
+            border-radius: 50%;
+            animation: float 6s infinite ease-in-out alternate;
+        }
+        
+        .line {
+            position: absolute;
+            background: linear-gradient(to right, rgba(124,58,237,0.25), rgba(249,115,22,0.25));
+            height: 2px;
+            transform-origin: 0 0;
+            animation: pulse-line 4s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) scale(1); opacity: 0.5; }
+            100% { transform: translateY(-20px) scale(1.2); opacity: 1; }
+        }
+
+        @keyframes pulse-line {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 0.8; box-shadow: 0 0 8px rgba(124,58,237,0.4); }
+        }
+
+        /* Hover Cards Config */
+        .tooltip-card {
+            visibility: hidden;
+            opacity: 0;
+            transform: translateY(10px) scale(0.98);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+        
+        .group:hover .tooltip-card {
+            visibility: visible;
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        /* Pipeline columns */
+        .flow-col {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(124, 58, 237, 0.15);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Safe Tooltip Positioning */
+        .tt-top { bottom: calc(100% + 10px); left: 50%; transform: translateX(-50%) translateY(10px) scale(0.98); }
+        .group:hover .tt-top { transform: translateX(-50%) translateY(0) scale(1); }
+        
+        .tt-bottom { top: calc(100% + 10px); left: 50%; transform: translateX(-50%) translateY(-10px) scale(0.98); }
+        .group:hover .tt-bottom { transform: translateX(-50%) translateY(0) scale(1); }
+
+        .tt-right { left: calc(100% + 10px); top: 50%; transform: translateY(-50%) translateX(-10px) scale(0.98); }
+        .group:hover .tt-right { transform: translateY(-50%) translateX(0) scale(1); }
+
+        .tt-left { right: calc(100% + 10px); top: 50%; transform: translateY(-50%) translateX(10px) scale(0.98); }
+        .group:hover .tt-left { transform: translateY(-50%) translateX(0) scale(1); }
+    </style>
+</head>
+<body class="text-gray-900 font-sans">
+
+    <!-- Декоративный фон -->
+    <div class="bg-glow-1"></div>
+    <div class="bg-glow-2"></div>
+
+    <!-- Индикатор прогресса -->
+    <div class="absolute bottom-0 left-0 h-1.5 bg-gray-100 w-full z-50">
+        <div id="progress-bar" class="h-full gradient-bg w-0 transition-all duration-300"></div>
+    </div>
+
+    <!-- Controls UI -->
+    <div class="absolute bottom-4 right-4 z-50 flex gap-2 opacity-50 hover:opacity-100 transition-opacity">
+        <button onclick="prevSlide()" class="p-2 bg-white rounded-full shadow-md border hover:bg-gray-50"><i class="ph-bold ph-caret-left"></i></button>
+        <button onclick="nextSlide()" class="p-2 bg-white rounded-full shadow-md border hover:bg-gray-50"><i class="ph-bold ph-caret-right"></i></button>
+    </div>
+
+    <!-- СЛАЙД 1: Title -->
+    <div class="slide-container opacity-100 translate-y-0" id="slide-0">
+        <div class="node-network">
+            <div class="node" style="width:8px; height:8px; top:20%; left:30%; animation-delay: 0s;"></div>
+            <div class="node" style="width:12px; height:12px; top:60%; left:20%; animation-delay: 1s;"></div>
+            <div class="node" style="width:10px; height:10px; top:40%; left:70%; animation-delay: 2s;"></div>
+            <div class="node" style="width:15px; height:15px; top:70%; left:80%; animation-delay: 0.5s;"></div>
+            <div class="node" style="width:6px; height:6px; top:30%; left:50%; animation-delay: 1.5s;"></div>
+            <div class="line" style="top:20%; left:30%; width: 300px; transform: rotate(15deg); animation-delay: 0s;"></div>
+            <div class="line" style="top:60%; left:20%; width: 400px; transform: rotate(-25deg); animation-delay: 1s;"></div>
+            <div class="line" style="top:40%; left:70%; width: 200px; transform: rotate(75deg); animation-delay: 0.5s;"></div>
+        </div>
+
+        <div class="content-z text-center w-full max-w-6xl px-4 flex flex-col items-center justify-center h-full">
+            <div class="bg-gradient-to-r from-purple-50 to-orange-50 border border-purple-100 rounded-2xl p-4 md:p-6 max-w-3xl w-full shadow-lg mb-8 md:mb-12 backdrop-blur-sm">
+                <p class="text-purple-600 font-bold uppercase tracking-widest text-xs md:text-sm mb-2 flex items-center justify-center gap-2">
+                    <i class="ph-fill ph-book-open"></i> Семинар 1 - Разбор кейсов
+                </p>
+                <h2 class="text-sm md:text-lg font-medium text-gray-700 leading-relaxed">
+                    ИИ—агенты сегодня образуют полноценную операционную систему бизнеса
+                </h2>
+            </div>
+
+            <h1 class="text-4xl md:text-7xl lg:text-[80px] font-black mb-6 leading-tight tracking-tight text-gray-900 drop-shadow-sm">
+                Автоматизация бизнес-процессов<br/>
+                <span class="gradient-text">с ИИ-агентами</span>
+            </h1>
+            <p class="text-base md:text-2xl text-gray-600 mb-10 max-w-3xl mx-auto font-medium">Как ИИ-агенты трансформируют 10 главных функций компании и создают измеримый бизнес-результат</p>
+
+        </div>
+    </div>
+
+    <!-- СЛАЙД 2: 10 функций -->
+    <div class="slide-container opacity-0 pointer-events-none translate-y-8" id="slide-1">
+        <div class="content-z w-full max-w-6xl mx-auto flex flex-col justify-center h-full">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl md:text-5xl font-black mb-3 text-gray-900">Карта трансформации: <span class="gradient-text">10 модулей</span></h2>
+                <p class="text-gray-500 font-medium">Навигационный хаб. Кликните на блок для перехода к детальному пайплайну внедрения HIP.</p>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-5 px-4">
+                <button onclick="goToSlide(2)" class="group bg-white border border-gray-200 p-4 md:p-6 rounded-2xl md:rounded-3xl hover:border-purple-500 hover:shadow-xl transition-all text-center flex flex-col items-center justify-center h-32 md:h-40 relative overflow-hidden">
+                    <i class="ph-duotone ph-briefcase text-4xl md:text-5xl text-gray-400 group-hover:text-purple-500 transition-all transform group-hover:-translate-y-3"></i>
+                    <h3 class="font-bold text-sm md:text-base text-gray-800 group-hover:-translate-y-3 transition-transform mt-2">Менеджмент</h3>
+                    <div class="absolute bottom-0 w-full p-2 bg-gradient-to-t from-purple-50 to-white translate-y-full group-hover:translate-y-0 transition-transform">
+                        <p class="text-[10px] md:text-xs text-purple-700 font-semibold">От пожаров к ОС</p>
+                    </div>
+                </button>
+                <button onclick="goToSlide(3)" class="group bg-white border border-gray-200 p-4 md:p-6 rounded-2xl md:rounded-3xl hover:border-orange-500 hover:shadow-xl transition-all text-center flex flex-col items-center justify-center h-32 md:h-40 relative overflow-hidden">
+                    <i class="ph-duotone ph-users-three text-4xl md:text-5xl text-gray-400 group-hover:text-orange-500 transition-all transform group-hover:-translate-y-3"></i>
+                    <h3 class="font-bold text-sm md:text-base text-gray-800 group-hover:-translate-y-3 transition-transform mt-2">HR</h3>
+                    <div class="absolute bottom-0 w-full p-2 bg-gradient-to-t from-orange-50 to-white translate-y-full group-hover:translate-y-0 transition-transform">
+                        <p class="text-[10px] md:text-xs text-orange-700 font-semibold">Система талантов</p>
+                    </div>
+                </button>
+                <button onclick="goToSlide(4)" class="group bg-white border border-gray-200 p-4 md:p-6 rounded-2xl md:rounded-3xl hover:border-purple-500 hover:shadow-xl transition-all text-center flex flex-col items-center justify-center h-32 md:h-40 relative overflow-hidden">
+                    <i class="ph-duotone ph-megaphone text-4xl md:text-5xl text-gray-400 group-hover:text-purple-500 transition-all transform group-hover:-translate-y-3"></i>
+                    <h3 class="font-bold text-sm md:text-base text-gray-800 group-hover:-translate-y-3 transition-transform mt-2">Маркетинг</h3>
+                    <div class="absolute bottom-0 w-full p-2 bg-gradient-to-t from-purple-50 to-white translate-y-full group-hover:translate-y-0 transition-transform">
+                        <p class="text-[10px] md:text-xs text-purple-700 font-semibold">Понимание рынка</p>
+                    </div>
+                </button>
+                <button onclick="goToSlide(5)" class="group bg-white border border-gray-200 p-4 md:p-6 rounded-2xl md:rounded-3xl hover:border-orange-500 hover:shadow-xl transition-all text-center flex flex-col items-center justify-center h-32 md:h-40 relative overflow-hidden">
+                    <i class="ph-duotone ph-share-network text-4xl md:text-5xl text-gray-400 group-hover:text-orange-500 transition-all transform group-hover:-translate-y-3"></i>
+                    <h3 class="font-bold text-sm md:text-base text-gray-800 group-hover:-translate-y-3 transition-transform mt-2">SMM</h3>
+                    <div class="absolute bottom-0 w-full p-2 bg-gradient-to-t from-orange-50 to-white translate-y-full group-hover:translate-y-0 transition-transform">
+                        <p class="text-[10px] md:text-xs text-orange-700 font-semibold">Рост внимания</p>
+                    </div>
+                </button>
+                <button onclick="goToSlide(6)" class="group bg-white border border-gray-200 p-4 md:p-6 rounded-2xl md:rounded-3xl hover:border-purple-500 hover:shadow-xl transition-all text-center flex flex-col items-center justify-center h-32 md:h-40 relative overflow-hidden">
+                    <i class="ph-duotone ph-currency-dollar text-4xl md:text-5xl text-gray-400 group-hover:text-purple-500 transition-all transform group-hover:-translate-y-3"></i>
+                    <h3 class="font-bold text-sm md:text-base text-gray-800 group-hover:-translate-y-3 transition-transform mt-2">Продажи</h3>
+                    <div class="absolute bottom-0 w-full p-2 bg-gradient-to-t from-purple-50 to-white translate-y-full group-hover:translate-y-0 transition-transform">
+                        <p class="text-[10px] md:text-xs text-purple-700 font-semibold">Конверсия на стыках</p>
+                    </div>
+                </button>
+                <button onclick="goToSlide(7)" class="group bg-white border border-gray-200 p-4 md:p-6 rounded-2xl md:rounded-3xl hover:border-orange-500 hover:shadow-xl transition-all text-center flex flex-col items-center justify-center h-32 md:h-40 relative overflow-hidden">
+                    <i class="ph-duotone ph-headset text-4xl md:text-5xl text-gray-400 group-hover:text-orange-500 transition-all transform group-hover:-translate-y-3"></i>
+                    <h3 class="font-bold text-sm md:text-base text-gray-800 group-hover:-translate-y-3 transition-transform mt-2">Поддержка</h3>
+                    <div class="absolute bottom-0 w-full p-2 bg-gradient-to-t from-orange-50 to-white translate-y-full group-hover:translate-y-0 transition-transform">
+                        <p class="text-[10px] md:text-xs text-orange-700 font-semibold">Сенсорная система</p>
+                    </div>
+                </button>
+                <button onclick="goToSlide(8)" class="group bg-white border border-gray-200 p-4 md:p-6 rounded-2xl md:rounded-3xl hover:border-purple-500 hover:shadow-xl transition-all text-center flex flex-col items-center justify-center h-32 md:h-40 relative overflow-hidden">
+                    <i class="ph-duotone ph-chart-bar text-4xl md:text-5xl text-gray-400 group-hover:text-purple-500 transition-all transform group-hover:-translate-y-3"></i>
+                    <h3 class="font-bold text-sm md:text-base text-gray-800 group-hover:-translate-y-3 transition-transform mt-2">Аналитика</h3>
+                    <div class="absolute bottom-0 w-full p-2 bg-gradient-to-t from-purple-50 to-white translate-y-full group-hover:translate-y-0 transition-transform">
+                        <p class="text-[10px] md:text-xs text-purple-700 font-semibold">Автоматизация инсайтов</p>
+                    </div>
+                </button>
+                <button onclick="goToSlide(9)" class="group bg-white border border-gray-200 p-4 md:p-6 rounded-2xl md:rounded-3xl hover:border-orange-500 hover:shadow-xl transition-all text-center flex flex-col items-center justify-center h-32 md:h-40 relative overflow-hidden">
+                    <i class="ph-duotone ph-bezier-curve text-4xl md:text-5xl text-gray-400 group-hover:text-orange-500 transition-all transform group-hover:-translate-y-3"></i>
+                    <h3 class="font-bold text-sm md:text-base text-gray-800 group-hover:-translate-y-3 transition-transform mt-2">Дизайн</h3>
+                    <div class="absolute bottom-0 w-full p-2 bg-gradient-to-t from-orange-50 to-white translate-y-full group-hover:translate-y-0 transition-transform">
+                        <p class="text-[10px] md:text-xs text-orange-700 font-semibold">ОС опыта юзера</p>
+                    </div>
+                </button>
+                <button onclick="goToSlide(10)" class="group bg-white border border-gray-200 p-4 md:p-6 rounded-2xl md:rounded-3xl hover:border-purple-500 hover:shadow-xl transition-all text-center flex flex-col items-center justify-center h-32 md:h-40 relative overflow-hidden">
+                    <i class="ph-duotone ph-code text-4xl md:text-5xl text-gray-400 group-hover:text-purple-500 transition-all transform group-hover:-translate-y-3"></i>
+                    <h3 class="font-bold text-sm md:text-base text-gray-800 group-hover:-translate-y-3 transition-transform mt-2">Разработка</h3>
+                    <div class="absolute bottom-0 w-full p-2 bg-gradient-to-t from-purple-50 to-white translate-y-full group-hover:translate-y-0 transition-transform">
+                        <p class="text-[10px] md:text-xs text-purple-700 font-semibold">Ускорение Delivery</p>
+                    </div>
+                </button>
+                <button onclick="goToSlide(11)" class="group bg-white border border-gray-200 p-4 md:p-6 rounded-2xl md:rounded-3xl hover:border-orange-500 hover:shadow-xl transition-all text-center flex flex-col items-center justify-center h-32 md:h-40 relative overflow-hidden">
+                    <i class="ph-duotone ph-cpu text-4xl md:text-5xl text-gray-400 group-hover:text-orange-500 transition-all transform group-hover:-translate-y-3"></i>
+                    <h3 class="font-bold text-sm md:text-base text-gray-800 group-hover:-translate-y-3 transition-transform mt-2">Инженерия</h3>
+                    <div class="absolute bottom-0 w-full p-2 bg-gradient-to-t from-orange-50 to-white translate-y-full group-hover:translate-y-0 transition-transform">
+                        <p class="text-[10px] md:text-xs text-orange-700 font-semibold">Надежный фундамент</p>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- МАКРОС: Шаблон функций -->
+
+    <!-- СЛАЙД 3: Management -->
+    <div class="slide-container opacity-0 pointer-events-none translate-y-8" id="slide-2">
+        <div class="content-z max-w-7xl mx-auto flex flex-col lg:flex-row gap-6 items-center h-full px-4 lg:px-8">
+            <div class="w-full lg:w-1/4 text-left">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="p-2.5 bg-purple-100 text-purple-600 rounded-xl"><i class="ph-fill ph-briefcase text-3xl"></i></div>
+                    <h2 class="text-3xl font-black text-gray-900">Менеджмент</h2>
+                </div>
+                <h3 class="text-lg font-bold text-purple-600 mb-3 leading-tight">От хаоса к прозрачной системе</h3>
+                <p class="text-[11px] md:text-sm text-gray-600 leading-relaxed mb-4">
+                    ИИ-агенты буквально собирают управленческий процесс заново — как систему, где каждый шаг координации связан со следующим, возвращая менеджеру контроль над исполнением.
+                </p>
+            </div>
+            <div class="w-full lg:w-3/4 grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-5">
+                
+                <!-- Col 1 -->
+                <div class="flow-col p-3 md:p-4 rounded-xl flex flex-col gap-2">
+                    <h4 class="text-center font-bold text-gray-500 uppercase tracking-wide text-[10px] pb-1 border-b border-gray-200">Планирование и Контекст</h4>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Knowledge Transfer</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">ИИ поглощает документы, регламенты и историю решений, превращаясь в бизнес-память. Дает мгновенные ответы.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Сокращение онбординга, -25–35% времени на поиск ответов (uBreakiFix).</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Note Taking</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Записывает и расшифровывает встречи в структурированные артефакты: решения, риски, шаги.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">62% экономят 4 ч/нед, -60% ручной транскрипции (Otter.ai).</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Documentation Creation</div>
+                        <div class="tooltip-card tt-top w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Создает драфты в Google Docs из базы знаний, задач и шаблонов компании для описания процессов.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Ускорение подготовки материалов на 33% (MERGE).</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Col 2 -->
+                <div class="flow-col p-3 md:p-4 rounded-xl flex flex-col gap-2">
+                    <h4 class="text-center font-bold text-gray-500 uppercase tracking-wide text-[10px] pb-1 border-b border-gray-200">Исполнение</h4>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Task Tracking</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Извлекает задачи из встреч и писем, предлагает сроки и ответственных, напоминает и эскалирует.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">15 000 сэкономленных часов, экономия $600k (Morningstar).</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Email Writing</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Читает письма, понимает контекст и предлагает готовые ответы в корпоративной тональности.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Сокращение времени написания писем на 30–35% (Sports Basement).</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Table Creation</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Сам строит структуру, добавляет формулы, логику и связи по словесному описанию цели.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">30–35% роста эффективности обработки данных (Excel Copilot).</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Slide Creation</div>
+                        <div class="tooltip-card tt-top w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Собирает презентации из данных и заметок, выделяя ключевые выводы в корпоративных шаблонах.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Сокращение подготовки первого черновика с часов до минут (Rhythm Foundation).</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Col 3 -->
+                <div class="flow-col p-3 md:p-4 rounded-xl flex flex-col gap-2">
+                    <h4 class="text-center font-bold text-gray-500 uppercase tracking-wide text-[10px] pb-1 border-b border-gray-200">Координация и Контроль</h4>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Calendar Booking</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Сам находит слоты, рассылает инвайты и готовит повестку ко встрече.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Возврат 10-14 ч/нед, -60% конфликтов, процесс планирования сокращен до 12 минут.</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Team Management</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Балансирует загрузку по ролям, выявляя скрытые проблемы и расхождения приоритетов.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Четкая видимость задач, выявление проблем (рост нагрузки на совещания на 40%).</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Performance Analysis</div>
+                        <div class="tooltip-card tt-top w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Анализирует цели, задачи и сроки. Строит дашборды динамики и узких мест.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Превращает менеджмент из тушения пожаров в систему осознанной корректировки.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 4: HR -->
+    <div class="slide-container opacity-0 pointer-events-none translate-y-8" id="slide-3">
+        <div class="content-z max-w-7xl mx-auto flex flex-col lg:flex-row gap-6 items-center h-full px-4 lg:px-8">
+            <div class="w-full lg:w-1/4 text-left">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="p-2.5 bg-orange-100 text-orange-500 rounded-xl"><i class="ph-fill ph-users-three text-3xl"></i></div>
+                    <h2 class="text-3xl font-black text-gray-900">HR</h2>
+                </div>
+                <h3 class="text-lg font-bold text-orange-500 mb-3 leading-tight">Экосистема талантов</h3>
+                <p class="text-[11px] md:text-sm text-gray-600 leading-relaxed mb-4">
+                    HR перестает разгребать запросы вручную. ИИ собирает сквозной процесс: от создания вакансии до онбординга, формируя экосистему на основе данных.
+                </p>
+            </div>
+            <div class="w-full lg:w-3/4 grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-5">
+                
+                <!-- Col 1 -->
+                <div class="flow-col p-3 md:p-4 rounded-xl flex flex-col gap-2">
+                    <h4 class="text-center font-bold text-gray-500 uppercase tracking-wide text-[10px] pb-1 border-b border-gray-200">Найм</h4>
+                    
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Job Description Creation</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Создает персонализированные описания вакансий под команду, опираясь на знания о компании.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">Снижение времени закрытия вакансии на 85%, x3 рост shortlist rate (Blue Pearl).</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Candidate Search</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Автономно ищет во внутренних базах и внешних площадках, обновляя и ранжируя профили.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">75% снижения time-to-hire, +45% релевантных кандидатов (Aria AI).</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">CV Screening</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Читает резюме по заданной логике, подробно скорит каждого кандидата без субъективности.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">Экономия 50k часов, -90% time-to-hire, -75% нагрузки (Unilever).</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Candidate Screening</div>
+                        <div class="tooltip-card tt-top w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Проводит авто-интервью (чат/видео) с анализом содержания и логики ответов по профилю роли.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">Time-to-hire с 42 дней до 5, -83% админ. нагрузки (Hilton).</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Col 2 -->
+                <div class="flow-col p-3 md:p-4 rounded-xl flex flex-col gap-2">
+                    <h4 class="text-center font-bold text-gray-500 uppercase tracking-wide text-[10px] pb-1 border-b border-gray-200">Коммуникация и Планирование</h4>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Contact Discovery</div>
+                        <div class="tooltip-card tt-top w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Находит и верифицирует почты кандидатов, готовит персонализированный первый контакт.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">Быстрый старт коммуникации, выше отклик, убирает ручной ресёрч.</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Meeting Scheduling</div>
+                        <div class="tooltip-card tt-top w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Выбирает кандидатов, учитывает таймзоны, предлагает слоты и сам рассылает инвайты.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">93% диалогов завершаются менее чем за час, без логистики (Hilton).</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Work Schedule</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Анализирует отклонения, переработки и сигналы усталости при гибридных или сменных графиках.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">Снижение сверхурочных, уменьшение оттока персонала (nurse turnover на 30%).</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Col 3 -->
+                <div class="flow-col p-3 md:p-4 rounded-xl flex flex-col gap-2">
+                    <h4 class="text-center font-bold text-gray-500 uppercase tracking-wide text-[10px] pb-1 border-b border-gray-200">Поддержка и Развитие</h4>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Employee Onboarding</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Отправляет welcome-письма, строит индивидуальный план входа и дает чек-листы на первые недели.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">+15% к удержанию, -40% нагрузка на менеджеров, CSAT 92% (MediCare).</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Learning & Development</div>
+                        <div class="tooltip-card tt-top w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Ведёт модель компетенций, ищет гэпы и рекомендует персональные курсы под требования роли.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">Посещаемость 89%, +16% к вероятности продвижения за skill badge (IBM).</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Daily Support</div>
+                        <div class="tooltip-card tt-top w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Постоянный цифровой HR-ассистент, отвечает на типовые вопросы по процессам и документам.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">11.5 млн взаимодействий, -75% HR-тикетов, -40% затрат (IBM AskHR).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 5: Marketing -->
+    <div class="slide-container opacity-0 pointer-events-none translate-y-8" id="slide-4">
+        <div class="content-z max-w-7xl mx-auto flex flex-col lg:flex-row gap-6 items-center h-full px-4 lg:px-8">
+            <div class="w-full lg:w-1/4 text-left">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="p-2.5 bg-purple-100 text-purple-600 rounded-xl"><i class="ph-fill ph-megaphone text-3xl"></i></div>
+                    <h2 class="text-3xl font-black text-gray-900">Маркетинг</h2>
+                </div>
+                <h3 class="text-lg font-bold text-purple-600 mb-3 leading-tight">Система понимания рынка</h3>
+                <p class="text-[11px] md:text-sm text-gray-600 leading-relaxed mb-4">
+                    Переход от идеи «сделаем рекламу и надеемся» к цепочке уверенных решений: «данные -> ICP -> JTBD -> GTM». Маркетинг как операционная система понимания.
+                </p>
+            </div>
+            <div class="w-full lg:w-3/4 grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-5">
+                
+                <!-- Col 1 -->
+                <div class="flow-col p-3 md:p-4 rounded-xl flex flex-col gap-2">
+                    <h4 class="text-center font-bold text-gray-500 uppercase tracking-wide text-[10px] pb-1 border-b border-gray-200">Исследования рынка</h4>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Deep Market Research</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Находит реальные продукты, извлекает данные и сегментирует рынок снизу вверх.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Цикл исследования сокращается с 4-12 недель до нескольких дней.</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Ideal Customer Profile</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Формирует ICP для сегментов: мотивации, триггеры, бюджет и путь покупки.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Рост B2B лидов и встреч примерно на 50%.</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Simulated Interviews</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Симулирует мышление пользователя, его задачи, альтернативы и сомнения.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Ответы ИИ-персон совпадают с человеческими на 85–92%.</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Pain Map</div>
+                        <div class="tooltip-card tt-top w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Извлекает боли из интервью, оценивая их частоту, тяжесть и корневые причины.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Боли перестают быть абстракцией и становятся рабочим объектом продукта.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Col 2 -->
+                <div class="flow-col p-3 md:p-4 rounded-xl flex flex-col gap-2">
+                    <h4 class="text-center font-bold text-gray-500 uppercase tracking-wide text-[10px] pb-1 border-b border-gray-200">Стратегия и Ценность</h4>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">JTBD Synthesis</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Строит Jobs-To-Be-Done для сегментов, связывая мотивацию с реальным поведением.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Уход от фокусировки на фичах к прогрессу пользователя.</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Value Proposition</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Сопоставляет боли с возможностями продукта, выявляя несоответствия.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Синхронизирует продукт с рынком до релиза, снижая риск ошибок.</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Product Hypotheses</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Формирует гипотезы по JTBD, задает метрики и приоритезирует по фреймворку RICE.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Превращает хаос идей в дисциплину фокусных экспериментов.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Col 3 -->
+                <div class="flow-col p-3 md:p-4 rounded-xl flex flex-col gap-2">
+                    <h4 class="text-center font-bold text-gray-500 uppercase tracking-wide text-[10px] pb-1 border-b border-gray-200">GTM и Аналитика</h4>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Go-To-Market Strategy</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Собирает позиционирование, логику захвата и порядок тестов в единую базу GTM.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Рост выручки до двузначных значений, ROI продаж улучшается на 10–20%.</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Brandbook Generation</div>
+                        <div class="tooltip-card tt-top w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Строит брендбук на основе спроса: ценности, tone of voice и архетип.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Бренд вытекает из реального спроса, коммуникации консистентны.</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Insight Analytics</div>
+                        <div class="tooltip-card tt-top w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Объединяет данные из GA и CRM, интерпретирует их через сегменты и гипотезы.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Замкнутый контур обучения и быстрые ответы "что делать дальше".</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 6: SMM -->
+    <div class="slide-container opacity-0 pointer-events-none translate-y-8" id="slide-5">
+        <div class="content-z max-w-7xl mx-auto flex flex-col lg:flex-row gap-6 items-center h-full px-4 lg:px-8">
+            <div class="w-full lg:w-1/4 text-left">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="p-2.5 bg-orange-100 text-orange-500 rounded-xl"><i class="ph-fill ph-share-network text-3xl"></i></div>
+                    <h2 class="text-3xl font-black text-gray-900">SMM</h2>
+                </div>
+                <h3 class="text-lg font-bold text-orange-500 mb-3 leading-tight">Управляемый рост внимания</h3>
+                <p class="text-[11px] md:text-sm text-gray-600 leading-relaxed mb-4">
+                    SMM перестает быть ремеслом публикаций и становится системой, которая учится сама через постоянный анализ среды, авто-генерацию и умную модерацию.
+                </p>
+            </div>
+            <div class="w-full lg:w-3/4 grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-5">
+                
+                <!-- Col 1 -->
+                <div class="flow-col p-3 md:p-4 rounded-xl flex flex-col gap-2">
+                    <h4 class="text-center font-bold text-gray-500 uppercase tracking-wide text-[10px] pb-1 border-b border-gray-200">Аналитика и План</h4>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Channel Analysis</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Анализирует каналы бренда: форматы, перекосы и соответствие позиционированию.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">+101% видеопросмотров, +63% вовлеченности (GRDC).</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Content Plan</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Собирает систему: рубрики, форматы и баланс ценности/вовлечения.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">Маленькая команда смогла выпустить 3615 публикаций за год (GRDC).</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Audience Insights</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Собирает реакции и связывает их с форматами, понимая что реально работает.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">SMM превращается из потока публикаций в систему обучения.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Col 2 -->
+                <div class="flow-col p-3 md:p-4 rounded-xl flex flex-col gap-2">
+                    <h4 class="text-center font-bold text-gray-500 uppercase tracking-wide text-[10px] pb-1 border-b border-gray-200">Производство</h4>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Text Generation</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Генерирует посты и заголовки, удерживая уникальный tone of voice для каждой площадки.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">Сокращает время на посты с нуля, не жертвуя стилем (Paychex).</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Image Generation</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Создает визуалы под тексты, сохраняя фирменный стиль и эстетику бренда.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">850 млн earned impressions, 25-кратная отдача на media spend (Heinz).</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Video Generation</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Автоматически монтирует, подрезает и титрует ролики под разные соцсети.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">151 млн новых impressions без расширения команды (iHeartMedia).</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Short Video Creation</div>
+                        <div class="tooltip-card tt-top w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Пишет сценарий, подбирает стоки, делает AI-озвучку и собирает Reels/Shorts.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">Масштабирование говорящего контента без съемок и студий.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Col 3 -->
+                <div class="flow-col p-3 md:p-4 rounded-xl flex flex-col gap-2">
+                    <h4 class="text-center font-bold text-gray-500 uppercase tracking-wide text-[10px] pb-1 border-b border-gray-200">Публикация и Вовлечение</h4>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Auto Posting</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Адаптирует форматы, планирует и автоматически публикует контент по расписанию.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">Единый Smart Inbox убрал массу ручных действий (Paychex).</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Comment Moderation</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Находит токсичность и спам, автоматически модерируя ленту комментариев.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">Маленькая команда разбирает сотни комментариев (Financial Times).</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Comment Reply</div>
+                        <div class="tooltip-card tt-top w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Генерирует эмпатичные ответы в стиле бренда, превращая негатив в конструктив.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">Сокращение среднего времени ответа на 67% (Paychex).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 7: Sales -->
+    <div class="slide-container opacity-0 pointer-events-none translate-y-8" id="slide-6">
+        <div class="content-z max-w-7xl mx-auto flex flex-col lg:flex-row gap-6 items-center h-full px-4 lg:px-8">
+            <div class="w-full lg:w-1/4 text-left">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="p-2.5 bg-purple-100 text-purple-600 rounded-xl"><i class="ph-fill ph-currency-dollar text-3xl"></i></div>
+                    <h2 class="text-3xl font-black text-gray-900">Продажи</h2>
+                </div>
+                <h3 class="text-lg font-bold text-purple-600 mb-3 leading-tight">Конверсия без потери на стыках</h3>
+                <p class="text-[11px] md:text-sm text-gray-600 leading-relaxed mb-4">
+                    ИИ связывает оффер, креатив, лид и CRM в автономный режим. Воронка работает на автономных ИИ-функциях без потери данных.
+                </p>
+            </div>
+            <div class="w-full lg:w-3/4 grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-5">
+                
+                <!-- Col 1 -->
+                <div class="flow-col p-3 md:p-4 rounded-xl flex flex-col gap-2">
+                    <h4 class="text-center font-bold text-gray-500 uppercase tracking-wide text-[10px] pb-1 border-b border-gray-200">Реклама и Ассеты</h4>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Offer Assets</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Формирует единый каталог продуктов, услуг и цен из разрозненных сайтов и PDF.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Единый источник правды, ускорение вывода предложений в работу.</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Personalized Ad Generation</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Превращает ICP и боли в рекламные тексты под разные сегменты.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">2,5-кратный рост эффективности (Carrefour), 80% рост CTR (Monks).</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Ad Cover Generation</div>
+                        <div class="tooltip-card tt-top w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Создает обложки в UGC-эстетике, снижая баннерную слепоту аудитории.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">ROAS вырос на 45%, CPA упал на 66%, subscription rate +162% (Admiral Media).</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Video Content Generation</div>
+                        <div class="tooltip-card tt-top w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Генерирует ролики с объяснением продукта и отзывами под разные офферы.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Снижение стоимости видеопродакшна на 70%, time-to-market на 50% (Avantor).</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Col 2 -->
+                <div class="flow-col p-3 md:p-4 rounded-xl flex flex-col gap-2">
+                    <h4 class="text-center font-bold text-gray-500 uppercase tracking-wide text-[10px] pb-1 border-b border-gray-200">Вовлечение и Встречи</h4>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Lead Qualification</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Чат-бот выясняет бюджет/сроки и отсеивает нецелевые диалоги.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">496% роста pipeline, 454% роста bookings, 15-кратный ROI (Wrike).</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Meeting Scheduling</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Предлагает слоты, рассылает инвайты и готовит бриф по клиенту перед созвоном.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Экономия времени, каждый звонок проходит более подготовлено.</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Direct Sale</div>
+                        <div class="tooltip-card tt-top w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Формирует КП, учитывая контекст, и отрабатывает типовые возражения клиентов.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Сокращение цикла сделки и рост win-rate без перегрузки менеджеров.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Col 3 -->
+                <div class="flow-col p-3 md:p-4 rounded-xl flex flex-col gap-2">
+                    <h4 class="text-center font-bold text-gray-500 uppercase tracking-wide text-[10px] pb-1 border-b border-gray-200">Контроль и CRM</h4>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Cold Outreach</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Пишет cold emails, адаптируя каждое письмо под получателя и его контекст.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Запуск объемных кампаний без потери качества, постоянный поток лидов.</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Follow-Up Automation</div>
+                        <div class="tooltip-card tt-top w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Запускает цепочки догрева, адаптируя сообщения под реакцию или тишину.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Выше response rate, меньше потерянных сделок из-за забытых касаний.</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">CRM Analytics</div>
+                        <div class="tooltip-card tt-top w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Интегрируется с CRM, анализирует скорость воронки и выявляет узкие места.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Управление продажами на основе точных данных, а не интуиции и мнений.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 8: Support -->
+    <div class="slide-container opacity-0 pointer-events-none translate-y-8" id="slide-7">
+        <div class="content-z max-w-7xl mx-auto flex flex-col lg:flex-row gap-6 items-center h-full px-4 lg:px-8">
+            <div class="w-full lg:w-1/4 text-left">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="p-2.5 bg-orange-100 text-orange-500 rounded-xl"><i class="ph-fill ph-headset text-3xl"></i></div>
+                    <h2 class="text-3xl font-black text-gray-900">Поддержка</h2>
+                </div>
+                <h3 class="text-lg font-bold text-orange-500 mb-3 leading-tight">Источник продуктовой ясности</h3>
+                <p class="text-[11px] md:text-sm text-gray-600 leading-relaxed mb-4">
+                    От реактивной функции к сенсорной системе бизнеса через омниканальные агенты и глубокую аналитику фидбека.
+                </p>
+            </div>
+            <div class="w-full lg:w-3/4 grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-5">
+                
+                <!-- Col 1 -->
+                <div class="flow-col p-3 md:p-4 rounded-xl flex flex-col gap-2">
+                    <h4 class="text-center font-bold text-gray-500 uppercase tracking-wide text-[10px] pb-1 border-b border-gray-200">Многоканальность</h4>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">FAQ Answers</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Мгновенные, консистентные ответы на основе базы знаний без операторов.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">2.3 млн чатов/мес, время решения сократилось с 11 до 2 минут (Klarna).</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Telegram Support</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Принимает запросы в мессенджере, отвечает по базе или создает тикеты.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">Автоматизация 82% обращений, среднее время ответа с 23 мин до 4 сек.</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Email Support</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Анализирует письма, формирует ответы и связывает длинные треды с тикетами.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">Ручная обработка сократилась на 80–90%, ответы быстрее в 5 раз.</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Web Support</div>
+                        <div class="tooltip-card tt-top w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Общается 24/7 в чате на сайте, решая проблему на месте или передавая дальше.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">Обработка 75% онлайн-запросов, рост CSAT на 25%, экономия $150 млн (Alibaba).</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Col 2 -->
+                <div class="flow-col p-3 md:p-4 rounded-xl flex flex-col gap-2">
+                    <h4 class="text-center font-bold text-gray-500 uppercase tracking-wide text-[10px] pb-1 border-b border-gray-200">Маршрутизация</h4>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Ticket Management</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Собирает тикеты из всех каналов, назначает приоритеты и следит за SLA.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">Сокращение времени первого ответа на 46%, общего времени — на 51% (James Villa).</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Bug Reporting</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Распознает баги, собирает шаги воспроизведения и создает баг-тикеты.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">Снижение доли неполных bug reports, быстрое исправление ошибок.</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Feature Request</div>
+                        <div class="tooltip-card tt-top w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Отличает запросы на фичи от багов и передает идеи в продуктовый backlog.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">Инсайты попадают к продактам за час, ускоряя реакцию на голос клиента (Fivetran).</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Second-Line Escalation</div>
+                        <div class="tooltip-card tt-top w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Уточняет детали у пользователя и передает сложный кейс эксперту с контекстом.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">80% автоматизации рутины, сокращение времени решения сложных кейсов на 60%.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Col 3 -->
+                <div class="flow-col p-3 md:p-4 rounded-xl flex flex-col gap-2">
+                    <h4 class="text-center font-bold text-gray-500 uppercase tracking-wide text-[10px] pb-1 border-b border-gray-200">Аналитика сервиса</h4>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">CSI Analysis</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Анализирует NPS и фидбек, связывая недовольство с конкретными типами запросов.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">Мгновенное выявление реальных драйверов NPS на массиве из 100к+ отзывов (BA).</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Support Reports</div>
+                        <div class="tooltip-card tt-top w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Строит отчеты по тикетам, трендам и SLA, превращая саппорт в сенсор компании.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">Улучшение продукта на основе реальных данных о пользовательском трении.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 9: Analytics -->
+    <div class="slide-container opacity-0 pointer-events-none translate-y-8" id="slide-8">
+        <div class="content-z max-w-7xl mx-auto flex flex-col lg:flex-row gap-6 items-center h-full px-4 lg:px-8">
+            <div class="w-full lg:w-1/4 text-left">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="p-2.5 bg-purple-100 text-purple-600 rounded-xl"><i class="ph-fill ph-chart-bar text-3xl"></i></div>
+                    <h2 class="text-3xl font-black text-gray-900">Аналитика</h2>
+                </div>
+                <h3 class="text-lg font-bold text-purple-600 mb-3 leading-tight">Точные инсайты в реальном времени</h3>
+                <p class="text-[11px] md:text-sm text-gray-600 leading-relaxed mb-4">
+                    Аналитик больше не догоняет запросы бизнеса. От сбора данных до авто-генерации требований (PRD, User Story) и инсайтов.
+                </p>
+            </div>
+            <div class="w-full lg:w-3/4 grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-5">
+                
+                <!-- Col 1 -->
+                <div class="flow-col p-3 md:p-4 rounded-xl flex flex-col gap-2">
+                    <h4 class="text-center font-bold text-gray-500 uppercase tracking-wide text-[10px] pb-1 border-b border-gray-200">Открытия и Данные</h4>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Analytical Report</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Глубокий ресерч по теме, сбор данных, формирование гипотез и аналитической рамки.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Экономия времени на старте подготовки материала достигает 80%.</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Internal Data Integration</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Связывает внутренние данные (CRM, ERP) с бизнес-контекстом в общую картину.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Запросы сократились с 5 часов до минут, загрузка данных на 80% быстрее (Amarilo).</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Business Process Analysis</div>
+                        <div class="tooltip-card tt-top w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Интервьюирует процессы, находит узкие места и строит AS-IS модель работы.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Точная карта текущей логики, необходимая для автоматизации.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Col 2 -->
+                <div class="flow-col p-3 md:p-4 rounded-xl flex flex-col gap-2">
+                    <h4 class="text-center font-bold text-gray-500 uppercase tracking-wide text-[10px] pb-1 border-b border-gray-200">Требования</h4>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">PRD Creation</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Собирает PRD как живой документ, связывая цели, фичи и ограничения.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Сокращает цикл подготовки качественного PRD-черновика примерно на 80%.</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">User Story Generation</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Генерирует истории, привязывая их к бизнес-процессам, ролям и сценариям.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">87.5% сгенерированных AI историй соответствуют критериям качества.</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">User Flow</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Строит для каждой user story пошаговые флоу, точки решений и обходные пути.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Ошибки проектирования устраняются до начала дорогой разработки.</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">BRD Creation</div>
+                        <div class="tooltip-card tt-top w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Формализует бизнес-правила, KPI и условия успешности процесса.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Требования становятся явными, уменьшая количество конфликтов.</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">TRD Creation</div>
+                        <div class="tooltip-card tt-top w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Описывает производительность, безопасность и архитектурные ограничения.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Снижение технического долга и прозрачность архитектуры с самого начала.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Col 3 -->
+                <div class="flow-col p-3 md:p-4 rounded-xl flex flex-col gap-2">
+                    <h4 class="text-center font-bold text-gray-500 uppercase tracking-wide text-[10px] pb-1 border-b border-gray-200">Визуализация и Решения</h4>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Data Visualization</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Строит графики, аномалии и визуальные модели по подключенным источникам.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Рост скорости доступа к наглядным данным примерно на 80% (Domina).</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Decision Support</div>
+                        <div class="tooltip-card tt-top w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Формирует инсайты, риски и рекомендации, отвечая на вопрос "что делать дальше".</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Сокращение времени получения ответов на 90% — с недель до минут.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 10: Design -->
+    <div class="slide-container opacity-0 pointer-events-none translate-y-8" id="slide-9">
+        <div class="content-z max-w-7xl mx-auto flex flex-col lg:flex-row gap-6 items-center h-full px-4 lg:px-8">
+            <div class="w-full lg:w-1/4 text-left">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="p-2.5 bg-orange-100 text-orange-500 rounded-xl"><i class="ph-fill ph-bezier-curve text-3xl"></i></div>
+                    <h2 class="text-3xl font-black text-gray-900">Дизайн</h2>
+                </div>
+                <h3 class="text-lg font-bold text-orange-500 mb-3 leading-tight">ОС опыта пользователя</h3>
+                <p class="text-[11px] md:text-sm text-gray-600 leading-relaxed mb-4">
+                    Дизайн перестает быть ремеслом отдельных экранов и становится системой UX на основе поведенческих фактов: от пути пользователя к симуляции.
+                </p>
+            </div>
+            <div class="w-full lg:w-3/4 grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-5">
+                
+                <!-- Col 1 -->
+                <div class="flow-col p-3 md:p-4 rounded-xl flex flex-col gap-2">
+                    <h4 class="text-center font-bold text-gray-500 uppercase tracking-wide text-[10px] pb-1 border-b border-gray-200">Логика UX</h4>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Customer Journey Map</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Строит путь клиента по этапам: точки контакта, ожидания, фрустрации.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">Дизайн строится вокруг пути клиента (98% находят ответ через Erica в BofA).</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Product UX Design</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Переводит CJM в сценарии и состояния экранов, фокусируясь на прогрессе.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">200 млн виртуальных примерок, рост бронирований на 11% за счет UX (Sephora).</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Col 2 -->
+                <div class="flow-col p-3 md:p-4 rounded-xl flex flex-col gap-2">
+                    <h4 class="text-center font-bold text-gray-500 uppercase tracking-wide text-[10px] pb-1 border-b border-gray-200">Бренд и Интерфейс</h4>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Logo Generation</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Генерирует варианты логотипов под позиционирование, ценности и tone of voice.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">Быстрая сборка визуального ядра бренда (Looka обслужила 11 млн клиентов).</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Design System</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Собирает UI-паттерны и цвета в единую масштабируемую систему.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">Единый язык ускоряет разработку и предотвращает хаос в интерфейсе.</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Pitch Deck Design</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Проектирует презентации, опираясь на CJM и бизнес-логику продукта.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">Дизайн убеждения: рост вовлеченности инвесторов и вероятности сделки.</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Landing Page Design</div>
+                        <div class="tooltip-card tt-top w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Переводит value proposition в структуру блоков лендинга под конкретный сегмент.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">Рост конверсии на 20–30% по сравнению с обычным подходом (Unbounce).</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Figma Design</div>
+                        <div class="tooltip-card tt-top w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Создает макеты и компоненты, полностью готовые к handoff в разработку.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">Сокращение времени на экраны на 50%, 90% UI-кода генерируется (Findable).</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Col 3 -->
+                <div class="flow-col p-3 md:p-4 rounded-xl flex flex-col gap-2">
+                    <h4 class="text-center font-bold text-gray-500 uppercase tracking-wide text-[10px] pb-1 border-b border-gray-200">Оценка и Валидация</h4>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Application Prototype</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Собирает интерактивный кликабельный прототип реальных пользовательских сценариев.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">Сокращение количества сессий по прототипированию с 3 до 1 (Ingenico).</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">UX Simulation</div>
+                        <div class="tooltip-card tt-top w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">LLM-симуляция прохождения интерфейса, находящая лишние шаги и когнитивную нагрузку.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">Выявление значимых UX-ошибок до живого тестирования и релиза.</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Experience Evaluation</div>
+                        <div class="tooltip-card tt-top w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Анализирует реальное поведение после запуска и формирует рекомендации.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">+7% конверсии после UX-улучшений на основе данных (WorldRemit).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 11: Development -->
+    <div class="slide-container opacity-0 pointer-events-none translate-y-8" id="slide-10">
+        <div class="content-z max-w-7xl mx-auto flex flex-col lg:flex-row gap-6 items-center h-full px-4 lg:px-8">
+            <div class="w-full lg:w-1/4 text-left">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="p-2.5 bg-purple-100 text-purple-600 rounded-xl"><i class="ph-fill ph-code text-3xl"></i></div>
+                    <h2 class="text-3xl font-black text-gray-900">Разработка</h2>
+                </div>
+                <h3 class="text-lg font-bold text-purple-600 mb-3 leading-tight">Ускорение цикла Delivery</h3>
+                <p class="text-[11px] md:text-sm text-gray-600 leading-relaxed mb-4">
+                    От архитектуры до CI/CD. Разработка как система, где архитектура думает на шаг вперед, а качество закладывается заранее.
+                </p>
+            </div>
+            <div class="w-full lg:w-3/4 grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-5">
+                
+                <!-- Col 1 -->
+                <div class="flow-col p-3 md:p-4 rounded-xl flex flex-col gap-2">
+                    <h4 class="text-center font-bold text-gray-500 uppercase tracking-wide text-[10px] pb-1 border-b border-gray-200">Архитектура</h4>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Tech Architecture</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Проектирует целевую архитектуру, потоки данных и интеграции AI-агентов.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Связка бизнеса и технологий, минимизация самых дорогих ошибок.</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Task Definition</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Переводит проблему в эпики и задачи, выстраивая зависимости.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Прозрачность: команда видит, что реально создает бизнес-ценность.</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Test Cases</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Формирует негативные сценарии и edge-cases до написания кода.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Почти полное покрытие acceptance criteria, подготовка на 80% быстрее.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Col 2 -->
+                <div class="flow-col p-3 md:p-4 rounded-xl flex flex-col gap-2">
+                    <h4 class="text-center font-bold text-gray-500 uppercase tracking-wide text-[10px] pb-1 border-b border-gray-200">Создание продукта</h4>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Telegram Bot Dev</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Реализует MVP-ботов с AI-бэкендом для быстрой проверки гипотез.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Бот обработал 82% запросов за месяц и окупился за неделю (e-commerce).</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Web App Dev</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Пишет frontend/backend, закладывая масштабируемость с помощью AI-copilot.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Типовые задачи разработки выполняются примерно на 40% быстрее (DTCC).</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Mobile App Dev</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Адаптирует UX для мобильных устройств, удерживая общую логику с web.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Снижение объема рутинной разработки и удержание консистентности.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Col 3 -->
+                <div class="flow-col p-3 md:p-4 rounded-xl flex flex-col gap-2">
+                    <h4 class="text-center font-bold text-gray-500 uppercase tracking-wide text-[10px] pb-1 border-b border-gray-200">Качество и Доставка</h4>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">QA & Auto Testing</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Запускает непрерывные unit- и интеграционные тесты при каждом изменении.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Время регрессионного тестирования сократилось с 7 дней до 12 часов (JLR).</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Bug Fixing</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Локализует причины регрессий по логам и тестам, системно исправляя ошибки.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Ускорение деплоев и заметное снижение количества багов в продакшене.</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">CI/CD & Deploy</div>
+                        <div class="tooltip-card tt-top w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Автоматизирует пайплайны сборки и деплоя без ручного вмешательства.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Ускоренный delivery, частые и безопасные релизы.</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-purple-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Code Review & Mon.</div>
+                        <div class="tooltip-card tt-top w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Ищет антипаттерны в коде и круглосуточно мониторит аномалии в продакшене.</p>
+                            <p class="text-[10px] md:text-xs text-orange-400 font-bold leading-tight">Резкое ускорение pull request cycle и снижение числа регрессий.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 12: Engineering -->
+    <div class="slide-container opacity-0 pointer-events-none translate-y-8" id="slide-11">
+        <div class="content-z max-w-7xl mx-auto flex flex-col lg:flex-row gap-6 items-center h-full px-4 lg:px-8">
+            <div class="w-full lg:w-1/4 text-left">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="p-2.5 bg-orange-100 text-orange-500 rounded-xl"><i class="ph-fill ph-cpu text-3xl"></i></div>
+                    <h2 class="text-3xl font-black text-gray-900">Инженерия</h2>
+                </div>
+                <h3 class="text-lg font-bold text-orange-500 mb-3 leading-tight">Фундамент надежности</h3>
+                <p class="text-[11px] md:text-sm text-gray-600 leading-relaxed mb-4">
+                    Платформа не сдерживает рост компании, а поддерживает его. Инженерия как операционная система масштабирования и защиты.
+                </p>
+            </div>
+            <div class="w-full lg:w-3/4 grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-5">
+                
+                <!-- Col 1 -->
+                <div class="flow-col p-3 md:p-4 rounded-xl flex flex-col gap-2">
+                    <h4 class="text-center font-bold text-gray-500 uppercase tracking-wide text-[10px] pb-1 border-b border-gray-200">Инфраструктура</h4>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Infrastructure Audit</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Аудит узких мест сетей и контейнеров, формирование Infrastructure as Code.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">Подготовка к SOC 2, прозрачность и коммерческая готовность бизнеса.</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Platform Management</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Автоматизирует жизненный цикл виртуальных машин и масштабирование окружений.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">Снижение downtime на 50%, экономия облачных затрат 40–70%.</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Service Integration</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Настраивает API, очереди и БД как единую прозрачную систему.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">Меньше ошибок на стыках компонентов, гораздо выше стабильность.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Col 2 -->
+                <div class="flow-col p-3 md:p-4 rounded-xl flex flex-col gap-2">
+                    <h4 class="text-center font-bold text-gray-500 uppercase tracking-wide text-[10px] pb-1 border-b border-gray-200">Доступы и Безопасность</h4>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Access Management</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Управляет ролями и доступом пользователей по принципу минимальных прав.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">Время выдачи доступов с дней до часов, ноль висящих аккаунтов.</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Network Security</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Настраивает firewall, сегментацию VPN/VPC и контролирует трафик.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">Снижение успешности фишинга и экономия сотен часов расследований.</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Process Mining</div>
+                        <div class="tooltip-card tt-top w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Анализирует логи доступа, находя отклонения от реальных регламентов безопасности.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">Угрозы становятся видимыми до того, как превратятся в инциденты.</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Penetration Testing</div>
+                        <div class="tooltip-card tt-top w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Выполняет автоматизированные проверки векторов атак, оценивая риски.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">Время обнаружения уязвимостей сокращается на порядки, непрерывный pentest.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Col 3 -->
+                <div class="flow-col p-3 md:p-4 rounded-xl flex flex-col gap-2">
+                    <h4 class="text-center font-bold text-gray-500 uppercase tracking-wide text-[10px] pb-1 border-b border-gray-200">Операции</h4>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">IT Support</div>
+                        <div class="tooltip-card tt-bottom w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Обрабатывает запросы коллег по доступам и инфраструктуре в helpdesk.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">Время ответа сокращается с суток до часов, кратный рост пропускной способности.</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Cyber Security</div>
+                        <div class="tooltip-card tt-top w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Выполняет ротацию ключей, управляет секретами и пресекает их хранение в коде.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">Резкое снижение числа новых утечек и уязвимостей человеческого фактора.</p>
+                        </div>
+                    </div>
+                    <div class="group relative bg-white border border-gray-200 hover:border-orange-400 p-2.5 rounded-lg shadow-sm cursor-help transition-all hover:z-50 hover:shadow-md">
+                        <div class="font-semibold text-[11px] md:text-xs text-gray-800 text-center">Incident Monitoring</div>
+                        <div class="tooltip-card tt-top w-64 md:w-72 bg-gray-900 text-white text-left rounded-xl p-3 z-[100] shadow-2xl absolute">
+                            <p class="text-[10px] md:text-xs mb-1.5 text-gray-300 leading-tight">Круглосуточный мониторинг логов и AIOps-алерты на ранних стадиях.</p>
+                            <p class="text-[10px] md:text-xs text-purple-400 font-bold leading-tight">Снижение времени восстановления (MTTR) до 80%, меньше шумовых алертов.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 13: Заключение -->
+    <div class="slide-container opacity-0 pointer-events-none translate-y-8" id="slide-12">
+        <div class="content-z max-w-7xl mx-auto h-full flex flex-col justify-center px-4">
+            <div class="text-center mb-6 md:mb-8">
+                <h2 class="text-3xl md:text-5xl font-black mb-2 text-gray-900">Масштаб <span class="gradient-text">ИИ-трансформации</span></h2>
+                <p class="text-gray-600 font-medium">100 ИИ-функций HIP: от тушения пожаров — к управляемой ОС бизнеса.</p>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4 mb-8">
+                <div class="bg-white border-t-4 border-purple-500 p-4 rounded-xl shadow-sm text-center transform hover:-translate-y-1 transition-transform">
+                    <p class="text-xs text-gray-500 font-bold uppercase mb-1">Менеджмент</p>
+                    <p class="text-xl md:text-2xl font-black text-gray-900 mb-2">15,000+</p>
+                    <p class="text-[9px] md:text-xs text-gray-600 leading-tight">Часов сэкономлено на таск-трекинге</p>
+                </div>
+                <div class="bg-white border-t-4 border-orange-500 p-4 rounded-xl shadow-sm text-center transform hover:-translate-y-1 transition-transform">
+                    <p class="text-xs text-gray-500 font-bold uppercase mb-1">HR</p>
+                    <p class="text-xl md:text-2xl font-black text-gray-900 mb-2">-90%</p>
+                    <p class="text-[9px] md:text-xs text-gray-600 leading-tight">Времени на найм (time-to-hire)</p>
+                </div>
+                <div class="bg-white border-t-4 border-purple-500 p-4 rounded-xl shadow-sm text-center transform hover:-translate-y-1 transition-transform">
+                    <p class="text-xs text-gray-500 font-bold uppercase mb-1">Маркетинг</p>
+                    <p class="text-xl md:text-2xl font-black text-gray-900 mb-2">Дни</p>
+                    <p class="text-[9px] md:text-xs text-gray-600 leading-tight">Вместо недель на ресерч</p>
+                </div>
+                <div class="bg-white border-t-4 border-orange-500 p-4 rounded-xl shadow-sm text-center transform hover:-translate-y-1 transition-transform">
+                    <p class="text-xs text-gray-500 font-bold uppercase mb-1">SMM</p>
+                    <p class="text-xl md:text-2xl font-black text-gray-900 mb-2">+101%</p>
+                    <p class="text-[9px] md:text-xs text-gray-600 leading-tight">Роста просмотров видео-контента</p>
+                </div>
+                <div class="bg-white border-t-4 border-purple-500 p-4 rounded-xl shadow-sm text-center transform hover:-translate-y-1 transition-transform">
+                    <p class="text-xs text-gray-500 font-bold uppercase mb-1">Продажи</p>
+                    <p class="text-xl md:text-2xl font-black text-gray-900 mb-2">+496%</p>
+                    <p class="text-[9px] md:text-xs text-gray-600 leading-tight">Роста pipeline через скоринг</p>
+                </div>
+                <div class="bg-white border-t-4 border-orange-500 p-4 rounded-xl shadow-sm text-center transform hover:-translate-y-1 transition-transform">
+                    <p class="text-xs text-gray-500 font-bold uppercase mb-1">Поддержка</p>
+                    <p class="text-xl md:text-2xl font-black text-gray-900 mb-2">2 мин</p>
+                    <p class="text-[9px] md:text-xs text-gray-600 leading-tight">Вместо 11 минут на решение тикета</p>
+                </div>
+                <div class="bg-white border-t-4 border-purple-500 p-4 rounded-xl shadow-sm text-center transform hover:-translate-y-1 transition-transform">
+                    <p class="text-xs text-gray-500 font-bold uppercase mb-1">Аналитика</p>
+                    <p class="text-xl md:text-2xl font-black text-gray-900 mb-2">-90%</p>
+                    <p class="text-[9px] md:text-xs text-gray-600 leading-tight">Времени на бизнес-инсайты</p>
+                </div>
+                <div class="bg-white border-t-4 border-orange-500 p-4 rounded-xl shadow-sm text-center transform hover:-translate-y-1 transition-transform">
+                    <p class="text-xs text-gray-500 font-bold uppercase mb-1">Дизайн</p>
+                    <p class="text-xl md:text-2xl font-black text-gray-900 mb-2">-50%</p>
+                    <p class="text-[9px] md:text-xs text-gray-600 leading-tight">Времени на дизайн и handoff</p>
+                </div>
+                <div class="bg-white border-t-4 border-purple-500 p-4 rounded-xl shadow-sm text-center transform hover:-translate-y-1 transition-transform">
+                    <p class="text-xs text-gray-500 font-bold uppercase mb-1">Разработка</p>
+                    <p class="text-xl md:text-2xl font-black text-gray-900 mb-2">+40%</p>
+                    <p class="text-[9px] md:text-xs text-gray-600 leading-tight">Чистой скорости написания кода</p>
+                </div>
+                <div class="bg-white border-t-4 border-orange-500 p-4 rounded-xl shadow-sm text-center transform hover:-translate-y-1 transition-transform">
+                    <p class="text-xs text-gray-500 font-bold uppercase mb-1">Инженерия</p>
+                    <p class="text-xl md:text-2xl font-black text-gray-900 mb-2">-80%</p>
+                    <p class="text-[9px] md:text-xs text-gray-600 leading-tight">Времени восстановления (MTTR)</p>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button onclick="goToSlide(0)" class="px-10 py-4 gradient-bg text-white rounded-full font-black text-lg shadow-xl hover:shadow-orange-500/40 hover:scale-105 transition-all">
+                    В начало
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const totalSlides = 13; 
+            window.currentSlide = 0;
+            const progressBar = document.getElementById('progress-bar');
+
+            window.updateSlides = function() {
+                for (let i = 0; i < totalSlides; i++) {
+                    const slide = document.getElementById(`slide-${i}`);
+                    if (!slide) continue;
+
+                    if (i === window.currentSlide) {
+                        slide.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-8', '-translate-y-8');
+                        slide.classList.add('opacity-100', 'translate-y-0');
+                    } else if (i < window.currentSlide) {
+                        slide.classList.remove('opacity-100', 'translate-y-0', 'translate-y-8');
+                        slide.classList.add('opacity-0', 'pointer-events-none', '-translate-y-8');
+                    } else {
+                        slide.classList.remove('opacity-100', 'translate-y-0', '-translate-y-8');
+                        slide.classList.add('opacity-0', 'pointer-events-none', 'translate-y-8');
+                    }
+                }
+
+                if (progressBar) {
+                    const progress = ((window.currentSlide + 1) / totalSlides) * 100;
+                    progressBar.style.width = `${progress}%`;
+                }
+            }
+
+            window.nextSlide = function() {
+                if (window.currentSlide < totalSlides - 1) {
+                    window.currentSlide++;
+                    window.updateSlides();
+                }
+            }
+
+            window.prevSlide = function() {
+                if (window.currentSlide > 0) {
+                    window.currentSlide--;
+                    window.updateSlides();
+                }
+            }
+
+            window.goToSlide = function(index) {
+                if (index >= 0 && index < totalSlides) {
+                    window.currentSlide = index;
+                    window.updateSlides();
+                }
+            }
+
+            // Управление с клавиатуры
+            window.addEventListener('keydown', (e) => {
+                if (['ArrowRight', ' ', 'Enter', 'PageDown'].includes(e.key)) {
+                    window.nextSlide();
+                } else if (['ArrowLeft', 'PageUp', 'Backspace'].includes(e.key)) {
+                    window.prevSlide();
+                }
+            });
+
+            // Свайпы для мобильных
+            let touchStartX = 0;
+            window.addEventListener('touchstart', e => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, {passive: true});
+
+            window.addEventListener('touchend', e => {
+                let touchEndX = e.changedTouches[0].screenX;
+                const swipeThreshold = 50;
+                if (touchStartX - touchEndX > swipeThreshold) {
+                    window.nextSlide(); 
+                } else if (touchEndX - touchStartX > swipeThreshold) {
+                    window.prevSlide(); 
+                }
+            }, {passive: true});
+
+            // Инициализация
+            window.updateSlides();
+        });
+    </script>
+</body>
+</html>
