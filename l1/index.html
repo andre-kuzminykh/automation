@@ -30,108 +30,220 @@
             }
         }
     </script>
-    <style>
+
+<style>
+    html {
+        background: #ffffff !important;
+    }
+
+    body {
+        user-select: none;
+        overflow: hidden;
+        background-color: #ffffff !important;
+        margin: 0;
+        width: 100vw;
+        height: 100vh;
+    }
+
+    .slide-container {
+        transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        overflow-y: auto;
+        overflow-x: hidden;
+        background: #ffffff;
+    }
+
+    .slide-container::-webkit-scrollbar {
+        display: none;
+    }
+    
+    .slide-container {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    .content-z {
+        position: relative;
+        z-index: 10;
+        margin: auto;
+        width: 100%;
+        padding-top: 1rem;
+        padding-bottom: 1.5rem;
+    }
+
+    @media (min-width: 768px) {
+        .content-z {
+            padding-top: 2rem;
+            padding-bottom: 3rem;
+        }
+    }
+
+    .gradient-text {
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-image: linear-gradient(to right, #7c3aed, #f97316);
+    }
+
+    .gradient-bg {
+        background-image: linear-gradient(135deg, #7c3aed, #f97316);
+    }
+
+    .bg-glow-1 {
+        position: absolute;
+        top: -20%;
+        left: -10%;
+        width: 80vw;
+        height: 80vw;
+        max-width: 800px;
+        max-height: 800px;
+        background: radial-gradient(circle, rgba(124,58,237,0.04) 0%, rgba(255,255,255,0) 70%);
+        z-index: 0;
+        pointer-events: none;
+    }
+    
+    .bg-glow-2 {
+        position: absolute;
+        bottom: -20%;
+        right: -10%;
+        width: 60vw;
+        height: 60vw;
+        max-width: 600px;
+        max-height: 600px;
+        background: radial-gradient(circle, rgba(249,115,22,0.04) 0%, rgba(255,255,255,0) 70%);
+        z-index: 0;
+        pointer-events: none;
+    }
+
+    @keyframes pulse-slow {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.8; transform: scale(1.05); }
+    }
+
+    .animate-pulse-slow {
+        animation: pulse-slow 4s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    .animate-float {
+        animation: float 3s ease-in-out infinite;
+    }
+
+    /* Режим экспорта в PDF: index.html?pdf=1 */
+    body.pdf-export-mode {
+        overflow: auto !important;
+        width: auto !important;
+        height: auto !important;
+        min-height: 100vh;
+        background: #ffffff !important;
+    }
+
+    body.pdf-export-mode .bg-glow-1,
+    body.pdf-export-mode .bg-glow-2,
+    body.pdf-export-mode #progress-container {
+        display: none !important;
+    }
+
+    body.pdf-export-mode .slide-container {
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        width: 100% !important;
+        min-height: 100vh;
+        height: auto !important;
+        opacity: 1 !important;
+        transform: none !important;
+        pointer-events: auto !important;
+        overflow: visible !important;
+        page-break-after: always;
+        break-after: page;
+        break-inside: avoid;
+    }
+
+    body.pdf-export-mode .slide-container:last-of-type {
+        page-break-after: auto;
+        break-after: auto;
+    }
+
+    body.pdf-export-mode .content-z {
+        margin: 0 auto !important;
+        padding-top: 1.5rem !important;
+        padding-bottom: 1.5rem !important;
+    }
+
+    body.pdf-export-mode .animate-pulse-slow,
+    body.pdf-export-mode .animate-float {
+        animation: none !important;
+    }
+
+    @page {
+        size: A4 landscape;
+        margin: 10mm;
+    }
+
+    @media print {
+        html,
         body {
-            user-select: none;
-            overflow: hidden;
-            background-color: #ffffff;
-            margin: 0;
-            width: 100vw;
-            height: 100vh;
+            overflow: visible !important;
+            width: auto !important;
+            height: auto !important;
+            background: #ffffff !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .bg-glow-1,
+        .bg-glow-2,
+        #progress-container {
+            display: none !important;
         }
 
         .slide-container {
-            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            overflow-y: auto; /* Fallback for extremely small screens */
-            overflow-x: hidden;
+            transition: none !important;
+            position: relative !important;
+            top: auto !important;
+            left: auto !important;
+            width: 100% !important;
+            min-height: 100vh;
+            height: auto !important;
+            opacity: 1 !important;
+            transform: none !important;
+            pointer-events: auto !important;
+            overflow: visible !important;
+            page-break-after: always;
+            break-after: page;
+            break-inside: avoid;
         }
 
-        .slide-container::-webkit-scrollbar {
-            display: none;
-        }
-        
-        .slide-container {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
+        .slide-container:last-of-type {
+            page-break-after: auto !important;
+            break-after: auto !important;
         }
 
         .content-z {
-            position: relative;
-            z-index: 10;
-            margin: auto;
-            width: 100%;
-            padding-top: 1rem;
-            padding-bottom: 1.5rem;
+            margin: 0 auto !important;
+            padding-top: 1.5rem !important;
+            padding-bottom: 1.5rem !important;
         }
 
-        @media (min-width: 768px) {
-            .content-z {
-                padding-top: 2rem;
-                padding-bottom: 3rem;
-            }
-        }
-
-        .gradient-text {
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-image: linear-gradient(to right, #7c3aed, #f97316);
-        }
-
-        .gradient-bg {
-            background-image: linear-gradient(135deg, #7c3aed, #f97316);
-        }
-
-        .bg-glow-1 {
-            position: absolute;
-            top: -20%;
-            left: -10%;
-            width: 80vw;
-            height: 80vw;
-            max-width: 800px;
-            max-height: 800px;
-            background: radial-gradient(circle, rgba(124,58,237,0.04) 0%, rgba(255,255,255,0) 70%);
-            z-index: 0;
-            pointer-events: none;
-        }
-        
-        .bg-glow-2 {
-            position: absolute;
-            bottom: -20%;
-            right: -10%;
-            width: 60vw;
-            height: 60vw;
-            max-width: 600px;
-            max-height: 600px;
-            background: radial-gradient(circle, rgba(249,115,22,0.04) 0%, rgba(255,255,255,0) 70%);
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        @keyframes pulse-slow {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.8; transform: scale(1.05); }
-        }
-        .animate-pulse-slow {
-            animation: pulse-slow 4s ease-in-out infinite;
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
+        .animate-pulse-slow,
         .animate-float {
-            animation: float 3s ease-in-out infinite;
+            animation: none !important;
         }
-    </style>
+    }
+</style>
+    
 </head>
 <body class="text-gray-900 font-sans">
 
@@ -140,7 +252,7 @@
     <div class="bg-glow-2"></div>
 
     <!-- Индикатор прогресса -->
-    <div class="absolute bottom-0 left-0 h-1.5 bg-gray-100 w-full z-50">
+    <div id="progress-container" class="absolute bottom-0 left-0 h-1.5 bg-gray-100 w-full z-50">
         <div id="progress-bar" class="h-full gradient-bg w-0 transition-all duration-300"></div>
     </div>
 
@@ -1589,84 +1701,139 @@
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const totalSlides = 33; // Обновленное количество слайдов
-            let currentSlide = 0;
-            const progressBar = document.getElementById('progress-bar');
+ <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const totalSlides = 33;
+        let currentSlide = 0;
+        const progressBar = document.getElementById('progress-bar');
+        const body = document.body;
+        const params = new URLSearchParams(window.location.search);
+        const exportMode =
+            params.has('pdf') ||
+            params.get('mode') === 'pdf' ||
+            window.location.hash === '#pdf';
 
-            function updateSlides() {
-                for (let i = 0; i < totalSlides; i++) {
-                    const slide = document.getElementById(`slide-${i}`);
-                    if (!slide) continue;
+        function updateProgress() {
+            if (!progressBar) return;
+            const progress = ((currentSlide + 1) / totalSlides) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
 
-                    if (i === currentSlide) {
-                        slide.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-8', '-translate-y-8');
-                        slide.classList.add('opacity-100', 'translate-y-0');
-                    } else if (i < currentSlide) {
-                        slide.classList.remove('opacity-100', 'translate-y-0', 'translate-y-8');
-                        slide.classList.add('opacity-0', 'pointer-events-none', '-translate-y-8');
-                    } else {
-                        slide.classList.remove('opacity-100', 'translate-y-0', '-translate-y-8');
-                        slide.classList.add('opacity-0', 'pointer-events-none', 'translate-y-8');
-                    }
-                }
+        function updateSlides() {
+            for (let i = 0; i < totalSlides; i++) {
+                const slide = document.getElementById(`slide-${i}`);
+                if (!slide) continue;
 
-                if (progressBar) {
-                    const progress = ((currentSlide + 1) / totalSlides) * 100;
-                    progressBar.style.width = `${progress}%`;
-                }
-            }
-
-            function nextSlide() {
-                if (currentSlide < totalSlides - 1) {
-                    currentSlide++;
-                    updateSlides();
-                }
-            }
-
-            function prevSlide() {
-                if (currentSlide > 0) {
-                    currentSlide--;
-                    updateSlides();
+                if (i === currentSlide) {
+                    slide.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-8', '-translate-y-8');
+                    slide.classList.add('opacity-100', 'translate-y-0');
+                } else if (i < currentSlide) {
+                    slide.classList.remove('opacity-100', 'translate-y-0', 'translate-y-8');
+                    slide.classList.add('opacity-0', 'pointer-events-none', '-translate-y-8');
+                } else {
+                    slide.classList.remove('opacity-100', 'translate-y-0', '-translate-y-8');
+                    slide.classList.add('opacity-0', 'pointer-events-none', 'translate-y-8');
                 }
             }
 
-            // Клавиатура
-            window.addEventListener('keydown', (e) => {
-                if (['ArrowRight', ' ', 'Enter', 'PageDown'].includes(e.key)) {
-                    nextSlide();
-                } else if (['ArrowLeft', 'PageUp', 'Backspace'].includes(e.key)) {
-                    prevSlide();
-                }
-            });
+            updateProgress();
+        }
 
-            // Клик мышью
-            window.addEventListener('mousedown', (e) => {
-                if (e.button === 0) nextSlide(); // ЛКМ = Вперед
-                if (e.button === 2) prevSlide(); // ПКМ = Назад
-            });
-            window.addEventListener('contextmenu', e => e.preventDefault());
+        function showAllSlidesForPdf() {
+            body.classList.add('pdf-export-mode');
 
-            // Свайпы для мобильных
-            let touchStartX = 0;
-            window.addEventListener('touchstart', e => {
-                touchStartX = e.changedTouches[0].screenX;
-            }, {passive: true});
+            for (let i = 0; i < totalSlides; i++) {
+                const slide = document.getElementById(`slide-${i}`);
+                if (!slide) continue;
 
-            window.addEventListener('touchend', e => {
-                let touchEndX = e.changedTouches[0].screenX;
-                const swipeThreshold = 50;
-                if (touchStartX - touchEndX > swipeThreshold) {
-                    nextSlide(); 
-                } else if (touchEndX - touchStartX > swipeThreshold) {
-                    prevSlide(); 
-                }
-            }, {passive: true});
+                slide.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-8', '-translate-y-8');
+                slide.classList.add('opacity-100');
+                slide.style.transform = 'none';
+                slide.style.pointerEvents = 'auto';
+            }
 
-            // Инициализация
+            if (progressBar) {
+                progressBar.style.width = '100%';
+            }
+        }
+
+        function restoreInteractiveMode() {
+            body.classList.remove('pdf-export-mode');
+
+            for (let i = 0; i < totalSlides; i++) {
+                const slide = document.getElementById(`slide-${i}`);
+                if (!slide) continue;
+                slide.style.transform = '';
+                slide.style.pointerEvents = '';
+            }
+
             updateSlides();
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlides();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlides();
+            }
+        }
+
+        window.addEventListener('beforeprint', () => {
+            showAllSlidesForPdf();
         });
-    </script>
+
+        window.addEventListener('afterprint', () => {
+            if (!exportMode) {
+                restoreInteractiveMode();
+            }
+        });
+
+        if (exportMode) {
+            showAllSlidesForPdf();
+            return;
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (['ArrowRight', ' ', 'Enter', 'PageDown'].includes(e.key)) {
+                nextSlide();
+            } else if (['ArrowLeft', 'PageUp', 'Backspace'].includes(e.key)) {
+                prevSlide();
+            }
+        });
+
+        window.addEventListener('mousedown', (e) => {
+            if (e.button === 0) nextSlide();
+            if (e.button === 2) prevSlide();
+        });
+
+        window.addEventListener('contextmenu', e => e.preventDefault());
+
+        let touchStartX = 0;
+
+        window.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        window.addEventListener('touchend', e => {
+            const touchEndX = e.changedTouches[0].screenX;
+            const swipeThreshold = 50;
+
+            if (touchStartX - touchEndX > swipeThreshold) {
+                nextSlide();
+            } else if (touchEndX - touchStartX > swipeThreshold) {
+                prevSlide();
+            }
+        }, { passive: true });
+
+        updateSlides();
+    });
+</script>
+    
 </body>
 </html>
