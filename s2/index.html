@@ -1,1 +1,687 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Семинар: От AS-IS к TO-BE</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            purple: '#7c3aed',
+                            orange: '#f97316',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 
+<style>
+    html { background: #ffffff !important; }
+    body {
+        user-select: none;
+        overflow: hidden;
+        background-color: #ffffff !important;
+        margin: 0;
+        width: 100vw;
+        height: 100vh;
+    }
+
+    .slide-container {
+        transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        display: flex; flex-direction: column; justify-content: center;
+        overflow-y: auto; overflow-x: hidden; background: #ffffff;
+        -ms-overflow-style: none; scrollbar-width: none;
+    }
+    .slide-container::-webkit-scrollbar { display: none; }
+
+    .content-z {
+        position: relative; z-index: 10; margin: auto; width: 100%;
+        padding-top: 1rem; padding-bottom: 1.5rem;
+    }
+
+    @media (min-width: 768px) {
+        .content-z { padding-top: 2rem; padding-bottom: 3rem; }
+    }
+
+    .gradient-text {
+        background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        background-image: linear-gradient(to right, #7c3aed, #f97316);
+    }
+    .gradient-bg { background-image: linear-gradient(135deg, #7c3aed, #f97316); }
+
+    .bg-glow-1 {
+        position: absolute; top: -20%; left: -10%; width: 80vw; height: 80vw; max-width: 800px; max-height: 800px;
+        background: radial-gradient(circle, rgba(124,58,237,0.03) 0%, rgba(255,255,255,0) 70%);
+        z-index: 0; pointer-events: none;
+    }
+    .bg-glow-2 {
+        position: absolute; bottom: -20%; right: -10%; width: 60vw; height: 60vw; max-width: 600px; max-height: 600px;
+        background: radial-gradient(circle, rgba(249,115,22,0.03) 0%, rgba(255,255,255,0) 70%);
+        z-index: 0; pointer-events: none;
+    }
+
+    /* PDF Mode */
+    body.pdf-export-mode { overflow: auto !important; height: auto !important; }
+    body.pdf-export-mode .bg-glow-1, body.pdf-export-mode .bg-glow-2, body.pdf-export-mode #progress-container { display: none !important; }
+    body.pdf-export-mode .slide-container {
+        position: relative !important; width: 100% !important; min-height: 100vh; height: auto !important;
+        opacity: 1 !important; transform: none !important; pointer-events: auto !important; overflow: visible !important;
+        page-break-after: always; break-after: page; break-inside: avoid;
+    }
+    @page { size: A4 landscape; margin: 10mm; }
+    @media print {
+        html, body { overflow: visible !important; height: auto !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .bg-glow-1, .bg-glow-2, #progress-container { display: none !important; }
+        .slide-container {
+            position: relative !important; width: 100% !important; min-height: 100vh; height: auto !important;
+            opacity: 1 !important; transform: none !important; pointer-events: auto !important; overflow: visible !important;
+            page-break-after: always; break-after: page; break-inside: avoid;
+        }
+    }
+</style>
+</head>
+<body class="text-gray-900 font-sans">
+
+    <!-- Декоративный фон -->
+    <div class="bg-glow-1"></div>
+    <div class="bg-glow-2"></div>
+
+    <!-- Индикатор прогресса -->
+    <div id="progress-container" class="absolute bottom-0 left-0 h-1.5 bg-gray-100 w-full z-50">
+        <div id="progress-bar" class="h-full gradient-bg w-0 transition-all duration-300"></div>
+    </div>
+
+    <!-- СЛАЙД 1: Титульный -->
+    <div class="slide-container px-4 md:px-12 opacity-100 translate-y-0" id="slide-0">
+        <div class="content-z text-center w-full max-w-6xl px-4 flex flex-col items-center justify-center h-full">
+            <div class="bg-white border border-purple-100 rounded-xl px-6 py-3 max-w-xl w-full shadow-sm mb-10 flex justify-center items-center text-center">
+                <p class="text-purple-600 font-bold uppercase tracking-widest text-xs md:text-sm"><i class="ph-fill ph-book-open mr-2"></i>Семинар 2: От AS-IS к TO-BE</p>
+            </div>
+
+            <h1 class="text-4xl md:text-6xl lg:text-[70px] font-black mb-12 leading-tight tracking-tight text-gray-900 drop-shadow-sm flex flex-col items-center text-center">
+                <span class="block mb-2">Кейс: работа</span>
+                <span class="block mb-2"><span class="gradient-text">ИИ-консультанта</span></span>
+                <span class="block">с научными статьями</span>
+            </h1>
+
+            <div class="w-24 h-1 gradient-bg rounded-full mt-6 opacity-50"></div>
+            <p class="text-gray-500 font-medium mt-6 text-sm md:text-lg">Андрей Кузьминых</p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 2: Процесс -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-1">
+        <div class="content-z max-w-6xl text-center">
+            <h2 class="text-2xl md:text-5xl font-black mb-12 md:mb-20 text-gray-900">Процесс создания <span class="gradient-text">ценности</span></h2>
+            
+            <div class="flex flex-col md:flex-row items-stretch justify-center gap-3 md:gap-4 mb-12 max-w-6xl mx-auto h-auto md:h-[220px]">
+                
+                <div class="bg-gray-50 border-2 border-gray-200 p-4 rounded-2xl flex-1 w-full shadow-sm flex flex-col items-center justify-center text-center">
+                    <i class="ph-duotone ph-file-arrow-down text-4xl text-purple-500 mb-3"></i>
+                    <h4 class="font-bold text-gray-900 text-sm md:text-lg mb-1 uppercase tracking-wider text-purple-600">Вход</h4>
+                    <p class="text-[11px] md:text-sm text-gray-700 font-medium">научные статьи<br>и препринты</p>
+                </div>
+                
+                <div class="flex items-center justify-center shrink-0 text-gray-300"><i class="ph-bold ph-arrow-right text-3xl hidden md:block"></i><i class="ph-bold ph-arrow-down text-3xl md:hidden"></i></div>
+
+                <div class="bg-white border-2 border-gray-200 p-4 rounded-2xl flex-1 w-full shadow-sm flex flex-col items-center justify-center text-center">
+                    <i class="ph-duotone ph-files text-4xl text-gray-400 mb-3"></i>
+                    <h4 class="font-bold text-gray-900 text-base md:text-lg mb-1">Поток статей</h4>
+                    <p class="text-[11px] md:text-sm text-gray-500">сложный математический язык</p>
+                </div>
+                
+                <div class="flex items-center justify-center shrink-0 text-gray-300"><i class="ph-bold ph-arrow-right text-3xl hidden md:block"></i><i class="ph-bold ph-arrow-down text-3xl md:hidden"></i></div>
+                
+                <div class="bg-purple-50 border-2 border-purple-200 p-4 rounded-2xl flex-1 w-full shadow-sm flex flex-col items-center justify-center text-center">
+                    <i class="ph-duotone ph-brain text-4xl text-purple-500 mb-3"></i>
+                    <h4 class="font-bold text-purple-900 text-base md:text-lg mb-1">Осмысление</h4>
+                    <p class="text-[11px] md:text-sm text-purple-700">отбор и интерпретация</p>
+                </div>
+                
+                <div class="flex items-center justify-center shrink-0 text-gray-300"><i class="ph-bold ph-arrow-right text-3xl hidden md:block"></i><i class="ph-bold ph-arrow-down text-3xl md:hidden"></i></div>
+
+                <div class="bg-orange-50 border-2 border-orange-200 p-4 rounded-2xl flex-1 w-full shadow-md flex flex-col items-center justify-center text-center">
+                    <i class="ph-duotone ph-check-circle text-4xl text-orange-500 mb-3"></i>
+                    <h4 class="font-bold text-orange-900 text-base md:text-lg mb-1">Рабочий материал</h4>
+                    <p class="text-[11px] md:text-sm text-orange-700">полезный результат</p>
+                </div>
+
+                <div class="flex items-center justify-center shrink-0 text-orange-300"><i class="ph-bold ph-arrow-right text-3xl hidden md:block"></i><i class="ph-bold ph-arrow-down text-3xl md:hidden"></i></div>
+                
+                <div class="bg-gray-50 border-2 border-gray-200 p-4 rounded-2xl flex-1 w-full shadow-sm flex flex-col items-center justify-center text-center">
+                    <i class="ph-duotone ph-file-arrow-up text-4xl text-orange-500 mb-3"></i>
+                    <h4 class="font-bold text-gray-900 text-sm md:text-lg mb-1 uppercase tracking-wider text-orange-600">Выход</h4>
+                    <p class="text-[11px] md:text-sm text-gray-700 font-medium">материалы<br>для изучения</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 3: Интервью -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-2">
+        <div class="content-z max-w-6xl">
+            <h2 class="text-2xl md:text-5xl font-black mb-12 md:mb-16 text-center text-gray-900">Сбор процесса через <span class="gradient-text">интервью</span></h2>
+            
+            <div class="flex flex-col md:flex-row gap-4 md:gap-6 justify-center mb-12">
+                <div class="bg-white border-t-4 border-blue-500 p-6 rounded-b-2xl shadow-md w-full md:w-1/3">
+                    <div class="bg-blue-50 text-blue-600 w-12 h-12 rounded-full flex items-center justify-center mb-4"><i class="ph-fill ph-microscope text-2xl"></i></div>
+                    <h3 class="font-black text-lg md:text-xl text-gray-900 mb-3">1. Исследователь</h3>
+                    <p class="text-[11px] md:text-sm text-gray-600">Смотрит на научную новизну, метод, ограничения.</p>
+                </div>
+                
+                <div class="bg-white border-t-4 border-purple-500 p-6 rounded-b-2xl shadow-md w-full md:w-1/3">
+                    <div class="bg-purple-50 text-purple-600 w-12 h-12 rounded-full flex items-center justify-center mb-4"><i class="ph-fill ph-terminal-window text-2xl"></i></div>
+                    <h3 class="font-black text-lg md:text-xl text-gray-900 mb-3">2. Инженер</h3>
+                    <p class="text-[11px] md:text-sm text-gray-600">Смотрит на применимость, архитектуру, возможность внедрения.</p>
+                </div>
+
+                <div class="bg-white border-t-4 border-orange-500 p-6 rounded-b-2xl shadow-md w-full md:w-1/3">
+                    <div class="bg-orange-50 text-orange-600 w-12 h-12 rounded-full flex items-center justify-center mb-4"><i class="ph-fill ph-strategy text-2xl"></i></div>
+                    <h3 class="font-black text-lg md:text-xl text-gray-900 mb-3">3. Консультант</h3>
+                    <p class="text-[11px] md:text-sm text-gray-600">Смотрит на значимость, приоритет внимания, влияние на решения.</p>
+                </div>
+            </div>
+
+            <div class="text-center mt-10">
+                <a href="https://docs.google.com/document/d/1qXjHi43slzIqeu7FUztvfdgFU749DDBqF9bVxhJlZU0/edit?usp=sharing" target="_blank" class="inline-flex items-center gap-3 bg-gradient-to-r from-purple-500 to-orange-500 text-white hover:opacity-90 px-6 py-4 rounded-xl font-bold shadow-md transition-opacity text-sm md:text-base">
+                    <i class="ph-bold ph-file-text text-xl"></i> Промты для синтетического интервью
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 4: AS-IS -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-3">
+        <div class="content-z max-w-6xl">
+            <h2 class="text-2xl md:text-5xl font-black mb-8 md:mb-12 text-center text-gray-900">Текущий процесс <span class="text-gray-400">(AS-IS)</span></h2>
+            
+            <div class="mb-12 pb-4">
+                <div class="flex flex-wrap items-center justify-center gap-2 max-w-6xl mx-auto px-2">
+                    <div class="bg-white border-2 border-gray-300 w-[150px] h-[60px] flex items-center justify-center rounded-xl font-bold text-[10px] md:text-xs text-gray-800 shadow-sm text-center px-2">Поток статей</div>
+                    <i class="ph-bold ph-arrow-right text-gray-400"></i>
+                    <div class="bg-white border-2 border-gray-300 w-[150px] h-[60px] flex items-center justify-center rounded-xl font-bold text-[10px] md:text-xs text-gray-800 shadow-sm text-center px-2">отбор</div>
+                    <i class="ph-bold ph-arrow-right text-gray-400"></i>
+                    <div class="bg-white border-2 border-gray-300 w-[150px] h-[60px] flex items-center justify-center rounded-xl font-bold text-[10px] md:text-xs text-gray-800 shadow-sm text-center px-2">глубокое чтение</div>
+                    <i class="ph-bold ph-arrow-right text-gray-400"></i>
+                    <div class="bg-white border-2 border-gray-300 w-[150px] h-[60px] flex items-center justify-center rounded-xl font-bold text-[10px] md:text-xs text-gray-800 shadow-sm text-center px-2">интерпретация</div>
+                    <i class="ph-bold ph-arrow-right text-gray-400"></i>
+                    <div class="bg-white border-2 border-gray-300 w-[150px] h-[60px] flex items-center justify-center rounded-xl font-bold text-[10px] md:text-xs text-gray-800 shadow-sm text-center px-2">рабочий материал</div>
+                    <i class="ph-bold ph-arrow-right text-gray-400"></i>
+                    <div class="bg-white border-2 border-gray-300 w-[150px] h-[60px] flex items-center justify-center rounded-xl font-bold text-[10px] md:text-xs text-gray-800 shadow-sm text-center px-2">реальная задача</div>
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-6 md:gap-8 max-w-5xl mx-auto">
+                <div class="bg-purple-50 border border-purple-200 p-6 md:p-8 rounded-2xl shadow-sm flex-1">
+                    <h4 class="font-black text-purple-900 text-base md:text-lg mb-4 flex items-center gap-2"><i class="ph-fill ph-git-branch text-purple-500"></i> Точки принятия решений</h4>
+                    <ul class="space-y-3">
+                        <li class="flex items-start gap-2 text-[11px] md:text-sm text-purple-800 font-medium">
+                            <i class="ph-bold ph-question text-purple-400 mt-0.5 shrink-0"></i> читать глубоко или нет
+                        </li>
+                        <li class="flex items-start gap-2 text-[11px] md:text-sm text-purple-800 font-medium">
+                            <i class="ph-bold ph-question text-purple-400 mt-0.5 shrink-0"></i> важно или нет
+                        </li>
+                        <li class="flex items-start gap-2 text-[11px] md:text-sm text-purple-800 font-medium">
+                            <i class="ph-bold ph-question text-purple-400 mt-0.5 shrink-0"></i> превращать в материал или нет
+                        </li>
+                        <li class="flex items-start gap-2 text-[11px] md:text-sm text-purple-800 font-medium">
+                            <i class="ph-bold ph-question text-purple-400 mt-0.5 shrink-0"></i> применить или нет
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="bg-orange-50 border border-orange-200 p-6 md:p-8 rounded-2xl shadow-sm flex-1">
+                    <h4 class="font-black text-orange-900 text-base md:text-lg mb-4 flex items-center gap-2"><i class="ph-fill ph-warning-circle text-orange-500"></i> Исключения</h4>
+                    <ul class="space-y-3">
+                        <li class="flex items-start gap-2 text-[11px] md:text-sm text-orange-800 font-medium">
+                            <i class="ph-bold ph-x text-orange-400 mt-0.5 shrink-0"></i> статья может быть упущена в источнике
+                        </li>
+                        <li class="flex items-start gap-2 text-[11px] md:text-sm text-orange-800 font-medium">
+                            <i class="ph-bold ph-x text-orange-400 mt-0.5 shrink-0"></i> важной, но не имеет научной новизны
+                        </li>
+                        <li class="flex items-start gap-2 text-[11px] md:text-sm text-orange-800 font-medium">
+                            <i class="ph-bold ph-x text-orange-400 mt-0.5 shrink-0"></i> краткое содержание ненадежно
+                        </li>
+                        <li class="flex items-start gap-2 text-[11px] md:text-sm text-orange-800 font-medium">
+                            <i class="ph-bold ph-x text-orange-400 mt-0.5 shrink-0"></i> релевантность неясна
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="mt-10 text-center">
+                <a href="https://docs.google.com/document/d/1qVCXqd3pTuW4kfi8pdUEdyJ-2-tEjKXa3lx9ZUlyqEY/edit?usp=sharing" target="_blank" class="inline-flex items-center gap-3 bg-gradient-to-r from-purple-500 to-orange-500 text-white hover:opacity-90 px-6 py-3 rounded-xl font-bold shadow-md transition-opacity text-sm md:text-base">
+                    <i class="ph-bold ph-file-text text-xl"></i> Промты для анализа процесса
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 5: Точки автоматизации -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-4">
+        <div class="content-z max-w-6xl">
+            <h2 class="text-2xl md:text-5xl font-black mb-10 md:mb-16 text-center text-gray-900">Точки <span class="gradient-text">автоматизации</span></h2>
+            
+            <div class="flex flex-col md:flex-row gap-4 md:gap-6 justify-center items-stretch max-w-6xl mx-auto h-auto">
+                <!-- Column 1 -->
+                <div class="bg-white border-t-4 border-gray-400 p-5 md:p-6 rounded-b-2xl shadow-md flex-1 w-full flex flex-col">
+                    <div class="flex items-center gap-3 mb-6">
+                        <i class="ph-fill ph-gear text-2xl text-gray-500"></i>
+                        <h3 class="font-black text-lg md:text-xl text-gray-900">Детерминированные</h3>
+                    </div>
+                    <ul class="space-y-3 text-[11px] md:text-sm text-gray-700 font-medium">
+                        <li class="flex gap-2"><i class="ph-bold ph-check text-gray-400 mt-0.5"></i> сбор статей</li>
+                        <li class="flex gap-2"><i class="ph-bold ph-check text-gray-400 mt-0.5"></i> отправка материалов</li>
+                        <li class="flex gap-2"><i class="ph-bold ph-check text-gray-400 mt-0.5"></i> сохранение в базу знаний</li>
+                    </ul>
+                </div>
+                
+                <!-- Column 2 -->
+                <div class="bg-white border-t-4 border-purple-500 p-5 md:p-6 rounded-b-2xl shadow-md flex-1 w-full flex flex-col z-10">
+                    <div class="flex items-center gap-3 mb-6">
+                        <i class="ph-fill ph-brain text-2xl text-purple-500"></i>
+                        <h3 class="font-black text-lg md:text-xl text-purple-900">Вероятностные</h3>
+                    </div>
+                    <ul class="space-y-3 text-[11px] md:text-sm text-gray-700 font-medium">
+                        <li class="flex gap-2"><i class="ph-bold ph-sparkle text-purple-400 mt-0.5"></i> краткие содержания</li>
+                        <li class="flex gap-2"><i class="ph-bold ph-sparkle text-purple-400 mt-0.5"></i> подготовка материалов</li>
+                        <li class="flex gap-2"><i class="ph-bold ph-sparkle text-purple-400 mt-0.5"></i> консультация</li>
+                    </ul>
+                </div>
+
+                <!-- Column 3 -->
+                <div class="bg-white border-t-4 border-orange-500 p-5 md:p-6 rounded-b-2xl shadow-md flex-1 w-full flex flex-col">
+                    <div class="flex items-center gap-3 mb-6">
+                        <i class="ph-fill ph-user text-2xl text-orange-500"></i>
+                        <h3 class="font-black text-lg md:text-xl text-orange-900 leading-tight">Остающиеся за человеком</h3>
+                    </div>
+                    <ul class="space-y-3 text-[11px] md:text-sm text-gray-700 font-medium">
+                        <li class="flex gap-2"><i class="ph-bold ph-star text-orange-400 mt-0.5"></i> оценка релевантности</li>
+                        <li class="flex gap-2"><i class="ph-bold ph-star text-orange-400 mt-0.5"></i> интерпретация материалов</li>
+                        <li class="flex gap-2"><i class="ph-bold ph-star text-orange-400 mt-0.5"></i> применение</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="mt-10 text-center">
+                <a href="https://docs.google.com/document/d/1yUDWeuFHXLgxLZsC0JDuZYs1t4zD9TNRsKLpL9fkUs4/edit?tab=t.0" target="_blank" class="inline-flex items-center gap-3 bg-gradient-to-r from-purple-500 to-orange-500 text-white hover:opacity-90 px-6 py-3 rounded-xl font-bold shadow-md transition-opacity text-sm md:text-base">
+                    <i class="ph-bold ph-file-text text-xl"></i> Промт для точек автоматизации
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 6: TO-BE -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-5">
+        <div class="content-z max-w-6xl">
+            <h2 class="text-2xl md:text-5xl font-black mb-12 text-center text-gray-900">Целевая модель <span class="gradient-text">TO-BE</span></h2>
+            
+            <div class="mb-10">
+                <div class="flex flex-col gap-y-4 max-w-6xl mx-auto px-2 items-center">
+                    
+                    <!-- Row 1 -->
+                    <div class="flex w-full justify-center items-center gap-2 md:gap-4 flex-wrap">
+                        <div class="flex flex-col items-center justify-center shrink-0 w-[80px]">
+                            <i class="ph-duotone ph-database text-4xl text-gray-500 mb-1"></i>
+                            <span class="font-bold text-[10px] text-gray-500 uppercase tracking-widest">Arxiv</span>
+                        </div>
+                        <i class="ph-bold ph-arrow-right text-gray-300"></i>
+                        <div class="bg-white border-2 border-gray-200 w-[140px] h-[60px] flex items-center justify-center rounded-xl font-bold text-[10px] md:text-xs text-gray-800 shadow-sm gap-2">
+                            <i class="ph-fill ph-gear text-gray-500 text-lg"></i> сбор
+                        </div>
+                        <i class="ph-bold ph-arrow-right text-gray-300"></i>
+                        <div class="bg-purple-50 border-2 border-purple-300 w-[140px] h-[60px] flex items-center justify-center rounded-xl font-bold text-[10px] md:text-xs text-purple-800 shadow-sm gap-2 text-center leading-tight">
+                            <i class="ph-fill ph-brain text-purple-500 text-lg"></i> краткое<br>содержание
+                        </div>
+                        <i class="ph-bold ph-arrow-right text-purple-300"></i>
+                        <div class="bg-orange-50 border-2 border-orange-300 w-[140px] h-[60px] flex items-center justify-center rounded-xl font-bold text-[10px] md:text-xs text-orange-800 shadow-sm gap-2 text-center leading-tight">
+                            <i class="ph-fill ph-user text-orange-500 text-lg"></i> оценка<br>релевантности
+                        </div>
+                        <i class="ph-bold ph-arrow-right text-orange-300"></i>
+                        <div class="bg-purple-50 border-2 border-purple-300 w-[140px] h-[60px] flex items-center justify-center rounded-xl font-bold text-[10px] md:text-xs text-purple-800 shadow-sm gap-2 text-center leading-tight">
+                            <i class="ph-fill ph-brain text-purple-500 text-lg"></i> подготовка<br>материалов
+                        </div>
+                    </div>
+                    
+                    <div class="w-full flex justify-center py-2"><i class="ph-bold ph-arrow-down text-gray-300 text-2xl"></i></div>
+                    
+                    <!-- Row 2 -->
+                    <div class="flex w-full justify-center items-center gap-2 md:gap-4 flex-wrap">
+                        <div class="bg-white border-2 border-gray-200 w-[140px] h-[60px] flex items-center justify-center rounded-xl font-bold text-[10px] md:text-xs text-gray-800 shadow-sm gap-2 text-center leading-tight">
+                            <i class="ph-fill ph-gear text-gray-500 text-lg"></i> отправка<br>материалов
+                        </div>
+                        <i class="ph-bold ph-arrow-right text-gray-300"></i>
+                        <div class="bg-orange-50 border-2 border-orange-300 w-[140px] h-[60px] flex items-center justify-center rounded-xl font-bold text-[10px] md:text-xs text-orange-800 shadow-sm gap-2">
+                            <i class="ph-fill ph-user text-orange-500 text-lg"></i> интерпретация
+                        </div>
+                        <i class="ph-bold ph-arrow-right text-gray-300"></i>
+                        <div class="bg-white border-2 border-gray-200 w-[140px] h-[60px] flex items-center justify-center rounded-xl font-bold text-[10px] md:text-xs text-gray-800 shadow-sm gap-2 text-center leading-tight">
+                            <i class="ph-fill ph-gear text-gray-500 text-lg"></i> сохранение<br>в БД
+                        </div>
+                        <i class="ph-bold ph-arrow-right text-gray-300"></i>
+                        <div class="bg-purple-50 border-2 border-purple-300 w-[140px] h-[60px] flex items-center justify-center rounded-xl font-bold text-[10px] md:text-xs text-purple-800 shadow-sm gap-2">
+                            <i class="ph-fill ph-brain text-purple-500 text-lg"></i> консультация
+                        </div>
+                        <i class="ph-bold ph-arrow-right text-purple-300"></i>
+                        <div class="bg-orange-50 border-2 border-orange-300 w-[140px] h-[60px] flex items-center justify-center rounded-xl font-bold text-[10px] md:text-xs text-orange-800 shadow-sm gap-2">
+                            <i class="ph-fill ph-user text-orange-500 text-lg"></i> применение
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="mt-12 mb-8 text-center">
+                <a href="https://docs.google.com/document/d/1OsX9SDRBAIXy9oc-W9i5T71T6Pk7uCJ_wn4yV1UHa_M/edit?usp=sharing" target="_blank" class="inline-flex items-center gap-3 bg-gradient-to-r from-purple-500 to-orange-500 text-white hover:opacity-90 px-6 py-3 rounded-xl font-bold shadow-md transition-opacity text-sm md:text-base">
+                    <i class="ph-bold ph-file-text text-xl"></i> Промт для TO-BE
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 7: Граф навыков -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-6">
+        <div class="content-z max-w-6xl h-full flex flex-col justify-center">
+            <h2 class="text-2xl md:text-5xl font-black mb-10 md:mb-16 text-center text-gray-900"><span class="gradient-text">Граф навыков</span> агента</h2>
+            
+            <div class="relative w-full max-w-[900px] h-[360px] mx-auto bg-gray-50 border border-gray-100 rounded-3xl shadow-inner p-8 flex items-center justify-center overflow-hidden">
+                
+                <!-- Линии графа (SVG) -->
+                <svg class="absolute inset-0 w-full h-full pointer-events-none z-0" viewBox="0 0 900 360" preserveAspectRatio="xMidYMid meet">
+                    <!-- Агент -> Сбор -->
+                    <line x1="80" y1="180" x2="220" y2="180" stroke="#d1d5db" stroke-width="3" />
+                    <!-- Сбор -> Краткое содержание -->
+                    <line x1="220" y1="180" x2="360" y2="180" stroke="#d1d5db" stroke-width="3" />
+                    <!-- Краткое содержание -> Подготовка -->
+                    <line x1="360" y1="180" x2="500" y2="180" stroke="#d1d5db" stroke-width="3" />
+                    <!-- Подготовка -> Отправка материалов -->
+                    <line x1="500" y1="180" x2="650" y2="100" stroke="#d1d5db" stroke-width="3" />
+                    <!-- Подготовка -> Сохранение в базу -->
+                    <line x1="500" y1="180" x2="650" y2="260" stroke="#d1d5db" stroke-width="3" />
+                    <!-- Сохранение в базу -> Запрос из БД -->
+                    <line x1="650" y1="260" x2="800" y2="260" stroke="#d1d5db" stroke-width="3" />
+                </svg>
+
+                <!-- Узлы графа -->
+                
+                <!-- Node: Агент -->
+                <div class="absolute flex flex-col items-center justify-center bg-gradient-to-br from-purple-500 to-orange-500 w-24 h-24 rounded-full shadow-lg z-10 text-white" style="left: calc((80/900)*100%); top: calc((180/360)*100%); transform: translate(-50%, -50%);">
+                    <i class="ph-fill ph-robot text-3xl mb-1"></i>
+                    <span class="text-[11px] font-black">Агент</span>
+                </div>
+
+                <!-- Node: Сбор -->
+                <div class="absolute flex flex-col items-center justify-center bg-white border-4 border-gray-300 w-28 h-28 rounded-full shadow-lg z-10" style="left: calc((220/900)*100%); top: calc((180/360)*100%); transform: translate(-50%, -50%);">
+                    <i class="ph-bold ph-gear text-2xl text-gray-500 mb-1"></i>
+                    <span class="text-[10px] font-bold text-gray-700">Сбор</span>
+                </div>
+
+                <!-- Node: Краткое содержание -->
+                <div class="absolute flex flex-col items-center justify-center bg-purple-50 border-4 border-purple-400 w-28 h-28 rounded-full shadow-lg z-10" style="left: calc((360/900)*100%); top: calc((180/360)*100%); transform: translate(-50%, -50%);">
+                    <i class="ph-bold ph-brain text-2xl text-purple-500 mb-1"></i>
+                    <span class="text-[10px] font-bold text-purple-800 text-center leading-tight">Краткое<br>содержание</span>
+                </div>
+
+                <!-- Node: Подготовка -->
+                <div class="absolute flex flex-col items-center justify-center bg-purple-50 border-4 border-purple-400 w-28 h-28 rounded-full shadow-lg z-10" style="left: calc((500/900)*100%); top: calc((180/360)*100%); transform: translate(-50%, -50%);">
+                    <i class="ph-bold ph-brain text-2xl text-purple-500 mb-1"></i>
+                    <span class="text-[10px] font-bold text-purple-800 text-center leading-tight">Подготовка<br>материалов</span>
+                </div>
+                
+                <!-- Node: Отправка материалов -->
+                <div class="absolute flex flex-col items-center justify-center bg-white border-4 border-gray-300 w-28 h-28 rounded-full shadow-lg z-10" style="left: calc((650/900)*100%); top: calc((100/360)*100%); transform: translate(-50%, -50%);">
+                    <i class="ph-bold ph-gear text-2xl text-gray-500 mb-1"></i>
+                    <span class="text-[10px] font-bold text-gray-700 text-center leading-tight">Отправка<br>материалов</span>
+                </div>
+
+                <!-- Node: Сохранение в базу -->
+                <div class="absolute flex flex-col items-center justify-center bg-white border-4 border-gray-300 w-28 h-28 rounded-full shadow-lg z-10" style="left: calc((650/900)*100%); top: calc((260/360)*100%); transform: translate(-50%, -50%);">
+                    <i class="ph-bold ph-gear text-3xl text-gray-500 mb-1"></i>
+                    <span class="text-[10px] font-bold text-gray-800 text-center leading-tight">Сохранение<br>в базу</span>
+                </div>
+
+                <!-- Node: Запрос из БЗ -->
+                <div class="absolute flex flex-col items-center justify-center bg-purple-50 border-4 border-purple-400 w-28 h-28 rounded-full shadow-lg z-10" style="left: calc((800/900)*100%); top: calc((260/360)*100%); transform: translate(-50%, -50%);">
+                    <i class="ph-bold ph-brain text-2xl text-purple-500 mb-1"></i>
+                    <span class="text-[9px] md:text-[10px] font-bold text-purple-800 text-center leading-tight">Запрос из<br>базы знаний</span>
+                </div>
+            </div>
+
+            <div class="mt-10 text-center">
+                <a href="https://docs.google.com/document/d/1OdHVAOLoHdXM4q3v4ss4tpqfxBmNpV4tXu2M_PApo7w/edit?tab=t.0" target="_blank" class="inline-flex items-center gap-3 bg-gradient-to-r from-purple-500 to-orange-500 text-white hover:opacity-90 px-6 py-3 rounded-xl font-bold shadow-md transition-opacity text-sm md:text-base">
+                    <i class="ph-bold ph-file-text text-xl"></i> Промт для графа навыков
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 8: Метрики и Улучшения -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-7">
+        <div class="content-z max-w-6xl">
+            <h2 class="text-2xl md:text-5xl font-black mb-10 md:mb-16 text-center text-gray-900">Метрики и <span class="gradient-text">улучшения</span></h2>
+            
+            <div class="flex flex-col md:flex-row gap-6 max-w-5xl mx-auto">
+                <div class="bg-white border-t-4 border-purple-500 p-6 md:p-8 rounded-b-2xl shadow-md flex-1 flex flex-col items-center text-center transform transition hover:scale-105">
+                    <div class="bg-purple-50 text-purple-600 w-16 h-16 rounded-full flex items-center justify-center mb-6"><i class="ph-fill ph-files text-3xl"></i></div>
+                    <h3 class="font-black text-3xl md:text-4xl text-gray-900 mb-2">~50</h3>
+                    <p class="font-bold text-sm md:text-base text-gray-700 uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">статей ежедневно</p>
+                    <p class="text-xs md:text-sm text-gray-500 leading-relaxed">Получаю короткие саммари всех новых научных работ по ИИ в удобном виде.</p>
+                </div>
+
+                <div class="bg-white border-t-4 border-orange-500 p-6 md:p-8 rounded-b-2xl shadow-md flex-1 flex flex-col items-center text-center transform transition hover:scale-105">
+                    <div class="bg-orange-50 text-orange-600 w-16 h-16 rounded-full flex items-center justify-center mb-6"><i class="ph-fill ph-target text-3xl"></i></div>
+                    <h3 class="font-black text-3xl md:text-4xl text-gray-900 mb-2">1-2</h3>
+                    <p class="font-bold text-sm md:text-base text-gray-700 uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">в фокусе</p>
+                    <p class="text-xs md:text-sm text-gray-500 leading-relaxed">Выбираю самое важное и мгновенно проваливаюсь в готовые проработанные материалы.</p>
+                </div>
+
+                <div class="bg-gray-900 border-t-4 border-gray-700 p-6 md:p-8 rounded-b-2xl shadow-xl flex-1 flex flex-col items-center text-center transform transition hover:scale-105">
+                    <div class="bg-gray-800 text-white w-16 h-16 rounded-full flex items-center justify-center mb-6"><i class="ph-fill ph-chats-circle text-3xl"></i></div>
+                    <h3 class="font-black text-3xl md:text-4xl text-white mb-2">24/7</h3>
+                    <p class="font-bold text-sm md:text-base text-gray-300 uppercase tracking-wider mb-4 border-b border-gray-700 pb-2">база знаний</p>
+                    <p class="text-xs md:text-sm text-gray-400 leading-relaxed">Использую накопленную и структурированную базу знаний для быстрой консультации клиентов.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 9: Дальнейшие шаги (Roadmap) -->
+    <div class="slide-container px-2 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-8">
+        <div class="content-z max-w-6xl">
+            <h2 class="text-2xl md:text-5xl font-black mb-4 text-center text-gray-900">Дальнейшие <span class="gradient-text">шаги</span></h2>
+            <p class="text-center text-gray-500 font-bold text-[10px] md:text-sm mb-16 md:mb-24">План реализации агентной системы</p>
+            
+            <div class="relative w-full max-w-6xl mx-auto px-4">
+                <!-- Line -->
+                <div class="absolute top-[30px] md:top-[40px] left-[5%] right-[5%] h-1 bg-gray-200 z-0"></div>
+                <div class="absolute top-[30px] md:top-[40px] left-[5%] w-[15%] h-1 bg-gradient-to-r from-purple-500 to-orange-500 z-0"></div> <!-- Progress line -->
+                
+                <div class="flex flex-row justify-between relative z-10 w-full gap-2">
+                    
+                    <div class="flex flex-col items-center flex-1">
+                        <div class="w-12 h-12 md:w-20 md:h-20 bg-purple-50 border-2 border-purple-500 rounded-full flex items-center justify-center text-purple-500 shadow-sm mb-4 relative">
+                            <i class="ph-bold ph-check text-xl md:text-3xl"></i>
+                            <div class="absolute -top-3 md:-top-4 bg-purple-500 text-white text-[8px] md:text-[10px] px-2 py-1 rounded-full font-bold whitespace-nowrap shadow-md">Сделано</div>
+                        </div>
+                        <span class="text-[8px] md:text-sm font-bold text-gray-800 text-center leading-tight">Определение<br>процесса</span>
+                    </div>
+
+                    <div class="flex flex-col items-center flex-1">
+                        <div class="w-12 h-12 md:w-20 md:h-20 bg-white border-2 border-gray-300 rounded-full flex items-center justify-center text-gray-400 shadow-sm mb-4">
+                            <i class="ph-fill ph-robot text-xl md:text-3xl"></i>
+                        </div>
+                        <span class="text-[8px] md:text-sm font-bold text-gray-500 text-center leading-tight">Разработка<br>агента</span>
+                    </div>
+
+                    <div class="flex flex-col items-center flex-1">
+                        <div class="w-12 h-12 md:w-20 md:h-20 bg-white border-2 border-gray-300 rounded-full flex items-center justify-center text-gray-400 shadow-sm mb-4">
+                            <i class="ph-fill ph-tag text-xl md:text-3xl"></i>
+                        </div>
+                        <span class="text-[8px] md:text-sm font-bold text-gray-500 text-center leading-tight">Разметка<br>человеком</span>
+                    </div>
+
+                    <div class="flex flex-col items-center flex-1">
+                        <div class="w-12 h-12 md:w-20 md:h-20 bg-white border-2 border-gray-300 rounded-full flex items-center justify-center text-gray-400 shadow-sm mb-4">
+                            <i class="ph-fill ph-trend-up text-xl md:text-3xl"></i>
+                        </div>
+                        <span class="text-[8px] md:text-sm font-bold text-gray-500 text-center leading-tight">Улучшение и<br>дообучение</span>
+                    </div>
+
+                    <div class="flex flex-col items-center flex-1">
+                        <div class="w-12 h-12 md:w-20 md:h-20 bg-white border-2 border-gray-300 rounded-full flex items-center justify-center text-gray-400 shadow-sm mb-4">
+                            <i class="ph-fill ph-scales text-xl md:text-3xl"></i>
+                        </div>
+                        <span class="text-[8px] md:text-sm font-bold text-gray-500 text-center leading-tight">A/B-тестирование</span>
+                    </div>
+
+                    <div class="flex flex-col items-center flex-1">
+                        <div class="w-12 h-12 md:w-20 md:h-20 bg-white border-2 border-gray-300 rounded-full flex items-center justify-center text-gray-400 shadow-sm mb-4">
+                            <i class="ph-fill ph-rocket-launch text-xl md:text-3xl"></i>
+                        </div>
+                        <span class="text-[8px] md:text-sm font-bold text-gray-500 text-center leading-tight">Деплой и<br>мониторинг</span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const totalSlides = 9; 
+        let currentSlide = 0;
+        const progressBar = document.getElementById('progress-bar');
+        const body = document.body;
+        const params = new URLSearchParams(window.location.search);
+        const exportMode = 
+            params.has('pdf') || 
+            params.get('mode') === 'pdf' || 
+            window.location.hash === '#pdf';
+
+        function updateProgress() {
+            if (!progressBar) return;
+            const progress = ((currentSlide + 1) / totalSlides) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        function updateSlides() {
+            for (let i = 0; i < totalSlides; i++) {
+                const slide = document.getElementById(`slide-${i}`);
+                if (!slide) continue;
+
+                if (i === currentSlide) {
+                    slide.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-8', '-translate-y-8');
+                    slide.classList.add('opacity-100', 'translate-y-0');
+                } else if (i < currentSlide) {
+                    slide.classList.remove('opacity-100', 'translate-y-0', 'translate-y-8');
+                    slide.classList.add('opacity-0', 'pointer-events-none', '-translate-y-8');
+                } else {
+                    slide.classList.remove('opacity-100', 'translate-y-0', '-translate-y-8');
+                    slide.classList.add('opacity-0', 'pointer-events-none', 'translate-y-8');
+                }
+            }
+            updateProgress();
+        }
+
+        function showAllSlidesForPdf() {
+            body.classList.add('pdf-export-mode');
+            for (let i = 0; i < totalSlides; i++) {
+                const slide = document.getElementById(`slide-${i}`);
+                if (!slide) continue;
+                slide.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-8', '-translate-y-8');
+                slide.classList.add('opacity-100');
+                slide.style.transform = 'none';
+                slide.style.pointerEvents = 'auto';
+            }
+            if (progressBar) progressBar.style.width = '100%';
+        }
+
+        function restoreInteractiveMode() {
+            body.classList.remove('pdf-export-mode');
+            for (let i = 0; i < totalSlides; i++) {
+                const slide = document.getElementById(`slide-${i}`);
+                if (!slide) continue;
+                slide.style.transform = '';
+                slide.style.pointerEvents = '';
+            }
+            updateSlides();
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlides();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlides();
+                }
+        }
+
+        window.addEventListener('beforeprint', () => { showAllSlidesForPdf(); });
+        window.addEventListener('afterprint', () => { if (!exportMode) restoreInteractiveMode(); });
+
+        if (exportMode) {
+            showAllSlidesForPdf();
+            return;
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (['ArrowRight', ' ', 'Enter', 'PageDown'].includes(e.key)) {
+                nextSlide();
+            } else if (['ArrowLeft', 'PageUp', 'Backspace'].includes(e.key)) {
+                prevSlide();
+            }
+        });
+
+        window.addEventListener('mousedown', (e) => {
+            // Игнорируем клики по ссылкам и кнопкам
+            if(e.target.closest('a') || e.target.closest('button')) return;
+            if (e.button === 0) nextSlide();
+            if (e.button === 2) prevSlide();
+        });
+
+        window.addEventListener('contextmenu', e => e.preventDefault());
+
+        let touchStartX = 0;
+        window.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        window.addEventListener('touchend', e => {
+            const touchEndX = e.changedTouches[0].screenX;
+            const swipeThreshold = 50;
+            if (touchStartX - touchEndX > swipeThreshold) {
+                nextSlide();
+            } else if (touchEndX - touchStartX > swipeThreshold) {
+                prevSlide();
+            }
+        }, { passive: true });
+
+        updateSlides();
+    });
+</script>
+    
+</body>
+</html>
