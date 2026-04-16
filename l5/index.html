@@ -1,0 +1,1845 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Лекция 5: Продвинутые техники разработки ИИ-сервисов</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        brand: { purple: '#7c3aed', orange: '#f97316' }
+                    }
+                }
+            }
+        }
+    </script>
+
+<style>
+    html { background: #ffffff !important; }
+    body {
+        user-select: none; overflow: hidden; background-color: #ffffff !important;
+        margin: 0; width: 100vw; height: 100vh;
+    }
+    .slide-container {
+        transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        display: flex; flex-direction: column; justify-content: center;
+        overflow-y: auto; overflow-x: hidden; background: #ffffff;
+        -ms-overflow-style: none; scrollbar-width: none;
+    }
+    .slide-container::-webkit-scrollbar { display: none; }
+    .content-z {
+        position: relative; z-index: 10; margin: auto; width: 100%;
+        padding-top: 1rem; padding-bottom: 1.5rem;
+    }
+    @media (min-width: 768px) { .content-z { padding-top: 2rem; padding-bottom: 2rem; } }
+    .gradient-text {
+        background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        background-image: linear-gradient(to right, #7c3aed, #f97316);
+    }
+    .gradient-bg { background-image: linear-gradient(135deg, #7c3aed, #f97316); }
+    .bg-glow-1 {
+        position: absolute; top: -20%; left: -10%; width: 80vw; height: 80vw; max-width: 800px; max-height: 800px;
+        background: radial-gradient(circle, rgba(124,58,237,0.04) 0%, rgba(255,255,255,0) 70%); z-index: 0; pointer-events: none;
+    }
+    .bg-glow-2 {
+        position: absolute; bottom: -20%; right: -10%; width: 60vw; height: 60vw; max-width: 600px; max-height: 600px;
+        background: radial-gradient(circle, rgba(249,115,22,0.04) 0%, rgba(255,255,255,0) 70%); z-index: 0; pointer-events: none;
+    }
+
+    /* PDF Mode */
+    body.pdf-export-mode { overflow: auto !important; height: auto !important; }
+    body.pdf-export-mode .bg-glow-1, body.pdf-export-mode .bg-glow-2, body.pdf-export-mode #progress-container { display: none !important; }
+    body.pdf-export-mode .slide-container {
+        position: relative !important; width: 100% !important; min-height: 100vh; height: auto !important;
+        opacity: 1 !important; transform: none !important; pointer-events: auto !important; overflow: visible !important;
+        page-break-after: always; break-after: page; break-inside: avoid;
+    }
+    @page { size: A4 landscape; margin: 10mm; }
+    @media print {
+        html, body { overflow: visible !important; height: auto !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .bg-glow-1, .bg-glow-2, #progress-container { display: none !important; }
+        .slide-container {
+            position: relative !important; width: 100% !important; min-height: 100vh; height: auto !important;
+            opacity: 1 !important; transform: none !important; pointer-events: auto !important; overflow: visible !important;
+            page-break-after: always; break-after: page; break-inside: avoid;
+        }
+    }
+</style>
+</head>
+<body class="text-gray-900 font-sans">
+
+    <!-- Декоративный фон -->
+    <div class="bg-glow-1"></div>
+    <div class="bg-glow-2"></div>
+
+    <!-- Индикатор прогресса -->
+    <div id="progress-container" class="absolute bottom-0 left-0 h-1.5 bg-gray-100 w-full z-50">
+        <div id="progress-bar" class="h-full gradient-bg w-0 transition-all duration-300"></div>
+    </div>
+
+    <!-- СЛАЙД 0: Титульный -->
+    <div class="slide-container px-4 md:px-12 opacity-100 translate-y-0" id="slide-0">
+        <div class="content-z text-center w-full max-w-6xl px-4 flex flex-col items-center justify-center h-full">
+            <div class="bg-gradient-to-r from-purple-50 to-orange-50 border border-purple-100 rounded-xl p-3 md:p-5 max-w-3xl w-full shadow-sm mb-6 md:mb-10">
+                <p class="text-purple-600 font-semibold uppercase tracking-widest text-[10px] md:text-xs mb-1 md:mb-1.5"><i class="ph-fill ph-book-open"></i> Лекция 5</p>
+                <h2 class="text-sm md:text-xl font-bold text-gray-800 leading-tight">Вайб-кодинг, код-ноды в n8n и Telegram-боты</h2>
+            </div>
+            <h1 class="text-4xl md:text-6xl lg:text-[70px] font-black mb-8 md:mb-12 leading-[1.1] tracking-tight text-gray-900 drop-shadow-sm flex flex-col items-center">
+                <span>Продвинутые техники</span>
+                <span class="gradient-text">разработки ИИ-сервисов</span>
+            </h1>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 1: Что было раньше и куда идём сейчас -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-1">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Что было раньше и <span class="gradient-text">куда идём сейчас</span></h2>
+            
+            <div class="flex flex-col md:flex-row items-stretch gap-8 w-full">
+                <!-- Прошлое -->
+                <div class="flex-1 bg-gray-50 border border-gray-200 p-8 rounded-3xl flex flex-col items-center">
+                    <h3 class="font-bold text-gray-400 uppercase tracking-widest mb-6">Автоматизация</h3>
+                    <div class="flex flex-col gap-3 w-full">
+                        <div class="bg-white p-4 rounded-xl shadow-sm text-gray-600 font-medium flex items-center"><i class="ph-fill ph-squares-four text-gray-400 text-2xl mr-3"></i> Базовые ноды</div>
+                        <div class="bg-white p-4 rounded-xl shadow-sm text-gray-600 font-medium flex items-center"><i class="ph-fill ph-gear text-gray-400 text-2xl mr-3"></i> Продвинутые функции</div>
+                        <div class="bg-white p-4 rounded-xl shadow-sm text-gray-600 font-medium flex items-center"><i class="ph-fill ph-git-branch text-gray-400 text-2xl mr-3"></i> Логика маршрутизации</div>
+                        <div class="bg-white p-4 rounded-xl shadow-sm text-gray-600 font-medium flex items-center"><i class="ph-fill ph-database text-gray-400 text-2xl mr-3"></i> Работа с данными</div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center justify-center"><i class="ph-bold ph-arrow-right text-4xl text-purple-400 hidden md:block"></i><i class="ph-bold ph-arrow-down text-4xl text-purple-400 md:hidden"></i></div>
+                
+                <!-- Будущее -->
+                <div class="flex-1 bg-purple-50 border border-purple-200 p-8 rounded-3xl flex flex-col items-center shadow-lg transform md:scale-105">
+                    <h3 class="font-bold text-purple-600 uppercase tracking-widest mb-6">Продукты</h3>
+                    <div class="flex flex-col gap-3 w-full">
+                        <div class="bg-white p-4 rounded-xl shadow-sm border border-purple-100 text-purple-900 font-bold flex items-center"><i class="ph-fill ph-robot text-purple-500 text-2xl mr-3"></i> Полноценные AI-сервисы</div>
+                        <div class="bg-white p-4 rounded-xl shadow-sm border border-purple-100 text-purple-900 font-bold flex items-center"><i class="ph-fill ph-device-mobile text-purple-500 text-2xl mr-3"></i> Клиентские интерфейсы</div>
+                        <div class="bg-white p-4 rounded-xl shadow-sm border border-purple-100 text-purple-900 font-bold flex items-center"><i class="ph-fill ph-brain text-purple-500 text-2xl mr-3"></i> Гибкая логика</div>
+                        <div class="bg-white p-4 rounded-xl shadow-sm border border-purple-100 text-purple-900 font-bold flex items-center"><i class="ph-fill ph-wrench text-purple-500 text-2xl mr-3"></i> Инженерный подход</div>
+                    </div>
+                </div>
+            </div>
+            
+            <p class="mt-10 font-bold text-xl text-gray-800 bg-white px-8 py-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-center">
+                <i class="ph-bold ph-rocket text-orange-500 mr-3 text-2xl"></i> Переходим от сборки workflows к созданию продуктов
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 2: Цель лекции -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-2">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Цель <span class="gradient-text">лекции</span></h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl relative">
+                <!-- Линия прогресса на фоне -->
+                <div class="absolute left-1/2 top-0 bottom-0 w-1 bg-gray-100 hidden md:block z-0"></div>
+                <div class="absolute top-1/2 left-0 right-0 h-1 bg-gray-100 hidden md:block z-0"></div>
+
+                <div class="bg-white border border-gray-200 p-8 rounded-3xl flex flex-col items-center text-center shadow-sm z-10 hover:shadow-md transition">
+                    <div class="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center text-purple-500 mb-4"><i class="ph-fill ph-brain text-3xl"></i></div>
+                    <h3 class="font-bold text-gray-900 text-lg">Понять vibe-coding</h3>
+                    <p class="text-sm text-gray-500 mt-2">Как управлять AI через намерения</p>
+                </div>
+                <div class="bg-white border border-gray-200 p-8 rounded-3xl flex flex-col items-center text-center shadow-sm z-10 hover:shadow-md transition">
+                    <div class="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-500 mb-4"><i class="ph-fill ph-file-text text-3xl"></i></div>
+                    <h3 class="font-bold text-gray-900 text-lg">Описывать сервисы</h3>
+                    <p class="text-sm text-gray-500 mt-2">Через требования и поведение системы</p>
+                </div>
+                <div class="bg-white border border-gray-200 p-8 rounded-3xl flex flex-col items-center text-center shadow-sm z-10 hover:shadow-md transition">
+                    <div class="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center text-orange-500 mb-4"><i class="ph-fill ph-code text-3xl"></i></div>
+                    <h3 class="font-bold text-gray-900 text-lg">Освоить Code Node</h3>
+                    <p class="text-sm text-gray-500 mt-2">Как точку гибкости в n8n</p>
+                </div>
+                <div class="bg-white border border-gray-200 p-8 rounded-3xl flex flex-col items-center text-center shadow-sm z-10 hover:shadow-md transition">
+                    <div class="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center text-green-500 mb-4"><i class="ph-fill ph-telegram-logo text-3xl"></i></div>
+                    <h3 class="font-bold text-gray-900 text-lg">Увидеть продукт</h3>
+                    <p class="text-sm text-gray-500 mt-2">Превращение в реальный сервис</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 3: Почему это важно -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-3">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Почему это <span class="gradient-text">важно</span></h2>
+            
+            <div class="flex flex-col md:flex-row gap-8 w-full max-w-4xl mb-12">
+                <div class="flex-1 bg-gray-50 border border-gray-200 p-8 rounded-3xl shadow-sm text-center">
+                    <h3 class="font-bold text-gray-400 uppercase tracking-widest mb-6">Медленный waterfall</h3>
+                    <ul class="flex flex-col gap-4 text-left">
+                        <li class="flex items-center text-gray-600 font-medium"><i class="ph-bold ph-clock text-red-400 mr-3 text-xl"></i> Недели на реализацию</li>
+                        <li class="flex items-center text-gray-600 font-medium"><i class="ph-bold ph-users text-red-400 mr-3 text-xl"></i> Высокая зависимость от разработчиков</li>
+                        <li class="flex items-center text-gray-600 font-medium"><i class="ph-bold ph-arrows-out-line-horizontal text-red-400 mr-3 text-xl"></i> Длинный цикл идеи до проверки</li>
+                    </ul>
+                </div>
+                
+                <div class="flex-1 bg-purple-50 border border-purple-200 p-8 rounded-3xl shadow-lg transform md:scale-105 text-center">
+                    <h3 class="font-bold text-purple-600 uppercase tracking-widest mb-6">Короткие циклы с ИИ</h3>
+                    <ul class="flex flex-col gap-4 text-left">
+                        <li class="flex items-center text-purple-900 font-bold"><i class="ph-bold ph-lightning text-orange-500 mr-3 text-xl"></i> Несколько сильных промптов</li>
+                        <li class="flex items-center text-purple-900 font-bold"><i class="ph-bold ph-arrows-clockwise text-orange-500 mr-3 text-xl"></i> Быстрые итерации</li>
+                        <li class="flex items-center text-purple-900 font-bold"><i class="ph-bold ph-rocket text-orange-500 mr-3 text-xl"></i> Ускоренное MVP и проверка</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <blockquote class="text-xl md:text-2xl font-black text-center text-gray-800 bg-white p-6 rounded-2xl shadow-sm border border-gray-200 max-w-3xl">
+                "Новый bottleneck — не код. <br><span class="text-purple-600">Новый bottleneck — качество мышления.</span>"
+            </blockquote>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 4: Что такое vibe-coding -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-4">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <span class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Блок 1. Концепция vibe-coding</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Что такое <span class="gradient-text">vibe-coding</span></h2>
+            
+            <p class="text-lg text-center text-gray-600 max-w-3xl mb-12">
+                Это подход, в котором вы описываете желаемый результат на естественном языке, а AI превращает это в код, логику или готовое приложение.
+            </p>
+            
+            <div class="flex flex-col md:flex-row items-center gap-6 w-full max-w-4xl justify-center mb-12">
+                <div class="flex flex-col items-center bg-white p-6 rounded-2xl shadow-sm border border-gray-200 w-full md:w-1/3">
+                    <i class="ph-fill ph-user text-5xl text-blue-500 mb-4"></i>
+                    <p class="text-sm font-bold text-center text-gray-700">Вы управляете намерением,<br>а не синтаксисом</p>
+                </div>
+                <i class="ph-bold ph-arrow-right text-3xl text-purple-300 hidden md:block"></i>
+                <i class="ph-bold ph-arrow-down text-3xl text-purple-300 md:hidden"></i>
+                <div class="flex flex-col items-center bg-purple-50 p-6 rounded-2xl shadow-md border border-purple-200 w-full md:w-1/3 transform md:scale-110">
+                    <i class="ph-fill ph-brain text-5xl text-purple-600 mb-4"></i>
+                    <p class="text-sm font-bold text-center text-purple-900">Код генерируется<br>через диалог</p>
+                </div>
+                <i class="ph-bold ph-arrow-right text-3xl text-purple-300 hidden md:block"></i>
+                <i class="ph-bold ph-arrow-down text-3xl text-purple-300 md:hidden"></i>
+                <div class="flex flex-col items-center bg-white p-6 rounded-2xl shadow-sm border border-gray-200 w-full md:w-1/3">
+                    <i class="ph-fill ph-terminal-window text-5xl text-orange-500 mb-4"></i>
+                    <p class="text-sm font-bold text-center text-gray-700">Язык = интерфейс<br>разработки</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 5: Откуда появился термин -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-5">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Откуда появился <span class="gradient-text">термин</span></h2>
+            
+            <div class="flex flex-col md:flex-row items-center gap-10 w-full max-w-4xl bg-gray-50 rounded-3xl p-8 border border-gray-200 shadow-sm relative overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 opacity-5 text-gray-900 pointer-events-none">
+                    <i class="ph-fill ph-quotes text-[200px]"></i>
+                </div>
+                
+                <div class="flex-1 flex flex-col gap-6 z-10">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center">
+                        <i class="ph-fill ph-calendar text-2xl text-purple-500 mr-4"></i>
+                        <span class="font-bold text-gray-800">Февраль 2025 года</span>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center">
+                        <i class="ph-fill ph-user-circle text-2xl text-orange-500 mr-4"></i>
+                        <span class="font-bold text-gray-800">Популяризован: Андрей Карпати</span>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center">
+                        <i class="ph-fill ph-target text-2xl text-blue-500 mr-4"></i>
+                        <span class="font-bold text-gray-800">Фокус на результате, а не ручном коде</span>
+                    </div>
+                </div>
+                
+                <div class="flex-1 bg-purple-600 text-white p-8 rounded-2xl shadow-xl z-10">
+                    <p class="font-black text-xl italic leading-relaxed">
+                        "Вы как будто поддаётесь потоку разработки и перестаёте думать о коде как о главном ограничении"
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 6: Главная идея vibe-coding -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-6">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Главная формула <span class="gradient-text">vibe-coding</span></h2>
+            
+            <div class="flex flex-col md:flex-row items-center gap-4 w-full max-w-5xl justify-center mb-12 bg-white p-8 rounded-3xl shadow-md border border-gray-100">
+                <div class="flex flex-col items-center flex-1">
+                    <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center text-blue-500 mb-4 shadow"><i class="ph-fill ph-compass text-4xl"></i></div>
+                    <span class="font-black text-gray-800 uppercase tracking-widest text-sm mb-2">Намерение</span>
+                    <p class="text-[10px] text-gray-500 text-center">Человек задаёт цель и ограничения</p>
+                </div>
+                <i class="ph-bold ph-arrow-right text-3xl text-gray-300 hidden md:block"></i><i class="ph-bold ph-arrow-down text-3xl text-gray-300 md:hidden my-2"></i>
+                
+                <div class="flex flex-col items-center flex-1">
+                    <div class="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 mb-4 shadow"><i class="ph-fill ph-brain text-4xl"></i></div>
+                    <span class="font-black text-purple-900 uppercase tracking-widest text-sm mb-2">AI</span>
+                    <p class="text-[10px] text-gray-500 text-center">Берёт на себя рутину</p>
+                </div>
+                <i class="ph-bold ph-arrow-right text-3xl text-gray-300 hidden md:block"></i><i class="ph-bold ph-arrow-down text-3xl text-gray-300 md:hidden my-2"></i>
+                
+                <div class="flex flex-col items-center flex-1">
+                    <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center text-gray-700 mb-4 shadow"><i class="ph-fill ph-code text-4xl"></i></div>
+                    <span class="font-black text-gray-800 uppercase tracking-widest text-sm mb-2">Код</span>
+                    <p class="text-[10px] text-gray-500 text-center">Синтаксис пишется автоматически</p>
+                </div>
+                <i class="ph-bold ph-arrow-right text-3xl text-gray-300 hidden md:block"></i><i class="ph-bold ph-arrow-down text-3xl text-gray-300 md:hidden my-2"></i>
+                
+                <div class="flex flex-col items-center flex-1">
+                    <div class="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center text-orange-500 mb-4 shadow"><i class="ph-fill ph-rocket text-4xl"></i></div>
+                    <span class="font-black text-orange-900 uppercase tracking-widest text-sm mb-2">Продукт</span>
+                    <p class="text-[10px] text-gray-500 text-center">Готовое поведение системы</p>
+                </div>
+            </div>
+            
+            <p class="text-xl font-bold text-gray-700 bg-gray-50 px-6 py-3 rounded-xl border border-gray-200">
+                Разработка превращается в <span class="text-purple-600">управление логикой и поведением</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 7: Почему это даёт ускорение -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-7">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Почему это даёт <span class="gradient-text">ускорение</span></h2>
+            
+            <div class="bg-white border border-gray-200 rounded-3xl p-8 w-full max-w-4xl shadow-sm mb-8 text-center">
+                <p class="text-2xl font-black text-gray-800 mb-8">
+                    То, что раньше занимало день, часто можно собрать за <br>
+                    <span class="text-purple-600 bg-purple-50 px-4 py-2 rounded-xl mx-2 inline-block mt-4 mb-2 shadow-sm border border-purple-100">10–15 минут</span><br> до первого рабочего черновика.
+                </p>
+                
+                <div class="flex flex-col md:flex-row gap-6 items-center justify-center bg-gray-50 p-6 rounded-2xl border border-gray-100 mb-8">
+                    <div class="flex flex-col items-center opacity-50"><span class="text-xs font-bold text-gray-500 mb-2">Было</span><div class="flex items-center gap-2 text-sm"><span class="bg-white px-2 py-1 rounded shadow-sm">Бэклог</span><i class="ph-bold ph-arrow-right"></i><span class="bg-white px-2 py-1 rounded shadow-sm">Код руками</span><i class="ph-bold ph-arrow-right"></i><span class="bg-white px-2 py-1 rounded shadow-sm text-red-500">Долго</span></div></div>
+                    <div class="h-8 w-0.5 bg-gray-300 hidden md:block"></div>
+                    <div class="flex flex-col items-center"><span class="text-xs font-bold text-purple-600 mb-2">Стало</span><div class="flex items-center gap-2 text-sm font-bold"><span class="bg-white px-2 py-1 rounded shadow-sm text-purple-700">Prompt</span><i class="ph-bold ph-arrow-right text-purple-300"></i><span class="bg-white px-2 py-1 rounded shadow-sm text-purple-700">Черновик</span><i class="ph-bold ph-arrow-right text-purple-300"></i><span class="bg-white px-2 py-1 rounded shadow-sm text-green-600">Refine</span></div></div>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="bg-gray-100 p-4 rounded-xl flex items-center justify-center gap-2 font-bold text-gray-700 text-sm"><i class="ph-fill ph-robot text-purple-500 text-xl"></i> Боты</div>
+                    <div class="bg-gray-100 p-4 rounded-xl flex items-center justify-center gap-2 font-bold text-gray-700 text-sm"><i class="ph-fill ph-plugs-connected text-blue-500 text-xl"></i> Интеграции</div>
+                    <div class="bg-gray-100 p-4 rounded-xl flex items-center justify-center gap-2 font-bold text-gray-700 text-sm"><i class="ph-fill ph-rocket-launch text-orange-500 text-xl"></i> MVP</div>
+                    <div class="bg-gray-100 p-4 rounded-xl flex items-center justify-center gap-2 font-bold text-gray-700 text-sm"><i class="ph-fill ph-briefcase text-green-500 text-xl"></i> Внутр. сервисы</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 8: Два уровня vibe-coding -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-8">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Два уровня <span class="gradient-text">vibe-coding</span></h2>
+            
+            <div class="flex flex-col md:flex-row gap-8 w-full max-w-4xl mb-12 relative items-stretch">
+                <!-- Local -->
+                <div class="flex-1 bg-white border border-gray-200 p-8 rounded-3xl shadow-sm text-center">
+                    <h3 class="font-bold text-gray-500 uppercase tracking-widest mb-6">Локальный уровень</h3>
+                    <div class="flex flex-col gap-3">
+                        <span class="bg-gray-50 py-2 rounded text-gray-700 font-medium">Функция</span>
+                        <span class="bg-gray-50 py-2 rounded text-gray-700 font-medium">Скрипт</span>
+                        <span class="bg-gray-50 py-2 rounded text-gray-700 font-medium">Модуль</span>
+                        <span class="bg-gray-50 py-2 rounded text-gray-700 font-medium">Исправление ошибки</span>
+                        <span class="bg-gray-50 py-2 rounded text-gray-700 font-medium">Маленькая задача</span>
+                    </div>
+                </div>
+
+                <div class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-full p-4 shadow-xl border border-purple-100 z-10 hidden md:flex flex-col items-center justify-center w-32 h-32 text-center">
+                    <i class="ph-bold ph-arrows-clockwise text-3xl text-purple-500 mb-1"></i>
+                    <span class="text-[10px] font-black text-purple-900 leading-tight uppercase">Общая петля итераций</span>
+                </div>
+                
+                <!-- Global -->
+                <div class="flex-1 bg-purple-50 border border-purple-200 p-8 rounded-3xl shadow-lg transform md:scale-105 text-center">
+                    <h3 class="font-bold text-purple-700 uppercase tracking-widest mb-6">Глобальный уровень</h3>
+                    <div class="flex flex-col gap-3">
+                        <span class="bg-white py-2 rounded text-purple-900 font-bold shadow-sm">Целое приложение</span>
+                        <span class="bg-white py-2 rounded text-purple-900 font-bold shadow-sm">UI + Backend</span>
+                        <span class="bg-white py-2 rounded text-purple-900 font-bold shadow-sm">Структура сервиса</span>
+                        <span class="bg-white py-2 rounded text-purple-900 font-bold shadow-sm">Архитектурный каркас</span>
+                        <span class="bg-white py-2 rounded text-purple-900 font-bold shadow-sm">MVP продукта</span>
+                    </div>
+                </div>
+            </div>
+            
+            <p class="text-xl font-bold text-gray-800 bg-white px-8 py-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-center">
+                <i class="ph-bold ph-infinity text-orange-500 mr-3 text-2xl"></i> На обоих уровнях работает Refinement Loop
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 9: Локальный уровень: refinement loop -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-9">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Локальный: <span class="gradient-text">Refinement Loop</span></h2>
+            
+            <div class="relative w-[350px] h-[350px] flex items-center justify-center mb-12">
+                <div class="absolute w-24 h-24 bg-gray-900 rounded-full flex flex-col items-center justify-center text-white font-bold text-xs z-30 shadow-xl border-4 border-white text-center leading-tight">
+                    Refinement<br>Loop
+                </div>
+                
+                <svg class="absolute inset-0 w-full h-full z-10" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="#e5e7eb" stroke-width="2" stroke-dasharray="4,4"/>
+                    <path d="M 50 5 A 45 45 0 0 1 95 50" fill="none" stroke="#a855f7" stroke-width="4" marker-end="url(#arrowhead)"/>
+                    <path d="M 95 50 A 45 45 0 0 1 50 95" fill="none" stroke="#f97316" stroke-width="4"/>
+                    <path d="M 50 95 A 45 45 0 0 1 5 50" fill="none" stroke="#3b82f6" stroke-width="4"/>
+                    <path d="M 5 50 A 45 45 0 0 1 50 5" fill="none" stroke="#22c55e" stroke-width="4"/>
+                </svg>
+
+                <div class="absolute top-[0%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 bg-white px-4 py-2 rounded-xl shadow-md border border-gray-100 font-bold text-purple-600 z-20 flex flex-col items-center text-xs whitespace-nowrap"><i class="ph-fill ph-chat-text text-xl mb-1"></i> 1. Сформулировали задачу<span class="text-[9px] font-normal text-gray-400 mt-0.5">Prompt</span></div>
+                <div class="absolute top-[50%] right-[0%] transform translate-x-1/2 -translate-y-1/2 bg-white px-4 py-2 rounded-xl shadow-md border border-gray-100 font-bold text-orange-600 z-20 flex flex-col items-center text-xs whitespace-nowrap"><i class="ph-fill ph-code text-xl mb-1"></i> 2. Получили код<span class="text-[9px] font-normal text-gray-400 mt-0.5">Output</span></div>
+                <div class="absolute bottom-[0%] left-[50%] transform -translate-x-1/2 translate-y-1/2 bg-white px-4 py-2 rounded-xl shadow-md border border-gray-100 font-bold text-blue-600 z-20 flex flex-col items-center text-xs whitespace-nowrap"><i class="ph-fill ph-play text-xl mb-1"></i> 3. Запустили и проверили<span class="text-[9px] font-normal text-gray-400 mt-0.5">Test</span></div>
+                <div class="absolute top-[50%] left-[0%] transform -translate-x-1/2 -translate-y-1/2 bg-white px-4 py-2 rounded-xl shadow-md border border-gray-100 font-bold text-green-600 z-20 flex flex-col items-center text-xs whitespace-nowrap"><i class="ph-fill ph-wrench text-xl mb-1"></i> 4. Уточнили / исправили<span class="text-[9px] font-normal text-gray-400 mt-0.5">Feedback</span></div>
+            </div>
+            
+            <p class="text-xl font-bold text-gray-800 bg-gray-50 px-8 py-4 rounded-xl border border-gray-200 text-center">
+                <i class="ph-bold ph-info text-blue-500 mr-2 text-2xl"></i> Ошибка — это не сбой процесса, а <span class="text-blue-600">часть процесса</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 10: Глобальный уровень: от идеи к приложению -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-10">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Глобальный: от идеи к <span class="gradient-text">приложению</span></h2>
+            
+            <div class="flex flex-col md:flex-row items-center justify-between w-full max-w-5xl bg-white border border-gray-200 p-8 rounded-3xl shadow-sm mb-12 relative overflow-x-auto">
+                <div class="flex flex-col items-center z-10 min-w-[100px] mb-4 md:mb-0">
+                    <div class="bg-yellow-50 border border-yellow-200 w-16 h-16 rounded-lg flex items-center justify-center text-yellow-500 shadow-sm mb-3 transform -rotate-3"><i class="ph-bold ph-lightbulb text-3xl"></i></div>
+                    <span class="text-xs font-bold text-gray-800 uppercase text-center">Идея</span>
+                </div>
+                <div class="hidden md:block flex-1 h-0.5 bg-gray-200 z-0 relative"><i class="ph-bold ph-caret-right absolute right-0 top-1/2 transform translate-x-1/2 -translate-y-1/2 text-gray-300"></i></div>
+                <div class="flex flex-col items-center z-10 min-w-[100px] mb-4 md:mb-0">
+                    <div class="bg-blue-50 border border-blue-200 w-16 h-16 rounded-lg flex items-center justify-center text-blue-500 shadow-sm mb-3"><i class="ph-bold ph-file-text text-3xl"></i></div>
+                    <span class="text-xs font-bold text-gray-800 uppercase text-center">PRD</span>
+                </div>
+                <div class="hidden md:block flex-1 h-0.5 bg-gray-200 z-0 relative"><i class="ph-bold ph-caret-right absolute right-0 top-1/2 transform translate-x-1/2 -translate-y-1/2 text-gray-300"></i></div>
+                <div class="flex flex-col items-center z-10 min-w-[100px] mb-4 md:mb-0">
+                    <div class="bg-purple-50 border border-purple-200 w-16 h-16 rounded-lg flex items-center justify-center text-purple-500 shadow-sm mb-3"><i class="ph-bold ph-tree-structure text-3xl"></i></div>
+                    <span class="text-xs font-bold text-gray-800 uppercase text-center">Flow</span>
+                </div>
+                <div class="hidden md:block flex-1 h-0.5 bg-gray-200 z-0 relative"><i class="ph-bold ph-caret-right absolute right-0 top-1/2 transform translate-x-1/2 -translate-y-1/2 text-gray-300"></i></div>
+                <div class="flex flex-col items-center z-10 min-w-[100px] mb-4 md:mb-0">
+                    <div class="bg-gray-50 border border-gray-300 w-16 h-16 rounded-lg flex items-center justify-center text-gray-700 shadow-sm mb-3"><i class="ph-bold ph-code text-3xl"></i></div>
+                    <span class="text-xs font-bold text-gray-800 uppercase text-center">UI / Back</span>
+                </div>
+                <div class="hidden md:block flex-1 h-0.5 bg-gray-200 z-0 relative"><i class="ph-bold ph-caret-right absolute right-0 top-1/2 transform translate-x-1/2 -translate-y-1/2 text-gray-300"></i></div>
+                <div class="flex flex-col items-center z-10 min-w-[100px]">
+                    <div class="bg-orange-50 border border-orange-200 w-16 h-16 rounded-lg flex items-center justify-center text-orange-500 shadow-sm mb-3 transform scale-110"><i class="ph-bold ph-rocket-launch text-3xl"></i></div>
+                    <span class="text-xs font-bold text-gray-800 uppercase text-center">Deploy / MVP</span>
+                </div>
+            </div>
+            
+            <p class="text-xl font-bold text-gray-800 text-center flex items-center justify-center max-w-3xl">
+                <i class="ph-bold ph-check-circle text-purple-500 mr-3 text-3xl"></i> Одним качественным описанием можно задать структуру целого продукта
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 11: Плюсы и ограничения -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-11">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Плюсы и <span class="gradient-text">ограничения</span></h2>
+            
+            <div class="flex flex-col md:flex-row gap-8 w-full max-w-5xl mb-12 items-stretch">
+                <!-- Плюсы -->
+                <div class="flex-1 bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 p-8 rounded-3xl shadow-sm text-center transform md:scale-105">
+                    <h3 class="font-bold text-green-700 uppercase tracking-widest mb-6 flex items-center justify-center gap-2"><i class="ph-bold ph-thumbs-up text-2xl"></i> Плюсы</h3>
+                    <ul class="flex flex-col gap-4 text-left">
+                        <li class="flex items-center text-green-900 font-bold bg-white p-3 rounded-lg shadow-sm"><i class="ph-bold ph-lightning text-green-500 mr-3 text-xl"></i> Скорость</li>
+                        <li class="flex items-center text-green-900 font-bold bg-white p-3 rounded-lg shadow-sm"><i class="ph-bold ph-users text-green-500 mr-3 text-xl"></i> Доступность</li>
+                        <li class="flex items-center text-green-900 font-bold bg-white p-3 rounded-lg shadow-sm"><i class="ph-bold ph-stairs text-green-500 mr-3 text-xl"></i> Низкий порог входа</li>
+                        <li class="flex items-center text-green-900 font-bold bg-white p-3 rounded-lg shadow-sm"><i class="ph-bold ph-rocket text-green-500 mr-3 text-xl"></i> Быстрый MVP</li>
+                    </ul>
+                </div>
+                
+                <!-- Ограничения -->
+                <div class="flex-1 bg-gray-50 border border-gray-200 p-8 rounded-3xl shadow-sm text-center">
+                    <h3 class="font-bold text-gray-500 uppercase tracking-widest mb-6 flex items-center justify-center gap-2"><i class="ph-bold ph-warning text-2xl"></i> Ограничения</h3>
+                    <ul class="flex flex-col gap-4 text-left">
+                        <li class="flex items-center text-gray-700 font-medium bg-white p-3 rounded-lg border border-gray-100"><i class="ph-bold ph-eye text-gray-400 mr-3 text-xl"></i> Код надо проверять</li>
+                        <li class="flex items-center text-gray-700 font-medium bg-white p-3 rounded-lg border border-gray-100"><i class="ph-bold ph-tree-structure text-gray-400 mr-3 text-xl"></i> Архитектуру нужно понимать</li>
+                        <li class="flex items-center text-gray-700 font-medium bg-white p-3 rounded-lg border border-gray-100"><i class="ph-bold ph-shield-warning text-gray-400 mr-3 text-xl"></i> Уязвимости надо исключать</li>
+                        <li class="flex items-center text-gray-700 font-medium bg-white p-3 rounded-lg border border-gray-100"><i class="ph-bold ph-check-square-offset text-gray-400 mr-3 text-xl"></i> Прод требует дисциплины</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <p class="text-2xl font-black text-gray-800 text-center">
+                AI не заменяет инженера. <span class="gradient-text">Он усиливает инженера.</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 12: Где vibe-coding особенно полезен -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-12">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Где vibe-coding <span class="gradient-text">особенно полезен</span></h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl">
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col items-start hover:shadow-md transition">
+                    <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-500 mb-4"><i class="ph-fill ph-telegram-logo text-2xl"></i></div>
+                    <h3 class="font-bold text-gray-900 text-lg mb-1">Telegram-боты</h3>
+                    <p class="text-sm text-gray-500">Быстрая сборка conversational интерфейсов.</p>
+                </div>
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col items-start hover:shadow-md transition">
+                    <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center text-purple-500 mb-4"><i class="ph-fill ph-browser text-2xl"></i></div>
+                    <h3 class="font-bold text-gray-900 text-lg mb-1">Веб-приложения и дашборды</h3>
+                    <p class="text-sm text-gray-500">Генерация UI и подключение данных.</p>
+                </div>
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col items-start hover:shadow-md transition">
+                    <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center text-orange-500 mb-4"><i class="ph-fill ph-plugs-connected text-2xl"></i></div>
+                    <h3 class="font-bold text-gray-900 text-lg mb-1">Автоматизации и интеграции</h3>
+                    <p class="text-sm text-gray-500">Связывание API и внутренних систем.</p>
+                </div>
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col items-start hover:shadow-md transition">
+                    <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center text-green-500 mb-4"><i class="ph-fill ph-flask text-2xl"></i></div>
+                    <h3 class="font-bold text-gray-900 text-lg mb-1">Прототипы и MVP</h3>
+                    <p class="text-sm text-gray-500">Мгновенное тестирование гипотез в коде.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 13: Карта инструментов -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-13">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <span class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Блок 2. Инструменты</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Карта <span class="gradient-text">экосистемы</span></h2>
+            
+            <p class="text-xl font-bold text-gray-600 mb-8">Нет одного универсального инструмента. Есть экосистема.</p>
+            
+            <div class="relative w-full max-w-3xl h-[400px] flex items-center justify-center mb-8">
+                <!-- Center -->
+                <div class="absolute w-32 h-32 bg-gray-900 text-white rounded-full flex flex-col items-center justify-center font-black z-30 shadow-2xl border-4 border-white text-center leading-tight">
+                    Vibe-coding<br>stack
+                </div>
+                
+                <!-- Orbits -->
+                <svg class="absolute inset-0 w-full h-full z-10" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="40" fill="none" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="2,2"/>
+                </svg>
+
+                <!-- Nodes -->
+                <div class="absolute transform -translate-x-1/2 -translate-y-1/2 bg-white px-4 py-2 rounded-xl shadow-md border border-purple-200 font-bold text-purple-700 z-20 text-xs text-center" style="top: 10%; left: 50%;">Ассистенты в IDE</div>
+                <div class="absolute transform -translate-x-1/2 -translate-y-1/2 bg-white px-4 py-2 rounded-xl shadow-md border border-orange-200 font-bold text-orange-700 z-20 text-xs text-center" style="top: 37.6%; left: 88%;">AI-powered IDE</div>
+                <div class="absolute transform -translate-x-1/2 -translate-y-1/2 bg-white px-4 py-2 rounded-xl shadow-md border border-blue-200 font-bold text-blue-700 z-20 text-xs text-center" style="top: 82.4%; left: 73.5%;">Платформы для MVP</div>
+                <div class="absolute transform -translate-x-1/2 -translate-y-1/2 bg-white px-4 py-2 rounded-xl shadow-md border border-green-200 font-bold text-green-700 z-20 text-xs text-center" style="top: 82.4%; left: 26.5%;">Виртуальные IDE / Облако</div>
+                <div class="absolute transform -translate-x-1/2 -translate-y-1/2 bg-white px-4 py-2 rounded-xl shadow-md border border-gray-300 font-bold text-gray-700 z-20 text-xs text-center" style="top: 37.6%; left: 12%;">No-code / Low-code с AI</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 14: Категория 1: AI-ассистенты в IDE -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-14">
+        <div class="content-z max-w-5xl flex flex-col items-center justify-center h-full">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Категория 1: <span class="gradient-text">AI-ассистенты</span></h2>
+            
+            <div class="flex flex-col md:flex-row gap-8 w-full max-w-4xl">
+                <div class="flex-1 bg-gray-900 text-gray-300 p-6 rounded-2xl font-mono text-xs shadow-xl border border-gray-700 relative overflow-hidden h-64 flex flex-col justify-center">
+                    <div class="absolute top-0 left-0 right-0 h-8 bg-gray-800 flex items-center px-4"><div class="flex gap-2"><div class="w-2 h-2 rounded-full bg-red-500"></div><div class="w-2 h-2 rounded-full bg-yellow-500"></div><div class="w-2 h-2 rounded-full bg-green-500"></div></div><span class="ml-4 text-[10px] text-gray-500">main.py</span></div>
+                    <div class="mt-8">
+                        def calculate_total(items):<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;total = 0<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;for item in items:<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;total += item.price<br>
+                        <span class="text-gray-500 animate-pulse">// AI: return total * (1 - discount)</span>
+                    </div>
+                </div>
+                <div class="flex-1 flex flex-col justify-center gap-4">
+                    <div class="flex gap-2 mb-2">
+                        <span class="bg-white px-3 py-1 rounded shadow-sm font-bold text-xs border border-gray-200">GitHub Copilot</span>
+                        <span class="bg-white px-3 py-1 rounded shadow-sm font-bold text-xs border border-gray-200">Gemini Code Assist</span>
+                    </div>
+                    <h3 class="font-bold text-lg text-gray-800">Когда полезны:</h3>
+                    <ul class="text-sm text-gray-600 flex flex-col gap-2">
+                        <li>— проект уже существует</li>
+                        <li>— нужно ускорить рутину</li>
+                        <li>— не хочется менять привычную IDE</li>
+                    </ul>
+                    <h3 class="font-bold text-lg text-gray-800 mt-2">Что делают:</h3>
+                    <ul class="text-sm text-gray-600 flex flex-col gap-2">
+                        <li>— дописывают код (autocomplete)</li>
+                        <li>— объясняют фрагменты</li>
+                        <li>— локальный рефакторинг</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 15: Категория 2: AI-powered IDE -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-15">
+        <div class="content-z max-w-5xl flex flex-col items-center justify-center h-full">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Категория 2: <span class="gradient-text">AI-powered IDE</span></h2>
+            
+            <div class="flex flex-col md:flex-row gap-8 w-full max-w-4xl bg-gray-50 p-6 rounded-3xl border border-gray-200 shadow-sm">
+                <div class="w-full md:w-2/3 bg-gray-900 text-gray-300 rounded-xl font-mono text-xs shadow-md border border-gray-700 relative overflow-hidden flex">
+                    <!-- Sidebar chat -->
+                    <div class="w-1/3 bg-gray-800 border-r border-gray-700 p-4 flex flex-col gap-4">
+                        <div class="bg-gray-700 p-2 rounded text-[10px] text-white">Добавь авторизацию через Google.</div>
+                        <div class="bg-purple-900/50 border border-purple-500/30 p-2 rounded text-[10px] text-purple-200">Создал Auth module, обновил routes, добавил ENV.</div>
+                    </div>
+                    <!-- Code -->
+                    <div class="w-2/3 p-4 flex flex-col">
+                        <div class="text-green-400">+ import { GoogleAuth } from 'lib'</div>
+                        <div class="text-gray-500 mt-2">app.use(...)</div>
+                        <div class="absolute inset-0 bg-purple-500/5 border-2 border-purple-500/20 m-2 rounded pointer-events-none"></div>
+                    </div>
+                </div>
+                <div class="w-full md:w-1/3 flex flex-col justify-center gap-4">
+                    <div class="flex gap-2 mb-2 flex-wrap">
+                        <span class="bg-white px-3 py-1 rounded shadow-sm font-bold text-xs border border-purple-200 text-purple-700">Cursor</span>
+                        <span class="bg-white px-3 py-1 rounded shadow-sm font-bold text-xs border border-purple-200 text-purple-700">Windsurf</span>
+                    </div>
+                    <ul class="text-sm text-gray-700 font-medium flex flex-col gap-3">
+                        <li class="flex items-start gap-2"><i class="ph-bold ph-check text-purple-500 mt-1"></i> Работа со всем проектом (context)</li>
+                        <li class="flex items-start gap-2"><i class="ph-bold ph-check text-purple-500 mt-1"></i> Понимание зависимостей</li>
+                        <li class="flex items-start gap-2"><i class="ph-bold ph-check text-purple-500 mt-1"></i> Рефакторинг на уровне системы</li>
+                        <li class="flex items-start gap-2 bg-purple-50 p-2 rounded text-purple-900 border border-purple-100"><i class="ph-bold ph-chat-text text-purple-500 mt-1"></i> Промпты = основа разработки</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 16: Категория 3: платформы “с нуля до MVP” -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-16">
+        <div class="content-z max-w-5xl flex flex-col items-center justify-center h-full">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Категория 3: <span class="gradient-text">С нуля до MVP</span></h2>
+            
+            <div class="flex flex-col items-center w-full max-w-4xl gap-6 mb-8">
+                <div class="flex gap-4 mb-4">
+                    <span class="bg-orange-50 px-4 py-2 rounded-xl shadow-sm font-bold text-sm border border-orange-200 text-orange-700">Replit</span>
+                    <span class="bg-orange-50 px-4 py-2 rounded-xl shadow-sm font-bold text-sm border border-orange-200 text-orange-700">Lovable</span>
+                </div>
+                
+                <div class="flex flex-col md:flex-row items-center gap-4 bg-white p-6 rounded-3xl shadow-md border border-gray-200 w-full">
+                    <div class="flex-1 bg-gray-50 p-4 rounded-xl border border-gray-200 w-full text-center">
+                        <i class="ph-fill ph-chat-text text-3xl text-gray-400 mb-2"></i>
+                        <p class="text-xs font-bold text-gray-600">Prompt:<br>"Создай landing page для..."</p>
+                    </div>
+                    <i class="ph-bold ph-arrow-right text-orange-400 text-3xl hidden md:block"></i>
+                    <i class="ph-bold ph-arrow-down text-orange-400 text-3xl md:hidden"></i>
+                    <div class="flex-[2] bg-gradient-to-br from-orange-100 to-white p-4 rounded-xl border border-orange-200 w-full shadow-inner flex flex-col items-center justify-center h-32 relative overflow-hidden">
+                        <div class="w-3/4 h-4 bg-orange-200 rounded mb-2"></div>
+                        <div class="w-1/2 h-8 bg-orange-500 rounded text-white text-[8px] flex items-center justify-center font-bold">Button</div>
+                        <span class="absolute bottom-2 right-2 text-[10px] font-black text-orange-700 uppercase tracking-widest bg-white/50 px-2 rounded">Instant App</span>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4 w-full text-sm font-medium text-gray-600 text-center">
+                    <div class="bg-gray-50 py-3 rounded-lg border border-gray-100">Описал идею</div>
+                    <div class="bg-gray-50 py-3 rounded-lg border border-gray-100">Получил каркас</div>
+                    <div class="bg-gray-50 py-3 rounded-lg border border-gray-100">Быстро собрал MVP</div>
+                    <div class="bg-gray-50 py-3 rounded-lg border border-gray-100">Доработал чатом</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 17: Категория 4: виртуальная IDE и облако -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-17">
+        <div class="content-z max-w-5xl flex flex-col items-center justify-center h-full">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Категория 4: <span class="gradient-text">Облачная разработка</span></h2>
+            
+            <div class="flex flex-col md:flex-row gap-8 w-full max-w-4xl items-center mb-8">
+                <div class="flex-1 w-full bg-blue-50 border border-blue-200 p-8 rounded-3xl flex flex-col items-center text-center shadow-sm">
+                    <i class="ph-fill ph-cloud text-6xl text-blue-400 mb-4"></i>
+                    <div class="flex gap-2 flex-wrap justify-center mb-6">
+                        <span class="bg-white px-2 py-1 rounded shadow-sm text-xs font-bold text-blue-800 border border-blue-100">Cloud Code</span>
+                        <span class="bg-white px-2 py-1 rounded shadow-sm text-xs font-bold text-blue-800 border border-blue-100">OpenAI Codex</span>
+                    </div>
+                    <p class="text-sm font-bold text-blue-900 bg-white/50 p-2 rounded">Невидимый инженер в облаке</p>
+                </div>
+                
+                <div class="flex-1 w-full flex flex-col gap-4">
+                    <h3 class="font-bold text-gray-800 text-lg">Подходят для:</h3>
+                    <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-3">
+                        <i class="ph-bold ph-terminal-window text-blue-500 text-2xl"></i> <span class="font-medium text-gray-700">Backend логики</span>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-3">
+                        <i class="ph-fill ph-squares-four text-blue-500 text-2xl"></i> <span class="font-medium text-gray-700">Микросервисов</span>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-3">
+                        <i class="ph-fill ph-git-merge text-blue-500 text-2xl"></i> <span class="font-medium text-gray-700">Data pipelines</span>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-3">
+                        <i class="ph-fill ph-cloud-arrow-up text-blue-500 text-2xl"></i> <span class="font-medium text-gray-700">Облачного выполнения</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 18: Категория 5: no-code / low-code -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-18">
+        <div class="content-z max-w-5xl flex flex-col items-center justify-center h-full">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Категория 5: <span class="gradient-text">No-code / Low-code с AI</span></h2>
+            
+            <div class="flex flex-col md:flex-row gap-8 w-full max-w-4xl bg-gray-50 border border-gray-200 p-8 rounded-3xl shadow-sm mb-8">
+                <div class="flex-1 w-full">
+                    <div class="flex gap-3 mb-6 flex-wrap">
+                        <span class="bg-white px-4 py-2 rounded-xl shadow-sm font-black text-sm border border-gray-200">n8n</span>
+                        <span class="bg-white px-4 py-2 rounded-xl shadow-sm font-bold text-sm border border-gray-200 text-orange-500">Zapier</span>
+                        <span class="bg-white px-4 py-2 rounded-xl shadow-sm font-bold text-sm border border-gray-200 text-purple-500">Make</span>
+                    </div>
+                    <ul class="text-sm text-gray-700 font-medium flex flex-col gap-4">
+                        <li class="flex items-center gap-3"><i class="ph-bold ph-puzzle-piece text-gray-400 text-xl"></i> Логика собирается блоками (canvas)</li>
+                        <li class="flex items-center gap-3 bg-purple-50 p-2 rounded-lg border border-purple-100 text-purple-900"><i class="ph-bold ph-brain text-purple-500 text-xl"></i> AI помогает в сложной логике (трансформации)</li>
+                        <li class="flex items-center gap-3"><i class="ph-bold ph-lightning text-gray-400 text-xl"></i> Быстро строятся интеграции и БП</li>
+                    </ul>
+                </div>
+                <div class="flex-1 w-full bg-white border border-gray-200 rounded-2xl flex items-center justify-center h-48 relative overflow-hidden shadow-inner p-4">
+                    <div class="flex gap-2 items-center">
+                        <div class="w-10 h-10 bg-gray-100 rounded border flex items-center justify-center text-gray-400"><i class="ph-fill ph-envelope"></i></div>
+                        <i class="ph-bold ph-arrow-right text-gray-300"></i>
+                        <div class="w-12 h-12 bg-purple-100 border-2 border-purple-300 rounded shadow flex items-center justify-center text-purple-600 transform scale-110 relative"><i class="ph-fill ph-brain"></i><span class="absolute -top-2 bg-purple-500 text-white text-[8px] px-1 rounded">AI Node</span></div>
+                        <i class="ph-bold ph-arrow-right text-gray-300"></i>
+                        <div class="w-10 h-10 bg-gray-100 rounded border flex items-center justify-center text-gray-400"><i class="ph-fill ph-database"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 19: Главный вывод по инструментам -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-19">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Вывод по <span class="gradient-text">инструментам</span></h2>
+            
+            <p class="text-xl font-bold text-gray-600 mb-8 text-center max-w-2xl">Не нужно выбирать один инструмент навсегда. Комбинируйте их.</p>
+            
+            <div class="flex flex-col md:flex-row items-center justify-center w-full max-w-5xl bg-white p-6 rounded-3xl mb-12 overflow-x-auto gap-4">
+                <div class="flex flex-col items-center p-2 min-w-[100px]">
+                    <span class="text-[10px] font-bold text-gray-400 uppercase mb-2">Начать</span>
+                    <span class="font-bold text-gray-800 text-sm">AI Studio</span>
+                </div>
+                <i class="ph-bold ph-arrow-right text-xl text-gray-300 hidden md:block"></i><i class="ph-bold ph-arrow-down text-xl text-gray-300 md:hidden"></i>
+                <div class="flex flex-col items-center p-2 min-w-[100px]">
+                    <span class="text-[10px] font-bold text-gray-400 uppercase mb-2">Доработать</span>
+                    <span class="font-bold text-gray-800 text-sm">Replit</span>
+                </div>
+                <i class="ph-bold ph-arrow-right text-xl text-gray-300 hidden md:block"></i><i class="ph-bold ph-arrow-down text-xl text-gray-300 md:hidden"></i>
+                <div class="flex flex-col items-center p-2 min-w-[100px]">
+                    <span class="text-[10px] font-bold text-purple-500 uppercase mb-2">Оркестрировать</span>
+                    <span class="font-black text-purple-800 text-sm">n8n</span>
+                </div>
+                <i class="ph-bold ph-arrow-right text-xl text-gray-300 hidden md:block"></i><i class="ph-bold ph-arrow-down text-xl text-gray-300 md:hidden"></i>
+                <div class="flex flex-col items-center p-2 min-w-[100px]">
+                    <span class="text-[10px] font-bold text-gray-400 uppercase mb-2">Шлифовать</span>
+                    <span class="font-bold text-gray-800 text-sm">Cursor/Copilot</span>
+                </div>
+                <i class="ph-bold ph-arrow-right text-xl text-gray-300 hidden md:block"></i><i class="ph-bold ph-arrow-down text-xl text-gray-300 md:hidden"></i>
+                <div class="flex flex-col items-center p-2 min-w-[100px]">
+                    <span class="text-[10px] font-bold text-green-500 uppercase mb-2">Запустить</span>
+                    <span class="font-bold text-green-700 text-sm">Деплой / Облако</span>
+                </div>
+            </div>
+            
+            <div class="bg-gradient-to-r from-purple-600 to-orange-500 text-white px-8 py-4 rounded-2xl shadow-lg text-center max-w-3xl">
+                <p class="font-black text-xl md:text-2xl">
+                    Главный актив — не инструмент, <br>а <span class="underline decoration-2 underline-offset-4">способность формулировать задачу</span>.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 20: Блок 3. Главная ошибка новичка -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-20">
+        <div class="content-z max-w-5xl flex flex-col items-center justify-center h-full">
+            <span class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Блок 3. От идеи к требованиям</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Главная ошибка <span class="gradient-text">новичка</span></h2>
+            
+            <div class="flex flex-col md:flex-row gap-8 w-full max-w-4xl mb-8 items-stretch">
+                <!-- Плохо -->
+                <div class="flex-1 bg-red-50 border border-red-200 p-8 rounded-3xl shadow-sm text-center relative opacity-80">
+                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-md"><i class="ph-bold ph-x text-2xl"></i></div>
+                    <h3 class="font-bold text-red-800 uppercase tracking-widest mb-6 mt-2">Плохо</h3>
+                    <div class="flex flex-col gap-3">
+                        <div class="bg-white p-3 rounded shadow-sm text-sm text-gray-600 italic">"Сделай Telegram-бота"</div>
+                        <div class="bg-white p-3 rounded shadow-sm text-sm text-gray-600 italic">"Сделай дашборд"</div>
+                    </div>
+                </div>
+                
+                <!-- Хорошо -->
+                <div class="flex-1 bg-green-50 border border-green-200 p-8 rounded-3xl shadow-md text-center relative transform md:scale-105">
+                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-md"><i class="ph-bold ph-check text-2xl"></i></div>
+                    <h3 class="font-bold text-green-800 uppercase tracking-widest mb-6 mt-2">Хорошо</h3>
+                    <p class="text-sm font-medium text-green-900 bg-white p-4 rounded-xl shadow-sm border border-green-100">
+                        Описать продукт, цель, пользователя, поведение, ограничения.
+                    </p>
+                </div>
+            </div>
+            
+            <p class="text-xl font-bold text-gray-800 bg-gray-50 px-6 py-3 rounded-xl border border-gray-200 flex items-center justify-center">
+                <i class="ph-bold ph-warning-circle text-orange-500 mr-2 text-2xl"></i> Без контекста AI начинает просто гадать
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 21: Product Requirements: с чего начинается сервис -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-21">
+        <div class="content-z max-w-5xl flex flex-col items-center justify-center h-full">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">PRD: С чего <span class="gradient-text">начинается сервис</span></h2>
+            
+            <div class="bg-white border-2 border-gray-200 rounded-3xl w-full max-w-2xl p-8 shadow-lg relative mb-8">
+                <div class="absolute -top-4 right-8 bg-purple-100 text-purple-800 font-black px-4 py-1 rounded shadow-sm text-sm uppercase tracking-widest">Product Brief</div>
+                <ul class="flex flex-col gap-6 text-lg font-bold text-gray-800">
+                    <li class="flex items-center gap-4 border-b border-gray-100 pb-4"><div class="w-8 h-8 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center border border-blue-100 shrink-0"><i class="ph-bold ph-question"></i></div> Что делает продукт?</li>
+                    <li class="flex items-center gap-4 border-b border-gray-100 pb-4"><div class="w-8 h-8 rounded-full bg-orange-50 text-orange-500 flex items-center justify-center border border-orange-100 shrink-0"><i class="ph-bold ph-users"></i></div> Для кого он?</li>
+                    <li class="flex items-center gap-4 border-b border-gray-100 pb-4"><div class="w-8 h-8 rounded-full bg-green-50 text-green-500 flex items-center justify-center border border-green-100 shrink-0"><i class="ph-bold ph-target"></i></div> Какую задачу решает?</li>
+                    <li class="flex items-center gap-4"><div class="w-8 h-8 rounded-full bg-purple-50 text-purple-500 flex items-center justify-center border border-purple-100 shrink-0"><i class="ph-bold ph-hand-pointing"></i></div> Как пользователь с ним взаимодействует?</li>
+                </ul>
+            </div>
+            
+            <p class="text-xl font-bold text-purple-800 bg-purple-50 px-8 py-4 rounded-xl border border-purple-200 shadow-sm text-center">
+                PRD — это мост между идеей и реализацией
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 22: Как описывать продукт (Шаблон) -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-22">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Как <span class="gradient-text">описывать продукт</span></h2>
+            
+            <div class="flex flex-col md:flex-row gap-6 w-full max-w-4xl bg-gray-50 border border-gray-200 p-8 rounded-3xl shadow-sm mb-8">
+                <!-- Структура -->
+                <div class="flex-1 pr-0 md:pr-6 md:border-r border-gray-200 flex flex-col gap-4 justify-center">
+                    <h3 class="font-bold text-gray-400 uppercase tracking-widest text-xs mb-2">Структура</h3>
+                    <div class="bg-white p-3 rounded-lg shadow-sm font-bold text-gray-700 text-sm flex items-center"><i class="ph-bold ph-text-align-left text-gray-400 mr-2"></i> Краткое описание сервиса</div>
+                    <div class="bg-white p-3 rounded-lg shadow-sm font-bold text-gray-700 text-sm flex items-center"><i class="ph-bold ph-list-checks text-gray-400 mr-2"></i> Список ключевых фич</div>
+                    <div class="bg-white p-3 rounded-lg shadow-sm font-bold text-gray-700 text-sm flex items-center"><i class="ph-bold ph-star text-gray-400 mr-2"></i> Ценность для пользователя</div>
+                </div>
+                
+                <!-- Шаблон -->
+                <div class="flex-[1.5] pl-0 md:pl-6 flex flex-col justify-center">
+                    <h3 class="font-bold text-purple-500 uppercase tracking-widest text-xs mb-4 flex items-center"><i class="ph-bold ph-magic-wand mr-2"></i> Мини-шаблон (Prompt Template)</h3>
+                    <div class="bg-white p-6 rounded-2xl border-2 border-purple-100 shadow-inner font-mono text-sm md:text-base text-gray-800 leading-relaxed relative">
+                        <div class="absolute top-2 right-2 text-gray-300"><i class="ph-bold ph-copy"></i></div>
+                        "Мне нужен сервис, который <span class="bg-purple-100 text-purple-700 px-1 rounded">[что делает]</span> <br><br>
+                        для <span class="bg-blue-100 text-blue-700 px-1 rounded">[кого]</span> <br><br>
+                        чтобы <span class="bg-orange-100 text-orange-700 px-1 rounded">[какая ценность]</span>."
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 23: User Stories -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-23">
+        <div class="content-z max-w-5xl flex flex-col items-center justify-center h-full">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">User Stories: <span class="gradient-text">перевод в действия</span></h2>
+            
+            <div class="w-full max-w-3xl bg-gray-900 text-white p-6 rounded-2xl shadow-xl text-center font-bold md:text-xl mb-10 border border-gray-700">
+                "Я как <span class="text-blue-400">[тип пользователя]</span> хочу <span class="text-orange-400">[действие]</span>, чтобы <span class="text-green-400">[результат]</span>"
+            </div>
+            
+            <div class="flex flex-col gap-4 w-full max-w-4xl">
+                <div class="bg-white border border-gray-200 p-4 rounded-xl shadow-sm text-sm md:text-base">
+                    Я как <span class="bg-blue-50 text-blue-700 font-bold px-2 py-0.5 rounded">новый клиент</span> хочу <span class="bg-orange-50 text-orange-700 font-bold px-2 py-0.5 rounded">пройти диагностику</span>, чтобы <span class="bg-green-50 text-green-700 font-bold px-2 py-0.5 rounded">понять свой уровень</span>.
+                </div>
+                <div class="bg-white border border-gray-200 p-4 rounded-xl shadow-sm text-sm md:text-base">
+                    Я как <span class="bg-blue-50 text-blue-700 font-bold px-2 py-0.5 rounded">пользователь бота</span> хочу <span class="bg-orange-50 text-orange-700 font-bold px-2 py-0.5 rounded">быстро выбрать ответ кнопкой</span>, чтобы <span class="bg-green-50 text-green-700 font-bold px-2 py-0.5 rounded">не печатать текст</span>.
+                </div>
+                <div class="bg-white border border-gray-200 p-4 rounded-xl shadow-sm text-sm md:text-base">
+                    Я как <span class="bg-blue-50 text-blue-700 font-bold px-2 py-0.5 rounded">CEO</span> хочу <span class="bg-orange-50 text-orange-700 font-bold px-2 py-0.5 rounded">получить рекомендации</span>, чтобы <span class="bg-green-50 text-green-700 font-bold px-2 py-0.5 rounded">внедрить AI в компанию</span>.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 24: User Flow -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-24">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">User Flow: <span class="gradient-text">описание поведения</span></h2>
+            
+            <div class="flex flex-col md:flex-row gap-8 w-full max-w-5xl mb-8 items-center">
+                <!-- Terms -->
+                <div class="flex-1 w-full bg-white border border-gray-200 p-8 rounded-3xl shadow-sm">
+                    <div class="flex flex-col gap-6">
+                        <div>
+                            <span class="font-black text-blue-600 uppercase text-xs tracking-widest block mb-1">User Story</span>
+                            <span class="font-bold text-gray-800 bg-blue-50 px-3 py-1 rounded block">Потребность пользователя</span>
+                        </div>
+                        <div>
+                            <span class="font-black text-orange-600 uppercase text-xs tracking-widest block mb-1">Feature</span>
+                            <span class="font-bold text-gray-800 bg-orange-50 px-3 py-1 rounded block">Что умеет система</span>
+                        </div>
+                        <div>
+                            <span class="font-black text-purple-600 uppercase text-xs tracking-widest block mb-1">User Flow</span>
+                            <span class="font-bold text-purple-900 bg-purple-100 border border-purple-200 px-3 py-2 rounded block shadow-sm">Как пользователь проходит путь</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Flowchart -->
+                <div class="flex-[1.5] w-full bg-gray-50 border border-gray-200 p-6 rounded-3xl shadow-sm flex flex-col items-center justify-center h-full min-h-[250px]">
+                    <div class="flex flex-wrap items-center justify-center gap-2 text-xs md:text-sm font-bold text-gray-600">
+                        <div class="bg-white p-3 rounded shadow-sm border border-gray-100 flex items-center"><i class="ph-fill ph-play-circle text-green-500 mr-1"></i> Start</div>
+                        <i class="ph-bold ph-arrow-right text-gray-300"></i>
+                        <div class="bg-white p-3 rounded shadow-sm border border-gray-100 flex items-center"><i class="ph-fill ph-question text-blue-500 mr-1"></i> Question</div>
+                        <i class="ph-bold ph-arrow-right text-gray-300"></i>
+                        <div class="bg-white p-3 rounded shadow-sm border border-gray-100 flex items-center"><i class="ph-fill ph-chat-circle text-orange-500 mr-1"></i> Answer</div>
+                        <i class="ph-bold ph-arrow-right text-gray-300"></i>
+                        <div class="bg-white p-3 rounded shadow-sm border border-gray-100 flex items-center"><i class="ph-fill ph-chart-bar text-purple-500 mr-1"></i> Result</div>
+                        <i class="ph-bold ph-arrow-right text-gray-300"></i>
+                        <div class="bg-white p-3 rounded shadow-sm border border-gray-100 flex items-center"><i class="ph-fill ph-lightbulb text-yellow-500 mr-1"></i> Recs</div>
+                    </div>
+                </div>
+            </div>
+            
+            <p class="text-xl font-bold text-gray-800 flex items-center">
+                <i class="ph-bold ph-tree-structure text-purple-500 mr-3 text-2xl"></i> Поведение — это основа тестов, архитектуры и кода
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 25: От Что к Как -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-25">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <span class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Блок 4. Requirements & Tests</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">От «Что» к <span class="gradient-text">«Как»</span></h2>
+            
+            <div class="flex flex-col md:flex-row items-center justify-center w-full max-w-5xl bg-white p-6 rounded-3xl mb-12 overflow-x-auto gap-4">
+                <div class="flex flex-col items-center min-w-[120px] p-4">
+                    <i class="ph-fill ph-file-text text-gray-400 text-3xl mb-2"></i>
+                    <span class="text-[10px] font-bold text-gray-500 uppercase mb-1">Что делаем</span>
+                    <span class="font-bold text-gray-800 text-sm">PRD</span>
+                </div>
+                <i class="ph-bold ph-arrow-right text-xl text-gray-300 hidden md:block"></i><i class="ph-bold ph-arrow-down text-xl text-gray-300 md:hidden"></i>
+                <div class="flex flex-col items-center min-w-[120px] p-4">
+                    <i class="ph-fill ph-users text-gray-400 text-3xl mb-2"></i>
+                    <span class="text-[10px] font-bold text-gray-500 uppercase mb-1">Потребность</span>
+                    <span class="font-bold text-gray-800 text-sm text-center">User Stories</span>
+                </div>
+                <i class="ph-bold ph-arrow-right text-xl text-gray-300 hidden md:block"></i><i class="ph-bold ph-arrow-down text-xl text-gray-300 md:hidden"></i>
+                <div class="flex flex-col items-center min-w-[120px] p-4">
+                    <i class="ph-fill ph-list-numbers text-gray-400 text-3xl mb-2"></i>
+                    <span class="text-[10px] font-bold text-gray-500 uppercase mb-1">Сценарии</span>
+                    <span class="font-bold text-gray-800 text-sm">Use Cases</span>
+                </div>
+                <i class="ph-bold ph-arrow-right text-xl text-purple-300 hidden md:block"></i><i class="ph-bold ph-arrow-down text-xl text-purple-300 md:hidden"></i>
+                <div class="flex flex-col items-center min-w-[140px] p-4 transform md:scale-110">
+                    <i class="ph-fill ph-gear-fine text-purple-500 text-4xl mb-2"></i>
+                    <span class="text-[10px] font-bold text-purple-600 uppercase mb-1">Как реагирует</span>
+                    <span class="font-black text-purple-900 text-base text-center">Поведение<br>системы</span>
+                </div>
+            </div>
+            
+            <p class="text-lg font-bold text-gray-700 bg-gray-50 px-6 py-3 rounded-xl border border-gray-200">
+                AI лучше работает с <span class="text-purple-600 font-black">поведением</span>, чем с абстракцией
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 26: Gherkin как язык поведения -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-26">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Gherkin как <span class="gradient-text">язык поведения</span></h2>
+            
+            <div class="w-full max-w-2xl bg-gray-900 rounded-2xl shadow-xl overflow-hidden border border-gray-700 font-mono text-sm md:text-base text-left">
+                <div class="bg-gray-800 px-4 py-2 border-b border-gray-700 flex gap-2">
+                    <div class="w-3 h-3 rounded-full bg-red-500"></div><div class="w-3 h-3 rounded-full bg-yellow-500"></div><div class="w-3 h-3 rounded-full bg-green-500"></div>
+                </div>
+                <div class="p-6 md:p-8 flex flex-col gap-4">
+                    <div>
+                        <span class="text-blue-400 font-bold">Given</span> 
+                        <span class="text-gray-300">пользователь находится в главном меню</span>
+                    </div>
+                    <div>
+                        <span class="text-orange-400 font-bold">When</span> 
+                        <span class="text-gray-300">нажимает кнопку "Пройти диагностику"</span>
+                    </div>
+                    <div>
+                        <span class="text-green-400 font-bold">Then</span> 
+                        <span class="text-gray-300">система показывает первый вопрос из JSON</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-10 flex gap-4">
+                <span class="bg-white px-4 py-2 rounded-xl shadow-sm border border-gray-200 font-bold text-gray-600 text-sm">Просто читать</span>
+                <span class="bg-white px-4 py-2 rounded-xl shadow-sm border border-gray-200 font-bold text-gray-600 text-sm">Легко парсить AI</span>
+                <span class="bg-white px-4 py-2 rounded-xl shadow-sm border border-gray-200 font-bold text-gray-600 text-sm">Готовый тест</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 27: Почему поведение важнее абстрактной задачи -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-27">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Почему поведение <span class="gradient-text">важнее абстракции</span></h2>
+            
+            <div class="flex flex-col md:flex-row gap-8 w-full max-w-5xl mb-8 items-stretch">
+                <!-- Абстракция -->
+                <div class="flex-1 bg-red-50 border border-red-200 p-8 rounded-3xl shadow-sm opacity-80 text-center flex flex-col items-center">
+                    <h3 class="font-bold text-red-800 uppercase tracking-widest mb-6">Абстрактный запрос</h3>
+                    <div class="bg-white p-6 rounded-xl shadow-inner w-full font-medium text-gray-600 border border-red-100 flex-1 flex items-center justify-center">
+                        "Сделай диагностику AI-зрелости"
+                    </div>
+                </div>
+                
+                <!-- Поведение -->
+                <div class="flex-1 bg-green-50 border border-green-200 p-8 rounded-3xl shadow-md transform md:scale-105 text-center flex flex-col items-center">
+                    <h3 class="font-bold text-green-800 uppercase tracking-widest mb-6">Поведенческий запрос</h3>
+                    <div class="bg-white p-6 rounded-xl shadow-sm w-full font-bold text-gray-800 border border-green-300 flex-1 flex items-center justify-center text-sm md:text-base leading-relaxed">
+                        "Если пользователь нажал кнопку старт,<br>покажи первый вопрос, сохрани ответ в state,<br>и переведи к следующему шагу."
+                    </div>
+                </div>
+            </div>
+            
+            <p class="text-xl font-bold text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 flex items-center shadow-sm">
+                <i class="ph-bold ph-check-circle text-green-500 mr-2 text-2xl"></i> AI лучше реализует то, что описано как система реакций
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 28: Технические требования: FR и NFR -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-28">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Технические требования: <span class="gradient-text">FR и NFR</span></h2>
+            
+            <div class="flex flex-col md:flex-row gap-8 w-full max-w-4xl mb-8">
+                <!-- FR -->
+                <div class="flex-1 bg-white border-t-4 border-t-blue-500 border-l border-r border-b border-gray-200 p-8 rounded-b-3xl shadow-sm">
+                    <h3 class="font-black text-blue-900 text-2xl mb-6 text-center">Functional (FR)</h3>
+                    <ul class="flex flex-col gap-4 text-sm font-bold text-gray-700">
+                        <li class="bg-blue-50 p-3 rounded-lg border border-blue-100">— Какие действия делает система</li>
+                        <li class="bg-blue-50 p-3 rounded-lg border border-blue-100">— Какие данные обрабатывает</li>
+                        <li class="bg-blue-50 p-3 rounded-lg border border-blue-100">— Какие правила применяет</li>
+                    </ul>
+                </div>
+                
+                <!-- NFR -->
+                <div class="flex-1 bg-white border-t-4 border-t-orange-500 border-l border-r border-b border-gray-200 p-8 rounded-b-3xl shadow-sm">
+                    <h3 class="font-black text-orange-900 text-2xl mb-6 text-center">Non-Functional (NFR)</h3>
+                    <div class="grid grid-cols-2 gap-4 text-sm font-bold text-gray-700 text-center">
+                        <div class="bg-orange-50 p-3 rounded-lg border border-orange-100 flex flex-col items-center"><i class="ph-bold ph-lightning text-orange-500 mb-1 text-xl"></i> Скорость</div>
+                        <div class="bg-orange-50 p-3 rounded-lg border border-orange-100 flex flex-col items-center"><i class="ph-bold ph-shield-check text-orange-500 mb-1 text-xl"></i> Стабильность</div>
+                        <div class="bg-orange-50 p-3 rounded-lg border border-orange-100 flex flex-col items-center"><i class="ph-bold ph-lock-key text-orange-500 mb-1 text-xl"></i> Безопасность</div>
+                        <div class="bg-orange-50 p-3 rounded-lg border border-orange-100 flex flex-col items-center"><i class="ph-bold ph-arrows-out text-orange-500 mb-1 text-xl"></i> Масштаб</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 29: Архитектура через C4 -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-29">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Архитектура через <span class="gradient-text">модель C4</span></h2>
+            
+            <div class="flex flex-col w-full max-w-xl perspective-[1000px] mb-8">
+                <!-- Stack layers (Pyramid style) -->
+                <div class="w-[40%] mx-auto bg-purple-200 text-purple-900 font-black text-xs py-2 px-4 rounded-t-lg text-center shadow-sm border border-purple-300">Context (Окружение)</div>
+                <div class="w-[60%] mx-auto bg-purple-300 text-purple-900 font-black text-sm py-3 px-4 text-center shadow-md border border-purple-400">Containers (Приложения/БД)</div>
+                <div class="w-[80%] mx-auto bg-purple-400 text-white font-black text-base py-4 px-4 text-center shadow-lg border border-purple-500">Components (Модули)</div>
+                <div class="w-full mx-auto bg-purple-600 text-white font-black text-lg py-5 px-6 rounded-b-xl text-center shadow-xl border border-purple-700">Code (Классы/Функции)</div>
+            </div>
+            
+            <p class="text-lg font-bold text-gray-600 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm">
+                Архитектура усложняется по мере зумирования (Zoom in)
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 30: Task grooming: как декомпозировать работу -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-30">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Task Grooming: <span class="gradient-text">декомпозиция</span></h2>
+            
+            <div class="w-full max-w-4xl bg-gray-50 border border-gray-200 rounded-3xl p-8 shadow-sm mb-8 flex flex-col items-center">
+                <!-- User Story -->
+                <div class="bg-blue-600 text-white font-bold px-6 py-3 rounded-xl shadow-md w-full max-w-md text-center mb-6 z-10 relative">
+                    User Story: Сделать опросник
+                </div>
+                
+                <i class="ph-bold ph-arrow-down text-gray-300 text-2xl mb-6"></i>
+                
+                <!-- Tasks Grid -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 w-full relative z-10">
+                    <div class="bg-white p-4 rounded-xl shadow border-t-4 border-t-orange-400 text-xs font-bold text-gray-700">1. Подготовить JSON-схему</div>
+                    <div class="bg-white p-4 rounded-xl shadow border-t-4 border-t-orange-400 text-xs font-bold text-gray-700">2. Настроить FSM состояний</div>
+                    <div class="bg-white p-4 rounded-xl shadow border-t-4 border-t-orange-400 text-xs font-bold text-gray-700">3. Создать UI inline-кнопок</div>
+                    <div class="bg-white p-4 rounded-xl shadow border-t-4 border-t-orange-400 text-xs font-bold text-gray-700">4. Написать модуль скоринга</div>
+                </div>
+            </div>
+            
+            <div class="flex gap-4 font-bold text-sm text-gray-600 flex-wrap justify-center">
+                <span class="bg-white px-3 py-1 rounded shadow-sm border border-gray-100"><i class="ph-bold ph-check text-green-500 mr-1"></i> Атомарные задачи</span>
+                <span class="bg-white px-3 py-1 rounded shadow-sm border border-gray-100"><i class="ph-bold ph-check text-green-500 mr-1"></i> Критерии готовности</span>
+                <span class="bg-white px-3 py-1 rounded shadow-sm border border-gray-100"><i class="ph-bold ph-check text-green-500 mr-1"></i> Выявление параллелей</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 31: Тесты как продолжение требований -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-31">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Тесты — <span class="gradient-text">продолжение требований</span></h2>
+            
+            <p class="text-xl font-bold text-gray-600 mb-12 text-center max-w-2xl">Gherkin-сценарии уже почти являются тест-планом</p>
+            
+            <div class="flex flex-col md:flex-row items-center justify-between w-full max-w-5xl bg-white border border-gray-200 p-8 rounded-3xl shadow-sm mb-8 overflow-x-auto relative min-h-[160px]">
+                <div class="flex flex-col items-center z-10 min-w-[100px]">
+                    <div class="bg-gray-50 border border-gray-200 w-14 h-14 rounded-xl flex items-center justify-center text-gray-600 shadow-sm mb-3"><i class="ph-fill ph-file-text text-2xl"></i></div>
+                    <span class="text-[10px] font-bold text-gray-500 uppercase text-center mb-1">Требования</span>
+                    <span class="text-xs font-black text-gray-800">Requirements</span>
+                </div>
+                <div class="hidden md:block flex-1 h-0.5 bg-gray-200 z-0 relative"><i class="ph-bold ph-caret-right absolute right-0 top-1/2 transform translate-x-1/2 -translate-y-1/2 text-gray-300"></i></div>
+                
+                <div class="flex flex-col items-center z-10 min-w-[100px]">
+                    <div class="bg-blue-50 border border-blue-200 w-14 h-14 rounded-xl flex items-center justify-center text-blue-500 shadow-sm mb-3"><i class="ph-fill ph-tree-structure text-2xl"></i></div>
+                    <span class="text-[10px] font-bold text-gray-500 uppercase text-center mb-1">Поведение</span>
+                    <span class="text-xs font-black text-blue-900">Behavior</span>
+                </div>
+                <div class="hidden md:block flex-1 h-0.5 bg-gray-200 z-0 relative"><i class="ph-bold ph-caret-right absolute right-0 top-1/2 transform translate-x-1/2 -translate-y-1/2 text-gray-300"></i></div>
+                
+                <div class="flex flex-col items-center z-10 min-w-[100px]">
+                    <div class="bg-orange-50 border border-orange-200 w-14 h-14 rounded-xl flex items-center justify-center text-orange-500 shadow-sm mb-3"><i class="ph-fill ph-flask text-2xl"></i></div>
+                    <span class="text-[10px] font-bold text-gray-500 uppercase text-center mb-1">Сценарии</span>
+                    <span class="text-xs font-black text-orange-900">Tests</span>
+                </div>
+                <div class="hidden md:block flex-1 h-0.5 bg-gray-200 z-0 relative"><i class="ph-bold ph-caret-right absolute right-0 top-1/2 transform translate-x-1/2 -translate-y-1/2 text-gray-300"></i></div>
+                
+                <div class="flex flex-col items-center z-10 min-w-[100px]">
+                    <div class="bg-green-100 border-2 border-green-400 w-16 h-16 rounded-xl flex items-center justify-center text-green-600 shadow-md mb-3 transform scale-110"><i class="ph-fill ph-shield-check text-3xl"></i></div>
+                    <span class="text-[10px] font-bold text-gray-500 uppercase text-center mb-1">Проверка</span>
+                    <span class="text-xs font-black text-green-900">Validation</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 32: Уровни тестирования -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-32">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Уровни <span class="gradient-text">тестирования</span></h2>
+            
+            <div class="flex flex-col w-full max-w-md mb-8">
+                <!-- Pyramid -->
+                <div class="w-[40%] mx-auto bg-orange-100 border-t-2 border-l-2 border-r-2 border-orange-300 text-orange-800 p-4 rounded-t-xl text-center shadow-sm relative">
+                    <span class="font-black text-lg block mb-1">E2E</span>
+                    <span class="text-[10px] font-medium leading-tight">Сквозной путь юзера</span>
+                </div>
+                <div class="w-[70%] mx-auto bg-blue-100 border-t-2 border-l-2 border-r-2 border-blue-300 text-blue-800 p-4 text-center shadow-md relative z-10">
+                    <span class="font-black text-xl block mb-1">Integration</span>
+                    <span class="text-xs font-medium leading-tight">Связки модулей (здесь хорош BDD)</span>
+                </div>
+                <div class="w-full mx-auto bg-gray-100 border-2 border-gray-300 text-gray-800 p-6 rounded-b-xl text-center shadow-lg relative z-20">
+                    <span class="font-black text-2xl block mb-1">Unit</span>
+                    <span class="text-sm font-medium">Отдельные функции и классы</span>
+                </div>
+            </div>
+            
+            <p class="text-lg font-bold text-purple-700 bg-purple-50 px-6 py-3 rounded-xl border border-purple-200">
+                BDD особенно хорошо ложится на интеграционные тесты
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 33: Блок 5. Code generation как управляемый процесс -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-33">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <span class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Блок 5. Code Generation</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Управляемый <span class="gradient-text">конвейер</span></h2>
+            
+            <div class="flex flex-col md:flex-row items-center justify-between w-full max-w-5xl bg-gray-900 border border-gray-800 p-6 md:p-8 rounded-3xl shadow-xl mb-8 overflow-x-auto relative">
+                
+                <div class="flex items-center gap-2 bg-gray-800 p-2 rounded-xl z-10">
+                    <div class="bg-gray-700 text-gray-300 px-3 py-2 rounded text-xs font-bold">1. Требования</div>
+                    <i class="ph-bold ph-arrow-right text-gray-500"></i>
+                    <div class="bg-gray-700 text-gray-300 px-3 py-2 rounded text-xs font-bold">2. Архитектура</div>
+                    <i class="ph-bold ph-arrow-right text-gray-500"></i>
+                    <div class="bg-gray-700 text-gray-300 px-3 py-2 rounded text-xs font-bold">3. Тесты</div>
+                </div>
+                
+                <i class="ph-bold ph-arrow-right text-purple-400 text-3xl mx-4 hidden md:block"></i>
+                <i class="ph-bold ph-arrow-down text-purple-400 text-3xl my-4 md:hidden"></i>
+                
+                <div class="bg-gradient-to-r from-purple-600 to-orange-500 p-1 rounded-xl z-10 shadow-lg transform md:scale-110">
+                    <div class="bg-gray-900 px-6 py-4 rounded-lg flex flex-col items-center">
+                        <i class="ph-fill ph-code text-white text-3xl mb-1"></i>
+                        <span class="font-black text-white uppercase text-sm">Code Gen</span>
+                    </div>
+                </div>
+                
+                <i class="ph-bold ph-arrow-right text-green-400 text-3xl mx-4 hidden md:block"></i>
+                <i class="ph-bold ph-arrow-down text-green-400 text-3xl my-4 md:hidden"></i>
+                
+                <div class="bg-green-900/50 border border-green-500/50 text-green-400 px-6 py-4 rounded-xl font-bold text-sm flex items-center z-10">
+                    <i class="ph-bold ph-shield-check mr-2 text-xl"></i> Валидация
+                </div>
+            </div>
+            
+            <p class="text-xl font-bold text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm">
+                Генерация кода зависит от <span class="text-purple-600">качества входящего контекста</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 34: Стратегии промт-инжиниринга -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-34">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Стратегии <span class="gradient-text">управления AI</span></h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl">
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex items-start gap-4 hover:shadow-md transition">
+                    <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-500 shrink-0"><i class="ph-fill ph-question text-2xl"></i></div>
+                    <div>
+                        <h3 class="font-bold text-gray-900 text-lg">Сначала задай вопросы</h3>
+                        <p class="text-sm text-gray-500 mt-1">AI собирает недостающий контекст до генерации кода.</p>
+                    </div>
+                </div>
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex items-start gap-4 hover:shadow-md transition">
+                    <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center text-purple-500 shrink-0"><i class="ph-fill ph-user-focus text-2xl"></i></div>
+                    <div>
+                        <h3 class="font-bold text-gray-900 text-lg">Роль эксперта</h3>
+                        <p class="text-sm text-gray-500 mt-1">Смещение весов модели к лучшим практикам Senior-разработчика.</p>
+                    </div>
+                </div>
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex items-start gap-4 hover:shadow-md transition">
+                    <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center text-orange-500 shrink-0"><i class="ph-fill ph-steps text-2xl"></i></div>
+                    <div>
+                        <h3 class="font-bold text-gray-900 text-lg">Делай шаг за шагом</h3>
+                        <p class="text-sm text-gray-500 mt-1">Chain-of-Thought для сложных алгоритмов.</p>
+                    </div>
+                </div>
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex items-start gap-4 hover:shadow-md transition">
+                    <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center text-green-500 shrink-0"><i class="ph-fill ph-scales text-2xl"></i></div>
+                    <div>
+                        <h3 class="font-bold text-gray-900 text-lg">Плюсы и минусы</h3>
+                        <p class="text-sm text-gray-500 mt-1">Запросить 3 варианта архитектуры с их трейдоффами до выбора.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 35: Debugging & refinement loop -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-35">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Дебаггинг и <span class="gradient-text">исправления</span></h2>
+            
+            <div class="relative w-[300px] h-[300px] md:w-[400px] md:h-[400px] flex items-center justify-center mb-12">
+                <div class="absolute w-28 h-28 md:w-32 md:h-32 bg-white rounded-full flex flex-col items-center justify-center font-black z-30 shadow-lg border-2 border-purple-100 text-center leading-tight">
+                    <span class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Ваш контроль</span>
+                    <i class="ph-fill ph-sliders text-2xl md:text-3xl text-purple-500"></i>
+                </div>
+                
+                <svg class="absolute inset-0 w-full h-full z-10" viewBox="0 0 100 100">
+                    <path d="M 50 10 A 40 40 0 0 1 90 50" fill="none" stroke="#e5e7eb" stroke-width="2"/>
+                    <path d="M 90 50 A 40 40 0 0 1 50 90" fill="none" stroke="#e5e7eb" stroke-width="2"/>
+                    <path d="M 50 90 A 40 40 0 0 1 10 50" fill="none" stroke="#e5e7eb" stroke-width="2"/>
+                    <path d="M 10 50 A 40 40 0 0 1 50 10" fill="none" stroke="#a855f7" stroke-width="3" stroke-dasharray="4,4"/>
+                </svg>
+
+                <div class="absolute top-[10%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 bg-gray-900 text-white px-3 py-1 md:px-4 md:py-2 rounded-xl shadow-md font-bold z-20 text-[10px] md:text-xs">1. Генерация</div>
+                <div class="absolute top-[50%] right-[10%] transform translate-x-1/2 -translate-y-1/2 bg-blue-50 border border-blue-200 text-blue-800 px-3 py-1 md:px-4 md:py-2 rounded-xl shadow-md font-bold z-20 text-[10px] md:text-xs">2. Запуск</div>
+                <div class="absolute bottom-[10%] left-[50%] transform -translate-x-1/2 translate-y-1/2 bg-orange-50 border border-orange-200 text-orange-800 px-3 py-1 md:px-4 md:py-2 rounded-xl shadow-md font-bold z-20 text-[10px] md:text-xs">3. Анализ</div>
+                <div class="absolute top-[50%] left-[10%] transform -translate-x-1/2 -translate-y-1/2 bg-purple-50 border border-purple-200 text-purple-800 px-3 py-1 md:px-4 md:py-2 rounded-xl shadow-md font-bold z-20 text-[10px] md:text-xs">4. Улучшение</div>
+            </div>
+            
+            <div class="flex gap-4 font-bold text-sm md:text-base text-gray-700">
+                <span class="flex items-center"><i class="ph-bold ph-check text-green-500 mr-2"></i> Дебаг — норма</span>
+                <span class="flex items-center"><i class="ph-bold ph-check text-green-500 mr-2"></i> Конкретный фидбек</span>
+                <span class="flex items-center"><i class="ph-bold ph-check text-green-500 mr-2"></i> Сохранение версий</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 36: Блок 6. Практика: Telegram-бот -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-36">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <span class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Блок 6. Практика (Кейс)</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Бот оценки <span class="gradient-text">AI-зрелости</span></h2>
+            
+            <div class="flex flex-col md:flex-row gap-12 w-full max-w-4xl items-center">
+                <!-- Phone Mockup -->
+                <div class="w-[280px] h-[550px] bg-white rounded-[40px] border-[10px] border-gray-900 shadow-2xl flex flex-col overflow-hidden relative shrink-0">
+                    <div class="h-16 bg-gray-100 border-b flex items-center justify-center font-bold text-gray-800">Andre AI Bot</div>
+                    <div class="flex-1 p-4 flex flex-col gap-4 bg-gray-50 overflow-hidden">
+                        <div class="self-start bg-white p-3 rounded-2xl rounded-tl-sm shadow-sm text-xs border border-gray-100 max-w-[85%]">
+                            Вопрос 1/35: Как часто вы используете LLM в рабочих процессах?
+                        </div>
+                        <div class="flex flex-col gap-2 mt-auto pb-4">
+                            <div class="bg-blue-500 text-white text-center py-2 rounded-lg text-xs font-bold shadow-sm">Каждый день</div>
+                            <div class="bg-blue-500 text-white text-center py-2 rounded-lg text-xs font-bold shadow-sm">Раз в неделю</div>
+                            <div class="bg-blue-500 text-white text-center py-2 rounded-lg text-xs font-bold shadow-sm">Редко</div>
+                        </div>
+                        <div class="w-full bg-gray-200 h-1 rounded-full absolute top-16 left-0"><div class="bg-green-500 h-1 rounded-full w-[3%]"></div></div>
+                    </div>
+                </div>
+                
+                <!-- Text points -->
+                <div class="flex flex-col gap-6">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+                        <h3 class="font-black text-gray-800 text-lg flex items-center"><i class="ph-fill ph-list-numbers text-purple-500 mr-2 text-2xl"></i> Структура</h3>
+                        <p class="text-sm text-gray-600 mt-1">35 вопросов, 5 вариантов ответа каждый.</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+                        <h3 class="font-black text-gray-800 text-lg flex items-center"><i class="ph-fill ph-calculator text-orange-500 mr-2 text-2xl"></i> Логика</h3>
+                        <p class="text-sm text-gray-600 mt-1">Динамический расчёт AI Maturity Score.</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-purple-50 to-orange-50 p-4 rounded-xl shadow-md border border-purple-200 transform md:scale-105">
+                        <h3 class="font-black text-purple-900 text-lg flex items-center"><i class="ph-fill ph-lightbulb text-orange-500 mr-2 text-2xl"></i> Результат</h3>
+                        <p class="text-sm text-purple-800 mt-1 font-medium">Живой интерактивный инструмент вместо статичной PDF-методики.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 37: Простая архитектура TG-бота -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-37">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Архитектура <span class="gradient-text">TG-бота</span></h2>
+            
+            <div class="flex flex-col md:flex-row gap-6 w-full max-w-5xl items-center justify-center mb-8">
+                <!-- User/TG -->
+                <div class="bg-blue-50 border border-blue-200 p-6 rounded-2xl flex flex-col items-center shadow-sm w-full md:w-48 shrink-0">
+                    <i class="ph-fill ph-telegram-logo text-blue-500 text-4xl mb-2"></i>
+                    <span class="font-black text-blue-900">Telegram API</span>
+                </div>
+                
+                <i class="ph-bold ph-arrows-left-right text-gray-300 text-3xl hidden md:block"></i>
+                <i class="ph-bold ph-arrows-down-up text-gray-300 text-3xl md:hidden"></i>
+                
+                <!-- Inner Logic -->
+                <div class="bg-white border-2 border-gray-200 p-8 rounded-3xl shadow-md w-full flex flex-col items-center gap-4 relative">
+                    <div class="absolute -top-3 bg-gray-100 px-4 py-1 rounded text-xs font-bold text-gray-500 uppercase">Backend (Python/Node)</div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+                        <div class="bg-gray-50 border border-gray-200 p-3 rounded-lg text-center font-bold text-sm text-gray-700"><i class="ph-fill ph-robot mr-1 text-purple-500"></i> Aiogram Bot</div>
+                        <div class="bg-gray-50 border border-gray-200 p-3 rounded-lg text-center font-bold text-sm text-gray-700"><i class="ph-fill ph-git-branch mr-1 text-orange-500"></i> FSM (Состояния)</div>
+                        <div class="bg-gray-50 border border-gray-200 p-3 rounded-lg text-center font-bold text-sm text-gray-700"><i class="ph-fill ph-file-code mr-1 text-blue-500"></i> JSON Questions</div>
+                        <div class="bg-gray-50 border border-gray-200 p-3 rounded-lg text-center font-bold text-sm text-gray-700"><i class="ph-fill ph-calculator mr-1 text-green-500"></i> Scoring Module</div>
+                    </div>
+                </div>
+                
+                <i class="ph-bold ph-arrow-right text-gray-300 text-3xl hidden md:block"></i>
+                <i class="ph-bold ph-arrow-down text-gray-300 text-3xl md:hidden"></i>
+                
+                <!-- Output -->
+                <div class="bg-purple-50 border border-purple-200 p-6 rounded-2xl flex flex-col items-center shadow-sm w-full md:w-48 shrink-0">
+                    <i class="ph-fill ph-file-text text-purple-500 text-4xl mb-2"></i>
+                    <span class="font-black text-purple-900 text-center text-sm">Result Formatter</span>
+                </div>
+            </div>
+            
+            <p class="text-lg font-bold text-gray-600">Минимально жизнеспособная архитектура без лишней сложности</p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 38: Декомпозиция на задачи и критерии -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-38">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Декомпозиция: <span class="gradient-text">Задачи и критерии</span></h2>
+            
+            <div class="flex flex-col md:flex-row gap-8 w-full max-w-5xl items-stretch mb-8">
+                <!-- Backlog -->
+                <div class="flex-[2] bg-gray-50 border border-gray-200 p-6 rounded-3xl shadow-sm flex flex-col">
+                    <h3 class="font-bold text-gray-500 uppercase tracking-widest mb-4">Backlog (Спринт)</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div class="bg-white p-3 rounded shadow-sm text-sm font-bold text-gray-700 border-l-4 border-l-blue-500">JSON-структура вопросов</div>
+                        <div class="bg-white p-3 rounded shadow-sm text-sm font-bold text-gray-700 border-l-4 border-l-orange-500">Модуль Scoring</div>
+                        <div class="bg-white p-3 rounded shadow-sm text-sm font-bold text-gray-700 border-l-4 border-l-purple-500">FSM (Машина состояний)</div>
+                        <div class="bg-white p-3 rounded shadow-sm text-sm font-bold text-gray-700 border-l-4 border-l-green-500">Сохранение ответов</div>
+                        <div class="bg-white p-3 rounded shadow-sm text-sm font-bold text-gray-700 border-l-4 border-l-red-500">Обработка прерываний</div>
+                        <div class="bg-white p-3 rounded shadow-sm text-sm font-bold text-gray-700 border-l-4 border-l-yellow-500">Генерация UX-кнопок</div>
+                    </div>
+                </div>
+                
+                <!-- Criteria -->
+                <div class="flex-1 bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 p-6 rounded-3xl shadow-md flex flex-col">
+                    <h3 class="font-bold text-green-800 uppercase tracking-widest mb-4 flex items-center"><i class="ph-bold ph-check-square-offset mr-2 text-xl"></i> Acceptance Criteria</h3>
+                    <ul class="flex flex-col gap-3 text-sm font-bold text-green-900 mt-2">
+                        <li class="flex items-start"><i class="ph-bold ph-check text-green-500 mt-0.5 mr-2"></i> Корректность подсчёта</li>
+                        <li class="flex items-start"><i class="ph-bold ph-check text-green-500 mt-0.5 mr-2"></i> Удобство UX (кнопки)</li>
+                        <li class="flex items-start"><i class="ph-bold ph-check text-green-500 mt-0.5 mr-2"></i> Валидность JSON</li>
+                        <li class="flex items-start"><i class="ph-bold ph-check text-green-500 mt-0.5 mr-2"></i> Учёт ограничений TG API</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 39: Почему маленькие задачи лучше большого запроса -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-39">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Маленькие задачи vs <span class="gradient-text">Монолит</span></h2>
+            
+            <div class="flex flex-col md:flex-row gap-8 w-full max-w-5xl mb-8 items-stretch">
+                <!-- Bad (Monolith) -->
+                <div class="flex-1 bg-red-50 border border-red-200 p-8 rounded-3xl shadow-sm text-center flex flex-col items-center opacity-80">
+                    <div class="bg-red-500 text-white px-4 py-1 rounded-full text-xs font-bold uppercase mb-4 shadow-sm">Плохо</div>
+                    <div class="w-full bg-white p-8 rounded-xl shadow-inner border border-red-100 flex items-center justify-center font-bold text-gray-500 italic h-48">
+                        "Сделай всего бота"
+                    </div>
+                </div>
+                
+                <!-- Good (Stack) -->
+                <div class="flex-1 bg-green-50 border border-green-200 p-8 rounded-3xl shadow-md text-center flex flex-col items-center transform md:scale-105">
+                    <div class="bg-green-500 text-white px-4 py-1 rounded-full text-xs font-bold uppercase mb-4 shadow-sm">Хорошо</div>
+                    <div class="w-full flex flex-col gap-2 h-48 justify-center">
+                        <div class="bg-white p-2 rounded shadow-sm border border-green-100 font-bold text-sm text-gray-700 text-left pl-4">1. Создай JSON вопросов</div>
+                        <div class="bg-white p-2 rounded shadow-sm border border-green-100 font-bold text-sm text-gray-700 text-left pl-4">2. Реализуй FSM</div>
+                        <div class="bg-white p-2 rounded shadow-sm border border-green-100 font-bold text-sm text-gray-700 text-left pl-4">3. Обработай inline-кнопки</div>
+                        <div class="bg-white p-2 rounded shadow-sm border border-green-100 font-bold text-sm text-gray-700 text-left pl-4">4. Добавь scoring</div>
+                        <div class="bg-white p-2 rounded shadow-sm border border-green-100 font-bold text-sm text-gray-700 text-left pl-4">5. Подготовь formatter</div>
+                    </div>
+                </div>
+            </div>
+            
+            <p class="text-xl font-bold text-gray-800 flex items-center bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm">
+                <i class="ph-bold ph-target text-purple-500 mr-2 text-2xl"></i> Чем меньше и точнее задача, тем лучше результат
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 40: Code Node в n8n — суперсила vibe-coding -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-40">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <h2 class="text-3xl md:text-5xl font-black mb-8 text-center text-gray-900">Суперсила vibe-coding: <span class="gradient-text">Code Node</span></h2>
+            <p class="text-lg font-bold text-gray-600 mb-10 text-center max-w-3xl">Точка максимальной гибкости и детерминированной логики в n8n</p>
+            
+            <div class="relative w-full max-w-4xl bg-white border border-gray-200 rounded-3xl shadow-inner flex flex-col md:flex-row items-center justify-between p-8 mb-8 overflow-hidden gap-6">
+                <!-- background grid -->
+                <div class="absolute inset-0" style="background-image: linear-gradient(#e5e7eb 1px, transparent 1px), linear-gradient(90deg, #e5e7eb 1px, transparent 1px); background-size: 20px 20px; opacity: 0.5;"></div>
+                
+                <!-- Left Side -->
+                <div class="flex flex-col items-center z-10">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 font-bold text-gray-600 flex items-center">
+                        <i class="ph-fill ph-telegram-logo text-blue-500 mr-2 text-xl"></i> Webhook
+                    </div>
+                </div>
+
+                <i class="ph-bold ph-arrow-right text-gray-400 text-3xl hidden md:block z-10"></i>
+                <i class="ph-bold ph-arrow-down text-gray-400 text-3xl md:hidden z-10"></i>
+
+                <!-- Hero Node -->
+                <div class="bg-purple-50 border-2 border-purple-500 p-6 rounded-2xl shadow-[0_0_20px_rgba(168,85,247,0.3)] flex flex-col items-center z-20 relative min-w-[220px]">
+                    <div class="w-12 h-12 bg-purple-200 rounded-xl mb-3 flex items-center justify-center text-purple-600"><i class="ph-bold ph-code text-3xl"></i></div>
+                    <span class="font-black text-gray-900 text-lg">Code Node</span>
+                    <span class="text-[10px] text-gray-500 mb-4">Детерминированная логика</span>
+                    
+                    <div class="grid grid-cols-2 gap-2 text-center w-full">
+                        <span class="bg-white px-2 py-1 rounded text-[10px] font-bold text-purple-600 border border-purple-100">Очищать</span>
+                        <span class="bg-white px-2 py-1 rounded text-[10px] font-bold text-purple-600 border border-purple-100">Преобразовывать</span>
+                        <span class="bg-white px-2 py-1 rounded text-[10px] font-bold text-purple-600 border border-purple-100">Агрегировать</span>
+                        <span class="bg-white px-2 py-1 rounded text-[10px] font-bold text-purple-600 border border-purple-100">Проверять</span>
+                    </div>
+                </div>
+
+                <i class="ph-bold ph-arrow-right text-gray-400 text-3xl hidden md:block z-10"></i>
+                <i class="ph-bold ph-arrow-down text-gray-400 text-3xl md:hidden z-10"></i>
+
+                <!-- Right Side -->
+                <div class="flex flex-col gap-4 items-center z-10 w-full md:w-auto">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 font-bold text-gray-600 flex items-center w-full justify-center">
+                        <i class="ph-fill ph-database text-green-500 mr-2 text-xl"></i> База данных
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 font-bold text-gray-600 flex items-center w-full justify-center">
+                        <i class="ph-fill ph-brain text-purple-500 mr-2 text-xl"></i> AI Agent
+                    </div>
+                </div>
+            </div>
+            
+            <p class="text-base md:text-lg font-bold text-gray-700 bg-orange-50 px-6 py-3 rounded-xl border border-orange-200">
+                Если задачу можно решить кодом детерминированно — часто это лучше, чем отдавать её AI
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 41: Два режима Code Node -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-41">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Два режима <span class="gradient-text">Code Node</span></h2>
+            
+            <div class="flex flex-col md:flex-row gap-8 w-full max-w-5xl mb-8 items-stretch">
+                <!-- For Each Item -->
+                <div class="flex-1 bg-white border border-gray-200 p-8 rounded-3xl shadow-sm">
+                    <h3 class="font-black text-blue-600 uppercase tracking-widest mb-4 flex items-center border-b border-blue-100 pb-2"><i class="ph-bold ph-list-numbers mr-2"></i> For Each Item</h3>
+                    <ul class="text-sm font-medium text-gray-600 mb-6 flex flex-col gap-2">
+                        <li>— Запускается на каждый item отдельно</li>
+                        <li>— Работает через <code class="bg-gray-100 px-1 rounded text-blue-600">$json</code></li>
+                        <li>— Подходит для локальной обработки</li>
+                    </ul>
+                    <div class="bg-gray-50 border border-gray-200 p-4 rounded-xl flex items-center justify-center gap-2">
+                        <div class="w-8 h-8 bg-blue-100 rounded text-blue-500 flex items-center justify-center">1</div>
+                        <div class="w-8 h-8 bg-blue-100 rounded text-blue-500 flex items-center justify-center">2</div>
+                        <div class="w-8 h-8 bg-blue-100 rounded text-blue-500 flex items-center justify-center">3</div>
+                        <span class="text-xs font-bold text-gray-400 ml-2">(отдельно)</span>
+                    </div>
+                </div>
+                
+                <!-- Once for All Items -->
+                <div class="flex-1 bg-white border border-gray-200 p-8 rounded-3xl shadow-sm border-t-4 border-t-purple-500">
+                    <h3 class="font-black text-purple-600 uppercase tracking-widest mb-4 flex items-center border-b border-purple-100 pb-2"><i class="ph-bold ph-stack mr-2"></i> Once for All Items</h3>
+                    <ul class="text-sm font-medium text-gray-600 mb-6 flex flex-col gap-2">
+                        <li>— Запускается один раз на весь массив</li>
+                        <li>— Работает через <code class="bg-gray-100 px-1 rounded text-purple-600">$input.all()</code></li>
+                        <li>— Подходит для работы со всем набором</li>
+                    </ul>
+                    <div class="bg-gray-50 border border-gray-200 p-4 rounded-xl flex items-center justify-center gap-2">
+                        <div class="bg-purple-100 border border-purple-200 p-2 rounded flex gap-1 items-center">
+                            <div class="w-6 h-6 bg-purple-200 rounded text-purple-700 flex items-center justify-center text-[10px]">1</div>
+                            <div class="w-6 h-6 bg-purple-200 rounded text-purple-700 flex items-center justify-center text-[10px]">2</div>
+                            <div class="w-6 h-6 bg-purple-200 rounded text-purple-700 flex items-center justify-center text-[10px]">3</div>
+                        </div>
+                        <span class="text-xs font-bold text-gray-400 ml-2">(единожды)</span>
+                    </div>
+                </div>
+            </div>
+            
+            <p class="text-xl font-bold text-gray-800 bg-gray-50 px-6 py-3 rounded-xl border border-gray-200 shadow-sm">
+                Выбор режима меняет поведение <span class="text-purple-600">всей ноды</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 42: Когда использовать какой режим -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-42">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Когда использовать <span class="gradient-text">какой режим</span></h2>
+            
+            <!-- Decision tree simple -->
+            <div class="bg-gray-900 text-white font-black px-6 py-3 rounded-2xl shadow-lg mb-4 text-center z-10 relative">
+                Нужно видеть все элементы (сравнивать)?
+            </div>
+            <div class="flex justify-center gap-32 mb-4 relative z-0">
+                <i class="ph-bold ph-arrow-down-left text-gray-300 text-4xl"></i>
+                <i class="ph-bold ph-arrow-down-right text-gray-300 text-4xl"></i>
+            </div>
+            
+            <div class="flex flex-col md:flex-row gap-8 w-full max-w-4xl mb-8 items-stretch">
+                <!-- NO -> For Each -->
+                <div class="flex-1 bg-white border border-gray-200 p-6 rounded-3xl shadow-sm text-center">
+                    <div class="bg-gray-100 text-gray-500 font-bold px-3 py-1 rounded inline-block mb-4">НЕТ</div>
+                    <h3 class="font-black text-blue-600 mb-4">For Each Item</h3>
+                    <ul class="text-sm font-medium text-gray-600 text-left bg-blue-50 p-4 rounded-xl border border-blue-100 flex flex-col gap-2">
+                        <li><i class="ph-bold ph-check text-blue-400 mr-1"></i> Форматирование</li>
+                        <li><i class="ph-bold ph-check text-blue-400 mr-1"></i> Переименование полей</li>
+                        <li><i class="ph-bold ph-check text-blue-400 mr-1"></i> Преобразование дат</li>
+                        <li><i class="ph-bold ph-check text-blue-400 mr-1"></i> Локальные вычисления</li>
+                    </ul>
+                </div>
+                
+                <!-- YES -> All Items -->
+                <div class="flex-1 bg-white border border-gray-200 p-6 rounded-3xl shadow-sm text-center border-t-4 border-t-purple-500">
+                    <div class="bg-gray-100 text-gray-500 font-bold px-3 py-1 rounded inline-block mb-4">ДА</div>
+                    <h3 class="font-black text-purple-600 mb-4">Once for All Items</h3>
+                    <ul class="text-sm font-medium text-gray-600 text-left bg-purple-50 p-4 rounded-xl border border-purple-100 flex flex-col gap-2">
+                        <li><i class="ph-bold ph-check text-purple-400 mr-1"></i> Суммы (Агрегация)</li>
+                        <li><i class="ph-bold ph-check text-purple-400 mr-1"></i> Сортировка</li>
+                        <li><i class="ph-bold ph-check text-purple-400 mr-1"></i> Дедупликация</li>
+                        <li><i class="ph-bold ph-check text-purple-400 mr-1"></i> Группировка</li>
+                    </ul>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- СЛАЙД 43: Почему Code Node так силён -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-43">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Почему Code Node <span class="gradient-text">так силён</span></h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl mb-8">
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl flex items-center shadow-sm">
+                    <div class="w-14 h-14 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 mr-4 shrink-0"><i class="ph-fill ph-target text-3xl"></i></div>
+                    <div>
+                        <h3 class="font-bold text-gray-900 text-lg">Предсказуемый результат</h3>
+                        <p class="text-xs text-gray-500 mt-1">Никаких галлюцинаций, работает строго по логике.</p>
+                    </div>
+                </div>
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl flex items-center shadow-sm">
+                    <div class="w-14 h-14 bg-green-50 rounded-full flex items-center justify-center text-green-500 mr-4 shrink-0"><i class="ph-fill ph-currency-dollar text-3xl"></i></div>
+                    <div>
+                        <h3 class="font-bold text-gray-900 text-lg">Нет затрат на токены</h3>
+                        <p class="text-xs text-gray-500 mt-1">Бесплатное исполнение без вызовов внешних API.</p>
+                    </div>
+                </div>
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl flex items-center shadow-sm">
+                    <div class="w-14 h-14 bg-orange-50 rounded-full flex items-center justify-center text-orange-500 mr-4 shrink-0"><i class="ph-fill ph-lightning text-3xl"></i></div>
+                    <div>
+                        <h3 class="font-bold text-gray-900 text-lg">Быстрее AI-агентов</h3>
+                        <p class="text-xs text-gray-500 mt-1">Миллисекунды вместо секунд ожидания ответа от LLM.</p>
+                    </div>
+                </div>
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl flex items-center shadow-sm">
+                    <div class="w-14 h-14 bg-purple-50 rounded-full flex items-center justify-center text-purple-500 mr-4 shrink-0"><i class="ph-fill ph-database text-3xl"></i></div>
+                    <div>
+                        <h3 class="font-bold text-gray-900 text-lg">Большие объёмы данных</h3>
+                        <p class="text-xs text-gray-500 mt-1">Обработка тысяч записей без проблем с контекстом.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <p class="text-lg font-bold text-gray-700 bg-gray-50 px-8 py-4 rounded-xl border border-gray-200 text-center">
+                Code Node делает workflow <span class="text-green-600">стабильнее, дешевле и надёжнее</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 44: Связка Telegram + n8n + Code Node -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-44">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Интеграционная <span class="gradient-text">схема</span></h2>
+            
+            <div class="flex flex-col md:flex-row items-center justify-between w-full max-w-5xl bg-white border border-gray-200 p-8 rounded-3xl shadow-sm mb-12 overflow-x-auto relative min-h-[160px]">
+                <!-- Telegram -->
+                <div class="flex flex-col items-center z-10 min-w-[120px]">
+                    <div class="bg-blue-50 border border-blue-200 w-16 h-16 rounded-2xl flex items-center justify-center text-blue-500 shadow-sm mb-3"><i class="ph-fill ph-telegram-logo text-3xl"></i></div>
+                    <span class="text-xs font-black text-gray-800 uppercase">Telegram</span>
+                    <span class="text-[10px] text-gray-500 mt-1">Интерфейс</span>
+                </div>
+                
+                <i class="ph-bold ph-arrow-right text-gray-300 text-2xl hidden md:block"></i>
+                <i class="ph-bold ph-arrow-down text-gray-300 text-2xl md:hidden my-2"></i>
+                
+                <!-- n8n Orchestrator -->
+                <div class="flex flex-col items-center z-10 min-w-[120px]">
+                    <div class="bg-gray-900 border border-gray-700 w-16 h-16 rounded-2xl flex items-center justify-center text-white shadow-md mb-3"><span class="font-black text-xl">n8n</span></div>
+                    <span class="text-xs font-black text-gray-800 uppercase">n8n</span>
+                    <span class="text-[10px] text-gray-500 mt-1">Оркестратор</span>
+                </div>
+                
+                <i class="ph-bold ph-arrow-right text-gray-300 text-2xl hidden md:block"></i>
+                <i class="ph-bold ph-arrow-down text-gray-300 text-2xl md:hidden my-2"></i>
+                
+                <!-- Code Node (Highlighted) -->
+                <div class="flex flex-col items-center z-10 min-w-[120px]">
+                    <div class="bg-purple-100 border-2 border-purple-400 w-20 h-20 rounded-2xl flex items-center justify-center text-purple-600 shadow-[0_0_15px_rgba(168,85,247,0.3)] mb-3 transform scale-110"><i class="ph-bold ph-code text-4xl"></i></div>
+                    <span class="text-xs font-black text-purple-800 uppercase mt-1">Code Node</span>
+                    <span class="text-[10px] text-purple-600 mt-1 font-bold">Детерминизм</span>
+                </div>
+                
+                <i class="ph-bold ph-arrow-right text-gray-300 text-2xl hidden md:block"></i>
+                <i class="ph-bold ph-arrow-down text-gray-300 text-2xl md:hidden my-2"></i>
+                
+                <!-- External -->
+                <div class="flex flex-col items-center z-10 min-w-[120px]">
+                    <div class="bg-orange-50 border border-orange-200 w-16 h-16 rounded-2xl flex flex-wrap items-center justify-center gap-1 text-orange-500 shadow-sm mb-3 p-2">
+                        <i class="ph-fill ph-calendar text-lg"></i><i class="ph-fill ph-database text-lg"></i>
+                        <i class="ph-fill ph-file-text text-lg"></i><i class="ph-fill ph-brain text-lg"></i>
+                    </div>
+                    <span class="text-xs font-black text-gray-800 uppercase">Внешние</span>
+                    <span class="text-[10px] text-gray-500 mt-1">Исполнение</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 45: Роль Code Node в потоке -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-45">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Роль <span class="gradient-text">Code Node</span> в потоке</h2>
+            
+            <div class="flex flex-col md:flex-row items-center gap-8 w-full max-w-5xl mb-8">
+                <!-- Before -->
+                <div class="flex-1 bg-gray-50 border border-gray-200 p-6 rounded-3xl shadow-sm text-left w-full h-48 flex flex-col justify-center relative opacity-80">
+                    <h3 class="absolute top-4 left-6 font-bold text-gray-400 uppercase text-xs">До (Хаос)</h3>
+                    <div class="flex flex-col gap-2 mt-4 text-xs font-mono text-gray-600">
+                        <div class="bg-white p-2 rounded shadow-sm border border-gray-100">message.text: "Привет, хочу встречу"</div>
+                        <div class="bg-white p-2 rounded shadow-sm border border-gray-100">callback_data: "slot_14_30"</div>
+                        <div class="bg-white p-2 rounded shadow-sm border border-gray-100">voice_message: true</div>
+                    </div>
+                </div>
+                
+                <!-- Node -->
+                <div class="flex flex-col items-center z-10 shrink-0">
+                    <div class="bg-purple-100 border-2 border-purple-400 w-16 h-16 rounded-xl flex items-center justify-center text-purple-600 shadow-md transform md:scale-110 mb-2"><i class="ph-bold ph-code text-3xl"></i></div>
+                    <span class="text-xs font-bold text-purple-800">Нормализация</span>
+                </div>
+                
+                <!-- After -->
+                <div class="flex-1 bg-white border-2 border-green-200 p-6 rounded-3xl shadow-md text-left w-full h-48 flex flex-col justify-center relative">
+                    <h3 class="absolute top-4 left-6 font-bold text-green-500 uppercase text-xs">После (Структура)</h3>
+                    <div class="mt-4 font-mono text-[10px] md:text-xs text-green-700 bg-green-50 p-3 rounded-xl border border-green-100">
+{<br>
+&nbsp;&nbsp;"userId": "123456",<br>
+&nbsp;&nbsp;"intent": "booking",<br>
+&nbsp;&nbsp;"combined_text": "Привет, хочу...",<br>
+&nbsp;&nbsp;"timestamp": "2025-04-16T12:00"<br>
+}
+                    </div>
+                </div>
+            </div>
+            
+            <p class="text-xl font-bold text-gray-800 bg-white px-8 py-4 rounded-xl shadow-sm border border-gray-200">
+                Code Node превращает хаотичный ввод в <span class="text-green-600">чистый сигнал для AI</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 46: Итог лекции -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-46">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center relative">
+            <h2 class="text-3xl md:text-5xl font-black mb-12 text-center text-gray-900">Итог <span class="gradient-text">лекции</span></h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl mb-12 relative z-10">
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex items-start gap-4">
+                    <div class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 shrink-0"><i class="ph-fill ph-brain text-xl"></i></div>
+                    <p class="font-bold text-gray-800 text-sm md:text-base">Vibe-coding — это смена мышления, а не просто новый синтаксис.</p>
+                </div>
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex items-start gap-4">
+                    <div class="w-10 h-10 bg-orange-50 rounded-full flex items-center justify-center text-orange-500 shrink-0"><i class="ph-fill ph-file-text text-xl"></i></div>
+                    <p class="font-bold text-gray-800 text-sm md:text-base">Хороший результат рождается из требований, поведения, тестов и итераций.</p>
+                </div>
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex items-start gap-4">
+                    <div class="w-10 h-10 bg-purple-50 rounded-full flex items-center justify-center text-purple-500 shrink-0"><i class="ph-fill ph-code text-xl"></i></div>
+                    <p class="font-bold text-gray-800 text-sm md:text-base">Code Node в n8n даёт контроль и надёжность там, где AI может ошибаться.</p>
+                </div>
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex items-start gap-4">
+                    <div class="w-10 h-10 bg-green-50 rounded-full flex items-center justify-center text-green-500 shrink-0"><i class="ph-fill ph-rocket-launch text-xl"></i></div>
+                    <p class="font-bold text-gray-800 text-sm md:text-base">Будущее за теми, кто умеет мыслить как инженер и формулировать намерения.</p>
+                </div>
+            </div>
+            
+            <div class="bg-gradient-to-br from-purple-600 to-orange-500 p-1 rounded-2xl shadow-xl z-10 w-full max-w-3xl transform md:scale-105">
+                <div class="bg-white px-8 py-6 rounded-xl text-center">
+                    <p class="text-2xl md:text-3xl font-black text-gray-900 leading-tight">
+                        Не обязательно уметь кодить.<br>
+                        <span class="gradient-text">Важно уметь думать как инженер.</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const totalSlides = 47; // 0 (Title) + 46 content slides
+        let currentSlide = 0;
+        const progressBar = document.getElementById('progress-bar');
+        const body = document.body;
+        const params = new URLSearchParams(window.location.search);
+        const exportMode = 
+            params.has('pdf') || 
+            params.get('mode') === 'pdf' || 
+            window.location.hash === '#pdf';
+
+        function updateProgress() {
+            if (!progressBar) return;
+            const progress = ((currentSlide + 1) / totalSlides) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        function updateSlides() {
+            for (let i = 0; i < totalSlides; i++) {
+                const slide = document.getElementById(`slide-${i}`);
+                if (!slide) continue;
+
+                if (i === currentSlide) {
+                    slide.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-8', '-translate-y-8');
+                    slide.classList.add('opacity-100', 'translate-y-0');
+                } else if (i < currentSlide) {
+                    slide.classList.remove('opacity-100', 'translate-y-0', 'translate-y-8');
+                    slide.classList.add('opacity-0', 'pointer-events-none', '-translate-y-8');
+                } else {
+                    slide.classList.remove('opacity-100', 'translate-y-0', '-translate-y-8');
+                    slide.classList.add('opacity-0', 'pointer-events-none', 'translate-y-8');
+                }
+            }
+            updateProgress();
+        }
+
+        function showAllSlidesForPdf() {
+            body.classList.add('pdf-export-mode');
+            for (let i = 0; i < totalSlides; i++) {
+                const slide = document.getElementById(`slide-${i}`);
+                if (!slide) continue;
+                slide.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-8', '-translate-y-8');
+                slide.classList.add('opacity-100');
+                slide.style.transform = 'none';
+                slide.style.pointerEvents = 'auto';
+            }
+            if (progressBar) progressBar.style.width = '100%';
+        }
+
+        function restoreInteractiveMode() {
+            body.classList.remove('pdf-export-mode');
+            for (let i = 0; i < totalSlides; i++) {
+                const slide = document.getElementById(`slide-${i}`);
+                if (!slide) continue;
+                slide.style.transform = '';
+                slide.style.pointerEvents = '';
+            }
+            updateSlides();
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlides();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlides();
+            }
+        }
+
+        window.addEventListener('beforeprint', () => { showAllSlidesForPdf(); });
+        window.addEventListener('afterprint', () => { if (!exportMode) restoreInteractiveMode(); });
+
+        if (exportMode) {
+            showAllSlidesForPdf();
+            return;
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (['ArrowRight', ' ', 'Enter', 'PageDown'].includes(e.key)) {
+                nextSlide();
+            } else if (['ArrowLeft', 'PageUp', 'Backspace'].includes(e.key)) {
+                prevSlide();
+            }
+        });
+
+        window.addEventListener('mousedown', (e) => {
+            if(e.target.closest('a') || e.target.closest('button') || e.target.closest('.code-block')) return;
+            if (e.button === 0) nextSlide();
+            if (e.button === 2) prevSlide();
+        });
+
+        window.addEventListener('contextmenu', e => e.preventDefault());
+
+        let touchStartX = 0;
+        window.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        window.addEventListener('touchend', e => {
+            const touchEndX = e.changedTouches[0].screenX;
+            const swipeThreshold = 50;
+            if (touchStartX - touchEndX > swipeThreshold) {
+                nextSlide();
+            } else if (touchEndX - touchStartX > swipeThreshold) {
+                prevSlide();
+            }
+        }, { passive: true });
+
+        updateSlides();
+    });
+</script>
+    
+</body>
+</html>
