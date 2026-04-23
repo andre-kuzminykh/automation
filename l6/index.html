@@ -710,7 +710,7 @@
             <div class="flex flex-col md:flex-row gap-8 w-full max-w-5xl mb-8 items-center">
                 <!-- Radar chart -->
                 <div class="flex-1 flex items-center justify-center">
-                    <svg viewBox="-100 -100 200 200" class="w-[300px] h-[300px]">
+                    <svg viewBox="-140 -110 280 220" class="w-[340px] h-[280px]" overflow="visible">
                         <!-- Background polygons -->
                         <polygon points="0,-80 69.3,-40 69.3,40 0,80 -69.3,40 -69.3,-40" fill="none" stroke="#e5e7eb" stroke-width="1"/>
                         <polygon points="0,-60 52,-30 52,30 0,60 -52,30 -52,-30" fill="none" stroke="#f3f4f6" stroke-width="1"/>
@@ -732,12 +732,12 @@
                             </linearGradient>
                         </defs>
                         <!-- Labels -->
-                        <text x="0" y="-88" font-size="9" fill="#1f2937" text-anchor="middle" font-weight="bold">Качество</text>
-                        <text x="78" y="-42" font-size="9" fill="#1f2937" text-anchor="start" font-weight="bold">Скорость</text>
-                        <text x="78" y="48" font-size="9" fill="#1f2937" text-anchor="start" font-weight="bold">Стоимость</text>
-                        <text x="0" y="95" font-size="9" fill="#1f2937" text-anchor="middle" font-weight="bold">Стабильность</text>
-                        <text x="-78" y="48" font-size="9" fill="#1f2937" text-anchor="end" font-weight="bold">Безопасность</text>
-                        <text x="-78" y="-42" font-size="9" fill="#1f2937" text-anchor="end" font-weight="bold">UX</text>
+                        <text x="0" y="-90" font-size="10" fill="#1f2937" text-anchor="middle" font-weight="bold">Качество</text>
+                        <text x="78" y="-46" font-size="10" fill="#1f2937" text-anchor="start" font-weight="bold">Скорость</text>
+                        <text x="78" y="52" font-size="10" fill="#1f2937" text-anchor="start" font-weight="bold">Стоимость</text>
+                        <text x="0" y="98" font-size="10" fill="#1f2937" text-anchor="middle" font-weight="bold">Стабильность</text>
+                        <text x="-78" y="52" font-size="10" fill="#1f2937" text-anchor="end" font-weight="bold">Безопасность</text>
+                        <text x="-78" y="-46" font-size="10" fill="#1f2937" text-anchor="end" font-weight="bold">UX</text>
                     </svg>
                 </div>
 
@@ -1005,9 +1005,6 @@
                 </div>
             </div>
 
-            <p class="font-bold text-base md:text-lg text-gray-800 bg-gray-50 px-6 py-3 rounded-xl border border-gray-200 text-center">
-                Fine-tuning — <span class="gradient-text">не кнопка</span>, а цикл
-            </p>
         </div>
     </div>
 
@@ -1158,7 +1155,7 @@
                 <i class="ph-bold ph-arrow-right text-gray-300 text-2xl hidden md:block"></i>
                 <i class="ph-bold ph-arrow-down text-gray-300 text-2xl md:hidden"></i>
                 <div class="flex flex-col items-center min-w-[120px]">
-                    <div class="bg-blue-50 border border-blue-200 w-16 h-16 rounded-2xl flex items-center justify-center text-blue-500 shadow-sm mb-3"><i class="ph-fill ph-split text-3xl"></i></div>
+                    <div class="bg-blue-50 border border-blue-200 w-16 h-16 rounded-2xl flex items-center justify-center text-blue-500 shadow-sm mb-3"><i class="ph-fill ph-git-fork text-3xl"></i></div>
                     <span class="text-xs font-black text-gray-800 uppercase text-center">2. Трафик</span>
                     <span class="text-[10px] text-gray-500 mt-1 text-center">Разделение на A и B</span>
                 </div>
@@ -1305,24 +1302,27 @@
 
                 <!-- Many -->
                 <div class="flex-[2] flex flex-col items-center">
-                    <div class="relative w-full h-32 flex items-center justify-center">
-                        <svg viewBox="0 0 200 100" class="absolute inset-0 w-full h-full">
-                            <line x1="100" y1="50" x2="30" y2="20" stroke="#d1d5db" stroke-width="1"/>
-                            <line x1="100" y1="50" x2="30" y2="80" stroke="#d1d5db" stroke-width="1"/>
-                            <line x1="100" y1="50" x2="170" y2="20" stroke="#d1d5db" stroke-width="1"/>
-                            <line x1="100" y1="50" x2="170" y2="80" stroke="#d1d5db" stroke-width="1"/>
-                            <line x1="100" y1="50" x2="100" y2="10" stroke="#d1d5db" stroke-width="1"/>
-                            <line x1="100" y1="50" x2="100" y2="90" stroke="#d1d5db" stroke-width="1"/>
+                    <div class="relative w-48 h-48 mx-auto">
+                        <!-- Connection lines -->
+                        <svg viewBox="0 0 100 100" class="absolute inset-0 w-full h-full" preserveAspectRatio="none">
+                            <line x1="50" y1="50" x2="50" y2="10" stroke="#e5e7eb" stroke-width="0.8"/>
+                            <line x1="50" y1="50" x2="90" y2="25" stroke="#e5e7eb" stroke-width="0.8"/>
+                            <line x1="50" y1="50" x2="90" y2="75" stroke="#e5e7eb" stroke-width="0.8"/>
+                            <line x1="50" y1="50" x2="50" y2="90" stroke="#e5e7eb" stroke-width="0.8"/>
+                            <line x1="50" y1="50" x2="10" y2="75" stroke="#e5e7eb" stroke-width="0.8"/>
+                            <line x1="50" y1="50" x2="10" y2="25" stroke="#e5e7eb" stroke-width="0.8"/>
                         </svg>
-                        <div class="absolute left-[5%] top-[5%] w-10 h-10 bg-purple-100 border border-purple-300 rounded-xl flex items-center justify-center text-purple-600 shadow-sm"><i class="ph-fill ph-robot text-lg"></i></div>
-                        <div class="absolute left-[5%] bottom-[5%] w-10 h-10 bg-orange-100 border border-orange-300 rounded-xl flex items-center justify-center text-orange-600 shadow-sm"><i class="ph-fill ph-database text-lg"></i></div>
-                        <div class="absolute right-[5%] top-[5%] w-10 h-10 bg-blue-100 border border-blue-300 rounded-xl flex items-center justify-center text-blue-600 shadow-sm"><i class="ph-fill ph-plugs-connected text-lg"></i></div>
-                        <div class="absolute right-[5%] bottom-[5%] w-10 h-10 bg-green-100 border border-green-300 rounded-xl flex items-center justify-center text-green-600 shadow-sm"><i class="ph-fill ph-users-three text-lg"></i></div>
-                        <div class="absolute top-0 left-[45%] w-10 h-10 bg-red-100 border border-red-300 rounded-xl flex items-center justify-center text-red-600 shadow-sm"><i class="ph-fill ph-warning-diamond text-lg"></i></div>
-                        <div class="absolute bottom-0 left-[45%] w-10 h-10 bg-indigo-100 border border-indigo-300 rounded-xl flex items-center justify-center text-indigo-600 shadow-sm"><i class="ph-fill ph-cloud text-lg"></i></div>
-                        <div class="absolute w-14 h-14 bg-gradient-to-br from-purple-600 to-orange-500 rounded-full flex items-center justify-center text-white shadow-lg border-4 border-white z-20"><i class="ph-fill ph-network text-2xl"></i></div>
+                        <!-- Center -->
+                        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 bg-gradient-to-br from-purple-600 to-orange-500 rounded-full flex items-center justify-center text-white shadow-lg border-4 border-white z-20"><i class="ph-fill ph-network text-xl"></i></div>
+                        <!-- Satellites -->
+                        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-9 h-9 bg-purple-100 border border-purple-300 rounded-lg flex items-center justify-center text-purple-600 shadow-sm z-10"><i class="ph-fill ph-robot text-base"></i></div>
+                        <div class="absolute top-[15%] right-0 w-9 h-9 bg-blue-100 border border-blue-300 rounded-lg flex items-center justify-center text-blue-600 shadow-sm z-10"><i class="ph-fill ph-plugs-connected text-base"></i></div>
+                        <div class="absolute bottom-[15%] right-0 w-9 h-9 bg-green-100 border border-green-300 rounded-lg flex items-center justify-center text-green-600 shadow-sm z-10"><i class="ph-fill ph-users-three text-base"></i></div>
+                        <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-9 h-9 bg-indigo-100 border border-indigo-300 rounded-lg flex items-center justify-center text-indigo-600 shadow-sm z-10"><i class="ph-fill ph-cloud text-base"></i></div>
+                        <div class="absolute bottom-[15%] left-0 w-9 h-9 bg-orange-100 border border-orange-300 rounded-lg flex items-center justify-center text-orange-600 shadow-sm z-10"><i class="ph-fill ph-database text-base"></i></div>
+                        <div class="absolute top-[15%] left-0 w-9 h-9 bg-red-100 border border-red-300 rounded-lg flex items-center justify-center text-red-600 shadow-sm z-10"><i class="ph-fill ph-warning-diamond text-base"></i></div>
                     </div>
-                    <span class="text-xs font-black text-purple-600 uppercase mt-2">много агентов + интеграций</span>
+                    <span class="text-xs font-black text-purple-600 uppercase mt-3">много агентов + интеграций</span>
                     <span class="text-[10px] text-gray-500">сеть зависимостей</span>
                 </div>
             </div>
@@ -1758,22 +1758,22 @@
                 </svg>
 
                 <!-- Center -->
-                <div class="absolute w-20 h-20 bg-gradient-to-br from-purple-600 to-orange-500 rounded-full flex flex-col items-center justify-center text-white font-black text-[10px] z-30 shadow-xl border-4 border-white text-center leading-tight">
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-gradient-to-br from-purple-600 to-orange-500 rounded-full flex flex-col items-center justify-center text-white font-black text-[10px] z-30 shadow-xl border-4 border-white text-center leading-tight">
                     <i class="ph-fill ph-robot text-xl"></i>
                     <span class="mt-0.5">Агент</span>
                 </div>
 
-                <!-- Layer labels -->
-                <div class="absolute transform -translate-x-1/2 -translate-y-1/2 bg-white px-2 py-1 rounded-lg shadow-md border border-blue-200 text-blue-700 z-20 text-[10px] font-bold flex items-center gap-1" style="top: 18%; left: 50%;">
+                <!-- Layer labels on the outer ring -->
+                <div class="absolute top-[4%] left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-3 py-1.5 rounded-lg shadow-md border border-red-200 text-red-700 z-20 text-[11px] font-bold flex items-center gap-1.5 whitespace-nowrap">
                     <i class="ph-fill ph-shield"></i> Правила
                 </div>
-                <div class="absolute transform -translate-x-1/2 -translate-y-1/2 bg-white px-2 py-1 rounded-lg shadow-md border border-purple-200 text-purple-700 z-20 text-[10px] font-bold flex items-center gap-1" style="top: 50%; right: 2%;">
+                <div class="absolute top-1/2 left-[96%] -translate-x-1/2 -translate-y-1/2 bg-white px-3 py-1.5 rounded-lg shadow-md border border-orange-200 text-orange-700 z-20 text-[11px] font-bold flex items-center gap-1.5 whitespace-nowrap">
                     <i class="ph-fill ph-database"></i> Данные
                 </div>
-                <div class="absolute transform -translate-x-1/2 -translate-y-1/2 bg-white px-2 py-1 rounded-lg shadow-md border border-orange-200 text-orange-700 z-20 text-[10px] font-bold flex items-center gap-1" style="bottom: 10%; left: 50%;">
+                <div class="absolute top-[96%] left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-3 py-1.5 rounded-lg shadow-md border border-purple-200 text-purple-700 z-20 text-[11px] font-bold flex items-center gap-1.5 whitespace-nowrap">
                     <i class="ph-fill ph-key"></i> Доступ
                 </div>
-                <div class="absolute transform -translate-x-1/2 -translate-y-1/2 bg-white px-2 py-1 rounded-lg shadow-md border border-red-200 text-red-700 z-20 text-[10px] font-bold flex items-center gap-1" style="top: 50%; left: 2%;">
+                <div class="absolute top-1/2 left-[4%] -translate-x-1/2 -translate-y-1/2 bg-white px-3 py-1.5 rounded-lg shadow-md border border-blue-200 text-blue-700 z-20 text-[11px] font-bold flex items-center gap-1.5 whitespace-nowrap">
                     <i class="ph-fill ph-lightning"></i> Действия
                 </div>
             </div>
@@ -2062,43 +2062,48 @@
         <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
             <h2 class="text-3xl md:text-5xl font-black mb-10 text-center text-gray-900"><span class="gradient-text">DataOps</span></h2>
 
-            <!-- Data pipeline -->
-            <div class="flex flex-col md:flex-row items-center justify-between w-full max-w-5xl bg-white border border-gray-200 p-6 rounded-3xl shadow-sm mb-6 overflow-x-auto gap-2">
-                <div class="flex flex-col items-center min-w-[120px]">
-                    <div class="bg-blue-50 border border-blue-200 w-16 h-16 rounded-2xl flex items-center justify-center text-blue-500 shadow-sm mb-3"><i class="ph-fill ph-plugs text-3xl"></i></div>
-                    <span class="text-xs font-black text-gray-800 uppercase text-center">Источники</span>
+            <div class="relative w-[400px] h-[400px] flex items-center justify-center mb-6 mx-auto">
+                <!-- Center -->
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-gray-900 rounded-full flex flex-col items-center justify-center text-white font-black text-sm z-30 shadow-xl border-4 border-white text-center leading-tight">
+                    DataOps<br><span class="text-[9px] font-normal opacity-70">поток данных</span>
                 </div>
-                <i class="ph-bold ph-arrow-right text-gray-300 text-2xl hidden md:block"></i>
-                <i class="ph-bold ph-arrow-down text-gray-300 text-2xl md:hidden"></i>
-                <div class="flex flex-col items-center min-w-[120px]">
-                    <div class="bg-orange-50 border border-orange-200 w-16 h-16 rounded-2xl flex items-center justify-center text-orange-500 shadow-sm mb-3"><i class="ph-fill ph-check-square text-3xl"></i></div>
-                    <span class="text-xs font-black text-gray-800 uppercase text-center">Проверка</span>
-                </div>
-                <i class="ph-bold ph-arrow-right text-gray-300 text-2xl hidden md:block"></i>
-                <i class="ph-bold ph-arrow-down text-gray-300 text-2xl md:hidden"></i>
-                <div class="flex flex-col items-center min-w-[120px]">
-                    <div class="bg-purple-50 border border-purple-200 w-16 h-16 rounded-2xl flex items-center justify-center text-purple-500 shadow-sm mb-3"><i class="ph-fill ph-funnel-simple text-3xl"></i></div>
-                    <span class="text-xs font-black text-gray-800 uppercase text-center">Подготовка</span>
-                </div>
-                <i class="ph-bold ph-arrow-right text-gray-300 text-2xl hidden md:block"></i>
-                <i class="ph-bold ph-arrow-down text-gray-300 text-2xl md:hidden"></i>
-                <div class="flex flex-col items-center min-w-[120px]">
-                    <div class="bg-green-50 border border-green-200 w-16 h-16 rounded-2xl flex items-center justify-center text-green-500 shadow-sm mb-3"><i class="ph-fill ph-truck text-3xl"></i></div>
-                    <span class="text-xs font-black text-gray-800 uppercase text-center">Доставка</span>
-                </div>
-                <i class="ph-bold ph-arrow-right text-gray-300 text-2xl hidden md:block"></i>
-                <i class="ph-bold ph-arrow-down text-gray-300 text-2xl md:hidden"></i>
-                <div class="flex flex-col items-center min-w-[120px]">
-                    <div class="bg-red-50 border-2 border-red-300 w-20 h-20 rounded-2xl flex items-center justify-center text-red-500 shadow-md mb-3 transform scale-110"><i class="ph-fill ph-robot text-3xl"></i></div>
-                    <span class="text-xs font-black text-red-700 uppercase text-center">ИИ-система</span>
-                </div>
-            </div>
 
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 w-full max-w-4xl mb-6">
-                <div class="bg-gray-50 p-3 rounded-xl border border-gray-200 flex items-center gap-2"><i class="ph-fill ph-wave-triangle text-blue-500 text-xl"></i><span class="font-bold text-gray-800 text-xs">Поток данных</span></div>
-                <div class="bg-gray-50 p-3 rounded-xl border border-gray-200 flex items-center gap-2"><i class="ph-fill ph-check-circle text-green-500 text-xl"></i><span class="font-bold text-gray-800 text-xs">Проверка качества</span></div>
-                <div class="bg-gray-50 p-3 rounded-xl border border-gray-200 flex items-center gap-2"><i class="ph-fill ph-users-three text-purple-500 text-xl"></i><span class="font-bold text-gray-800 text-xs">Доступность командам</span></div>
-                <div class="bg-gray-50 p-3 rounded-xl border border-gray-200 flex items-center gap-2"><i class="ph-fill ph-lightning text-orange-500 text-xl"></i><span class="font-bold text-gray-800 text-xs">Быстрая доставка</span></div>
+                <!-- Dashed orbit -->
+                <svg class="absolute inset-0 w-full h-full z-10" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="40" fill="none" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="2,2"/>
+                </svg>
+
+                <!-- 6 nodes on orbit -->
+                <!-- top -->
+                <div class="absolute transform -translate-x-1/2 -translate-y-1/2 bg-white px-3 py-2 rounded-xl shadow-md border border-blue-200 z-20 flex items-center gap-2 whitespace-nowrap" style="top: 10%; left: 50%;">
+                    <i class="ph-fill ph-plugs text-blue-500 text-lg"></i>
+                    <span class="text-xs font-bold text-blue-700">Источники</span>
+                </div>
+                <!-- top-right -->
+                <div class="absolute transform -translate-x-1/2 -translate-y-1/2 bg-white px-3 py-2 rounded-xl shadow-md border border-orange-200 z-20 flex items-center gap-2 whitespace-nowrap" style="top: 30%; left: 88%;">
+                    <i class="ph-fill ph-check-square text-orange-500 text-lg"></i>
+                    <span class="text-xs font-bold text-orange-700">Проверка</span>
+                </div>
+                <!-- bottom-right -->
+                <div class="absolute transform -translate-x-1/2 -translate-y-1/2 bg-white px-3 py-2 rounded-xl shadow-md border border-purple-200 z-20 flex items-center gap-2 whitespace-nowrap" style="top: 72%; left: 88%;">
+                    <i class="ph-fill ph-funnel-simple text-purple-500 text-lg"></i>
+                    <span class="text-xs font-bold text-purple-700">Подготовка</span>
+                </div>
+                <!-- bottom -->
+                <div class="absolute transform -translate-x-1/2 -translate-y-1/2 bg-white px-3 py-2 rounded-xl shadow-md border border-green-200 z-20 flex items-center gap-2 whitespace-nowrap" style="top: 92%; left: 50%;">
+                    <i class="ph-fill ph-truck text-green-500 text-lg"></i>
+                    <span class="text-xs font-bold text-green-700">Доставка</span>
+                </div>
+                <!-- bottom-left -->
+                <div class="absolute transform -translate-x-1/2 -translate-y-1/2 bg-white px-3 py-2 rounded-xl shadow-md border border-red-200 z-20 flex items-center gap-2 whitespace-nowrap" style="top: 72%; left: 12%;">
+                    <i class="ph-fill ph-robot text-red-500 text-lg"></i>
+                    <span class="text-xs font-bold text-red-700">ИИ-система</span>
+                </div>
+                <!-- top-left -->
+                <div class="absolute transform -translate-x-1/2 -translate-y-1/2 bg-white px-3 py-2 rounded-xl shadow-md border border-yellow-200 z-20 flex items-center gap-2 whitespace-nowrap" style="top: 30%; left: 12%;">
+                    <i class="ph-fill ph-arrows-clockwise text-yellow-600 text-lg"></i>
+                    <span class="text-xs font-bold text-yellow-700">Мониторинг</span>
+                </div>
             </div>
 
             <p class="font-bold text-base md:text-lg text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
