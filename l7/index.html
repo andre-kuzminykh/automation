@@ -1129,74 +1129,82 @@
         <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
             <h2 class="text-3xl md:text-5xl font-black mb-8 text-center text-gray-900">Новые роли <span class="gradient-text">гибридной системы</span></h2>
 
-            <!-- Сетка 3x3 с центральным процессом и 5 ролями вокруг -->
-            <div class="w-full max-w-5xl mb-6 relative">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
-                    <!-- Роль 5: ИИ-чемпион (левый верх) -->
-                    <div class="bg-white border-2 border-green-300 p-3 rounded-2xl shadow-md hover:shadow-lg transition flex items-start gap-2">
-                        <div class="w-10 h-10 bg-gradient-to-br from-green-400 to-green-600 rounded-xl flex items-center justify-center text-white shrink-0 shadow"><i class="ph-fill ph-medal text-lg"></i></div>
-                        <div>
-                            <h3 class="font-bold text-gray-900 text-xs leading-tight">ИИ-чемпион</h3>
-                            <p class="text-[10px] text-gray-600 mt-0.5">Помогает принять норму через практику</p>
+            <div class="w-full max-w-5xl mb-6">
+                <!-- 5 ролей в строку -->
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-3 mb-3">
+                    <div class="bg-white border-2 border-purple-300 rounded-2xl shadow-md hover:shadow-xl transition overflow-hidden flex flex-col">
+                        <div class="bg-gradient-to-br from-purple-500 to-purple-600 px-3 py-2 text-white">
+                            <div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm mb-1"><i class="ph-fill ph-flow-arrow text-lg"></i></div>
+                            <span class="text-[9px] font-black uppercase tracking-widest opacity-80">Роль 1</span>
+                        </div>
+                        <div class="p-3 flex-1 flex flex-col">
+                            <h3 class="font-bold text-gray-900 text-xs leading-tight mb-1">Владелец гибридного процесса</h3>
+                            <p class="text-[10px] text-gray-600">Отвечает за процесс, где работают люди и ИИ</p>
                         </div>
                     </div>
 
-                    <!-- Роль 1: Владелец процесса (верх центр) -->
-                    <div class="bg-white border-2 border-purple-300 p-3 rounded-2xl shadow-md hover:shadow-lg transition flex items-start gap-2 md:transform md:scale-105">
-                        <div class="w-10 h-10 bg-gradient-to-br from-purple-400 to-purple-600 rounded-xl flex items-center justify-center text-white shrink-0 shadow"><i class="ph-fill ph-flow-arrow text-lg"></i></div>
-                        <div>
-                            <h3 class="font-bold text-gray-900 text-xs leading-tight">Владелец гибридного процесса</h3>
-                            <p class="text-[10px] text-gray-600 mt-0.5">Где работают люди и ИИ</p>
+                    <div class="bg-white border-2 border-blue-300 rounded-2xl shadow-md hover:shadow-xl transition overflow-hidden flex flex-col">
+                        <div class="bg-gradient-to-br from-blue-500 to-blue-600 px-3 py-2 text-white">
+                            <div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm mb-1"><i class="ph-fill ph-tree-structure text-lg"></i></div>
+                            <span class="text-[9px] font-black uppercase tracking-widest opacity-80">Роль 2</span>
+                        </div>
+                        <div class="p-3 flex-1 flex flex-col">
+                            <h3 class="font-bold text-gray-900 text-xs leading-tight mb-1">Архитектор автоматизации</h3>
+                            <p class="text-[10px] text-gray-600">Проектирует взаимодействие людей, агентов, данных и систем</p>
                         </div>
                     </div>
 
-                    <!-- Роль 2: Архитектор (правый верх) -->
-                    <div class="bg-white border-2 border-blue-300 p-3 rounded-2xl shadow-md hover:shadow-lg transition flex items-start gap-2">
-                        <div class="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center text-white shrink-0 shadow"><i class="ph-fill ph-tree-structure text-lg"></i></div>
-                        <div>
-                            <h3 class="font-bold text-gray-900 text-xs leading-tight">Архитектор автоматизации</h3>
-                            <p class="text-[10px] text-gray-600 mt-0.5">Взаимодействие людей и агентов</p>
+                    <div class="bg-white border-2 border-orange-300 rounded-2xl shadow-md hover:shadow-xl transition overflow-hidden flex flex-col">
+                        <div class="bg-gradient-to-br from-orange-500 to-orange-600 px-3 py-2 text-white">
+                            <div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm mb-1"><i class="ph-fill ph-trophy text-lg"></i></div>
+                            <span class="text-[9px] font-black uppercase tracking-widest opacity-80">Роль 3</span>
+                        </div>
+                        <div class="p-3 flex-1 flex flex-col">
+                            <h3 class="font-bold text-gray-900 text-xs leading-tight mb-1">Бизнес-владелец результата</h3>
+                            <p class="text-[10px] text-gray-600">Отвечает за эффект, а не за факт запуска</p>
                         </div>
                     </div>
 
-                    <!-- Стрелки сверху (decorative) -->
-                    <div class="hidden md:flex items-center justify-center">
-                        <i class="ph-bold ph-arrow-down-right text-gray-300 text-2xl"></i>
-                    </div>
-
-                    <!-- Центр: гибридный процесс -->
-                    <div class="bg-gradient-to-br from-purple-600 via-pink-500 to-orange-500 rounded-full aspect-square flex flex-col items-center justify-center text-white shadow-2xl border-4 border-white relative overflow-hidden mx-auto w-40 h-40 md:w-full md:h-full md:max-w-[180px] md:max-h-[180px]">
-                        <div class="absolute inset-0 bg-white/10 rounded-full scale-90"></div>
-                        <i class="ph-fill ph-flow-arrow text-3xl mb-1 relative z-10"></i>
-                        <span class="text-xs font-black uppercase tracking-wide text-center leading-tight relative z-10">Гибридный<br>процесс</span>
-                    </div>
-
-                    <!-- Стрелки сверху (decorative) -->
-                    <div class="hidden md:flex items-center justify-center">
-                        <i class="ph-bold ph-arrow-down-left text-gray-300 text-2xl"></i>
-                    </div>
-
-                    <!-- Роль 4: Владелец риска (левый низ) -->
-                    <div class="bg-white border-2 border-red-300 p-3 rounded-2xl shadow-md hover:shadow-lg transition flex items-start gap-2">
-                        <div class="w-10 h-10 bg-gradient-to-br from-red-400 to-red-600 rounded-xl flex items-center justify-center text-white shrink-0 shadow"><i class="ph-fill ph-shield-warning text-lg"></i></div>
-                        <div>
-                            <h3 class="font-bold text-gray-900 text-xs leading-tight">Владелец риска</h3>
-                            <p class="text-[10px] text-gray-600 mt-0.5">Юр., репутац., этические последствия</p>
+                    <div class="bg-white border-2 border-red-300 rounded-2xl shadow-md hover:shadow-xl transition overflow-hidden flex flex-col">
+                        <div class="bg-gradient-to-br from-red-500 to-red-600 px-3 py-2 text-white">
+                            <div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm mb-1"><i class="ph-fill ph-shield-warning text-lg"></i></div>
+                            <span class="text-[9px] font-black uppercase tracking-widest opacity-80">Роль 4</span>
+                        </div>
+                        <div class="p-3 flex-1 flex flex-col">
+                            <h3 class="font-bold text-gray-900 text-xs leading-tight mb-1">Владелец риска</h3>
+                            <p class="text-[10px] text-gray-600">Юридические, репутационные, этические и операционные последствия</p>
                         </div>
                     </div>
 
-                    <!-- Роль 3: Бизнес-владелец (низ центр) -->
-                    <div class="bg-white border-2 border-orange-300 p-3 rounded-2xl shadow-md hover:shadow-lg transition flex items-start gap-2 md:transform md:scale-105">
-                        <div class="w-10 h-10 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center text-white shrink-0 shadow"><i class="ph-fill ph-trophy text-lg"></i></div>
-                        <div>
-                            <h3 class="font-bold text-gray-900 text-xs leading-tight">Бизнес-владелец результата</h3>
-                            <p class="text-[10px] text-gray-600 mt-0.5">Эффект, а не факт запуска</p>
+                    <div class="bg-white border-2 border-green-300 rounded-2xl shadow-md hover:shadow-xl transition overflow-hidden flex flex-col">
+                        <div class="bg-gradient-to-br from-green-500 to-green-600 px-3 py-2 text-white">
+                            <div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm mb-1"><i class="ph-fill ph-medal text-lg"></i></div>
+                            <span class="text-[9px] font-black uppercase tracking-widest opacity-80">Роль 5</span>
+                        </div>
+                        <div class="p-3 flex-1 flex flex-col">
+                            <h3 class="font-bold text-gray-900 text-xs leading-tight mb-1">ИИ-чемпион</h3>
+                            <p class="text-[10px] text-gray-600">Помогает команде принять новую норму через практику</p>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Заполнитель пустой, чтобы низ-правый угол не пустовал — поставлю акцентную точку -->
-                    <div class="hidden md:flex items-center justify-center">
-                        <div class="w-3 h-3 rounded-full bg-gradient-to-br from-purple-400 to-orange-400 opacity-50"></div>
+                <!-- Стрелки от ролей вниз к центру -->
+                <div class="hidden md:flex justify-around px-8">
+                    <i class="ph-bold ph-arrow-down text-purple-400 text-xl"></i>
+                    <i class="ph-bold ph-arrow-down text-blue-400 text-xl"></i>
+                    <i class="ph-bold ph-arrow-down text-orange-400 text-xl"></i>
+                    <i class="ph-bold ph-arrow-down text-red-400 text-xl"></i>
+                    <i class="ph-bold ph-arrow-down text-green-400 text-xl"></i>
+                </div>
+
+                <!-- Центральный процесс -->
+                <div class="bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 p-4 rounded-2xl shadow-xl text-white flex items-center justify-center gap-3 mt-2 relative overflow-hidden">
+                    <div class="absolute -top-6 -right-6 w-24 h-24 bg-white/10 rounded-full"></div>
+                    <div class="absolute -bottom-6 -left-6 w-24 h-24 bg-white/10 rounded-full"></div>
+                    <div class="w-12 h-12 bg-white/25 rounded-full flex items-center justify-center backdrop-blur-sm border-2 border-white/40 shrink-0 relative z-10"><i class="ph-fill ph-flow-arrow text-2xl"></i></div>
+                    <div class="relative z-10">
+                        <span class="text-[10px] font-black uppercase tracking-widest opacity-80">Сходятся в одном процессе</span>
+                        <h3 class="font-black text-base md:text-lg">Гибридный процесс</h3>
                     </div>
                 </div>
             </div>
