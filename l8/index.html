@@ -1,0 +1,1707 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Лекция 8: Экономика ИИ-трансформации</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        brand: { purple: '#7c3aed', orange: '#f97316' }
+                    }
+                }
+            }
+        }
+    </script>
+
+<style>
+    html { background: #ffffff !important; }
+    body {
+        user-select: none; overflow: hidden; background-color: #ffffff !important;
+        margin: 0; width: 100vw; height: 100vh;
+    }
+    .slide-container {
+        transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        display: flex; flex-direction: column; justify-content: center;
+        overflow-y: auto; overflow-x: hidden; background: #ffffff;
+        -ms-overflow-style: none; scrollbar-width: none;
+    }
+    .slide-container::-webkit-scrollbar { display: none; }
+    .content-z {
+        position: relative; z-index: 10; margin: auto; width: 100%;
+        padding-top: 1rem; padding-bottom: 1.5rem;
+    }
+    @media (min-width: 768px) { .content-z { padding-top: 2rem; padding-bottom: 2rem; } }
+    .gradient-text {
+        background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        background-image: linear-gradient(to right, #7c3aed, #f97316);
+    }
+    .gradient-bg { background-image: linear-gradient(135deg, #7c3aed, #f97316); }
+    .bg-glow-1 {
+        position: absolute; top: -20%; left: -10%; width: 80vw; height: 80vw; max-width: 800px; max-height: 800px;
+        background: radial-gradient(circle, rgba(124,58,237,0.04) 0%, rgba(255,255,255,0) 70%); z-index: 0; pointer-events: none;
+    }
+    .bg-glow-2 {
+        position: absolute; bottom: -20%; right: -10%; width: 60vw; height: 60vw; max-width: 600px; max-height: 600px;
+        background: radial-gradient(circle, rgba(249,115,22,0.04) 0%, rgba(255,255,255,0) 70%); z-index: 0; pointer-events: none;
+    }
+
+    /* PDF Mode */
+    body.pdf-export-mode { overflow: auto !important; height: auto !important; }
+    body.pdf-export-mode .bg-glow-1, body.pdf-export-mode .bg-glow-2, body.pdf-export-mode #progress-container { display: none !important; }
+    body.pdf-export-mode .slide-container {
+        position: relative !important; width: 100% !important; min-height: 100vh; height: auto !important;
+        opacity: 1 !important; transform: none !important; pointer-events: auto !important; overflow: visible !important;
+        page-break-after: always; break-after: page; break-inside: avoid;
+    }
+    @page { size: A4 landscape; margin: 10mm; }
+    @media print {
+        html, body { overflow: visible !important; height: auto !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .bg-glow-1, .bg-glow-2, #progress-container { display: none !important; }
+        .slide-container {
+            position: relative !important; width: 100% !important; min-height: 100vh; height: auto !important;
+            opacity: 1 !important; transform: none !important; pointer-events: auto !important; overflow: visible !important;
+            page-break-after: always; break-after: page; break-inside: avoid;
+        }
+    }
+</style>
+</head>
+<body class="text-gray-900 font-sans">
+
+    <!-- Декоративный фон -->
+    <div class="bg-glow-1"></div>
+    <div class="bg-glow-2"></div>
+
+    <!-- Индикатор прогресса -->
+    <div id="progress-container" class="absolute bottom-0 left-0 h-1.5 bg-gray-100 w-full z-50">
+        <div id="progress-bar" class="h-full gradient-bg w-0 transition-all duration-300"></div>
+    </div>
+
+    <!-- СЛАЙД 0: Титульный -->
+    <div class="slide-container px-4 md:px-12 opacity-100 translate-y-0" id="slide-0">
+        <div class="content-z text-center w-full max-w-6xl px-4 flex flex-col items-center justify-center h-full">
+            <div class="bg-gradient-to-r from-purple-50 to-orange-50 border border-purple-100 rounded-xl p-3 md:p-5 max-w-3xl w-full shadow-sm mb-6 md:mb-10">
+                <p class="text-purple-600 font-semibold uppercase tracking-widest text-[10px] md:text-xs mb-1 md:mb-1.5"><i class="ph-fill ph-chart-line-up"></i> Лекция 8</p>
+                <h2 class="text-sm md:text-xl font-bold text-gray-800 leading-tight">Как считать эффект, защищать бизнес-кейс и масштабировать ИИ-решения</h2>
+            </div>
+            <h1 class="text-4xl md:text-6xl lg:text-[70px] font-black mb-8 md:mb-12 leading-[1.2] tracking-tight text-gray-900 drop-shadow-sm flex flex-col items-center">
+                <span class="pb-1">Экономика</span>
+                <span class="gradient-text pb-2">ИИ-трансформации</span>
+            </h1>
+            <div class="flex flex-col md:flex-row items-center gap-3 text-gray-600 mt-4">
+                <div class="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-xl border border-gray-200">
+                    <i class="ph-fill ph-flow-arrow text-purple-500"></i>
+                    <span class="font-bold text-sm">Процесс</span>
+                </div>
+                <i class="ph-bold ph-arrow-right text-2xl text-orange-400"></i>
+                <div class="flex items-center gap-2 bg-purple-50 px-4 py-2 rounded-xl border border-purple-200">
+                    <i class="ph-fill ph-robot text-purple-600"></i>
+                    <span class="font-bold text-sm text-purple-800">ИИ</span>
+                </div>
+                <i class="ph-bold ph-arrow-right text-2xl text-orange-400"></i>
+                <div class="flex items-center gap-2 bg-orange-50 px-4 py-2 rounded-xl border border-orange-200">
+                    <i class="ph-fill ph-coins text-orange-600"></i>
+                    <span class="font-bold text-sm text-orange-800">Экономика</span>
+                </div>
+                <i class="ph-bold ph-arrow-right text-2xl text-orange-400"></i>
+                <div class="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-orange-500 text-white px-4 py-2 rounded-xl shadow-md">
+                    <i class="ph-fill ph-arrows-out"></i>
+                    <span class="font-bold text-sm">Масштаб</span>
+                </div>
+            </div>
+            <p class="mt-8 font-bold text-base md:text-lg text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
+                ИИ — не цель, а инструмент <span class="gradient-text">изменения операционной модели</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 1: Карта лекции -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-1">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <span class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Карта лекции · 90 минут</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-8 text-center text-gray-900">Из чего состоит <span class="gradient-text">лекция</span></h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-5xl mb-6">
+                <!-- Часть 1 -->
+                <div class="bg-gradient-to-br from-purple-50 to-purple-100 border-2 border-purple-300 p-6 rounded-3xl shadow-md">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-12 h-12 bg-purple-200 rounded-2xl flex items-center justify-center text-purple-700"><i class="ph-fill ph-coins text-2xl"></i></div>
+                        <span class="text-xs font-black text-purple-700 uppercase tracking-widest">Часть 1 · 60 мин</span>
+                    </div>
+                    <h3 class="font-black text-purple-900 text-base mb-2">Экономика</h3>
+                    <p class="text-xs text-purple-800 mb-2">20 тезисов · 3 минуты на каждый</p>
+                    <ul class="text-[11px] text-purple-900 space-y-1">
+                        <li>• Единица процесса и точка отсчёта</li>
+                        <li>• Часы, ставки, стоимость операции</li>
+                        <li>• Прямая экономия и предотвращённые затраты</li>
+                        <li>• Ошибки, выручка, окупаемость</li>
+                        <li>• Масштабирование</li>
+                    </ul>
+                </div>
+                <!-- Часть 2 -->
+                <div class="bg-gradient-to-br from-orange-50 to-orange-100 border-2 border-orange-300 p-6 rounded-3xl shadow-md">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-12 h-12 bg-orange-200 rounded-2xl flex items-center justify-center text-orange-700"><i class="ph-fill ph-presentation-chart text-2xl"></i></div>
+                        <span class="text-xs font-black text-orange-700 uppercase tracking-widest">Часть 2 · 30 мин</span>
+                    </div>
+                    <h3 class="font-black text-orange-900 text-base mb-2">Демо-день</h3>
+                    <p class="text-xs text-orange-800 mb-2">10 тезисов · 3 минуты на каждый</p>
+                    <ul class="text-[11px] text-orange-900 space-y-1">
+                        <li>• Структура презентации</li>
+                        <li>• Как показать процесс и агента</li>
+                        <li>• Роль человека и дашборд</li>
+                        <li>• Защита эффекта</li>
+                        <li>• Финальный план</li>
+                    </ul>
+                </div>
+                <!-- Приложение -->
+                <div class="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-300 p-6 rounded-3xl shadow-md">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-12 h-12 bg-blue-200 rounded-2xl flex items-center justify-center text-blue-700"><i class="ph-fill ph-map-trifold text-2xl"></i></div>
+                        <span class="text-xs font-black text-blue-700 uppercase tracking-widest">Приложение</span>
+                    </div>
+                    <h3 class="font-black text-blue-900 text-base mb-2">Дорожная карта</h3>
+                    <p class="text-xs text-blue-800 mb-2">Внедрение на месяц и квартал</p>
+                    <ul class="text-[11px] text-blue-900 space-y-1">
+                        <li>• 30 дней — доказать эффект</li>
+                        <li>• 90 дней — встроить в процесс</li>
+                        <li>• Шаблон выступления</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Главная мысль -->
+            <div class="bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 p-1 rounded-2xl shadow-2xl max-w-4xl w-full">
+                <div class="bg-white px-5 py-3 rounded-xl text-center">
+                    <span class="text-[10px] font-black text-purple-600 uppercase tracking-widest">Главная мысль</span>
+                    <p class="text-sm md:text-base font-bold text-gray-900 mt-1">От модели, где рост требует больше людей, — к модели, где человек управляет системой, агенты выполняют рутину, а <span class="gradient-text">экономика процесса измерима и масштабируема</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 2: Тезис 1 — Начинаем не с технологии -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-2">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <span class="text-xs font-bold text-purple-500 uppercase tracking-widest mb-2">Тезис 1 · Часть 1</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-8 text-center text-gray-900">Начинаем не с технологии,<br>а с <span class="gradient-text">экономики процесса</span></h2>
+
+            <div class="flex flex-col md:flex-row gap-6 w-full max-w-5xl mb-6 items-stretch">
+                <div class="flex-1 bg-gray-50 border border-gray-200 p-6 rounded-3xl relative">
+                    <div class="absolute -top-3 left-6 bg-red-500 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow"><i class="ph-bold ph-x mr-1"></i>Слабо</div>
+                    <div class="mt-3">
+                        <p class="text-sm text-gray-700 italic mb-3">«Давайте сделаем чат-бота для HR»</p>
+                        <ul class="text-xs text-gray-600 space-y-1">
+                            <li class="flex items-center gap-2"><i class="ph-bold ph-x text-gray-400"></i> Нет процесса</li>
+                            <li class="flex items-center gap-2"><i class="ph-bold ph-x text-gray-400"></i> Нет метрики</li>
+                            <li class="flex items-center gap-2"><i class="ph-bold ph-x text-gray-400"></i> Нет бизнес-эффекта</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="flex-[1.3] bg-purple-50 border-2 border-purple-300 p-6 rounded-3xl shadow-lg relative">
+                    <div class="absolute -top-3 left-6 bg-purple-600 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow"><i class="ph-bold ph-check mr-1"></i>Сильно</div>
+                    <div class="mt-3">
+                        <p class="text-sm text-purple-900 font-bold mb-3">«Сократить обработку HR-заявки <span class="gradient-text">с двух дней до 15 минут</span> и снизить ручную нагрузку HR на 40%»</p>
+                        <ul class="text-xs text-purple-900 space-y-1">
+                            <li class="flex items-center gap-2"><i class="ph-bold ph-check text-purple-500"></i> Есть процесс</li>
+                            <li class="flex items-center gap-2"><i class="ph-bold ph-check text-purple-500"></i> Есть боль и измеримая метрика</li>
+                            <li class="flex items-center gap-2"><i class="ph-bold ph-check text-purple-500"></i> Понятный бизнес-эффект</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4 параметра эффекта -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 w-full max-w-4xl mb-6">
+                <div class="bg-white border border-purple-200 p-2 rounded-xl text-center"><i class="ph-fill ph-lightning text-purple-500"></i><p class="text-[11px] text-gray-700 font-bold">Скорость</p></div>
+                <div class="bg-white border border-purple-200 p-2 rounded-xl text-center"><i class="ph-fill ph-coins text-purple-500"></i><p class="text-[11px] text-gray-700 font-bold">Стоимость</p></div>
+                <div class="bg-white border border-purple-200 p-2 rounded-xl text-center"><i class="ph-fill ph-medal text-purple-500"></i><p class="text-[11px] text-gray-700 font-bold">Качество</p></div>
+                <div class="bg-white border border-purple-200 p-2 rounded-xl text-center"><i class="ph-fill ph-arrows-out text-purple-500"></i><p class="text-[11px] text-gray-700 font-bold">Масштабируемость</p></div>
+            </div>
+
+            <p class="font-bold text-base md:text-lg text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
+                ИИ создаёт эффект только <span class="gradient-text">в изменённом процессе</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 3: Тезис 2 — Единица процесса -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-3">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <span class="text-xs font-bold text-purple-500 uppercase tracking-widest mb-2">Тезис 2</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-8 text-center text-gray-900">Процесс превращаем<br>в <span class="gradient-text">измеряемую единицу</span></h2>
+
+            <!-- Карточки единиц -->
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3 w-full max-w-5xl mb-5">
+                <div class="bg-white border border-blue-200 p-3 rounded-2xl shadow-sm text-center"><i class="ph-fill ph-chat-circle-text text-blue-500 text-2xl"></i><h3 class="font-bold text-gray-900 text-sm mt-1">Поддержка</h3><p class="text-[11px] text-gray-500">одно обращение</p></div>
+                <div class="bg-white border border-green-200 p-3 rounded-2xl shadow-sm text-center"><i class="ph-fill ph-handshake text-green-500 text-2xl"></i><h3 class="font-bold text-gray-900 text-sm mt-1">Продажи</h3><p class="text-[11px] text-gray-500">один лид или сделка</p></div>
+                <div class="bg-white border border-purple-200 p-3 rounded-2xl shadow-sm text-center"><i class="ph-fill ph-file-text text-purple-500 text-2xl"></i><h3 class="font-bold text-gray-900 text-sm mt-1">Юристы</h3><p class="text-[11px] text-gray-500">один договор</p></div>
+                <div class="bg-white border border-orange-200 p-3 rounded-2xl shadow-sm text-center"><i class="ph-fill ph-chart-pie-slice text-orange-500 text-2xl"></i><h3 class="font-bold text-gray-900 text-sm mt-1">Финансы</h3><p class="text-[11px] text-gray-500">отчёт или сверка</p></div>
+                <div class="bg-white border border-pink-200 p-3 rounded-2xl shadow-sm text-center"><i class="ph-fill ph-user-plus text-pink-500 text-2xl"></i><h3 class="font-bold text-gray-900 text-sm mt-1">HR</h3><p class="text-[11px] text-gray-500">кандидат или заявка</p></div>
+                <div class="bg-white border border-yellow-200 p-3 rounded-2xl shadow-sm text-center"><i class="ph-fill ph-package text-yellow-600 text-2xl"></i><h3 class="font-bold text-gray-900 text-sm mt-1">Закупки</h3><p class="text-[11px] text-gray-500">одна заявка</p></div>
+            </div>
+
+            <!-- Формула и пример -->
+            <div class="bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 p-1 rounded-2xl shadow-xl w-full max-w-4xl mb-4">
+                <div class="bg-white rounded-[14px] p-4 text-center">
+                    <p class="text-xs font-black text-purple-600 uppercase tracking-widest mb-2">Формула</p>
+                    <p class="text-base md:text-xl font-black text-gray-900">Стоимость процесса <span class="gradient-text">=</span> стоимость одной единицы <span class="gradient-text">×</span> количество единиц</p>
+                </div>
+            </div>
+            <div class="bg-purple-50 border border-purple-200 rounded-xl px-5 py-3 max-w-3xl w-full text-center mb-4">
+                <p class="text-sm text-purple-900">Пример: 300 ₽ × 10 000 заявок = <span class="font-black text-xl gradient-text">3 000 000 ₽ / месяц</span></p>
+            </div>
+
+            <p class="font-bold text-base md:text-lg text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
+                Как только есть единица — <span class="gradient-text">разговор становится предметным</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 4: Тезис 3 — Исходная точка -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-4">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <span class="text-xs font-bold text-purple-500 uppercase tracking-widest mb-2">Тезис 3</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-8 text-center text-gray-900">Исходная точка — <br><span class="gradient-text">финансовая база, а не схема</span></h2>
+
+            <div class="flex flex-col md:flex-row gap-5 w-full max-w-5xl mb-5 items-stretch">
+                <!-- 5 показателей -->
+                <div class="flex-[1.4] bg-white border border-gray-200 rounded-3xl shadow-md overflow-hidden">
+                    <div class="bg-gradient-to-r from-purple-50 to-orange-50 px-5 py-2 border-b border-gray-200">
+                        <span class="text-[10px] font-black text-purple-600 uppercase tracking-widest">Что собрать</span>
+                    </div>
+                    <div class="divide-y divide-gray-100">
+                        <div class="px-5 py-2.5 flex items-center gap-3"><i class="ph-fill ph-stack text-blue-500 text-xl"></i><div><p class="text-sm font-bold text-gray-900">Объём</p><p class="text-[11px] text-gray-500">операций за день/неделю/месяц</p></div></div>
+                        <div class="px-5 py-2.5 flex items-center gap-3"><i class="ph-fill ph-clock text-green-500 text-xl"></i><div><p class="text-sm font-bold text-gray-900">Время</p><p class="text-[11px] text-gray-500">среднее и медианное на операцию</p></div></div>
+                        <div class="px-5 py-2.5 flex items-center gap-3"><i class="ph-fill ph-users text-purple-500 text-xl"></i><div><p class="text-sm font-bold text-gray-900">Роли</p><p class="text-[11px] text-gray-500">кто участвует, где ручные шаги</p></div></div>
+                        <div class="px-5 py-2.5 flex items-center gap-3"><i class="ph-fill ph-bug text-red-500 text-xl"></i><div><p class="text-sm font-bold text-gray-900">Качество</p><p class="text-[11px] text-gray-500">ошибки, возвраты, нарушения сроков</p></div></div>
+                        <div class="px-5 py-2.5 flex items-center gap-3"><i class="ph-fill ph-coins text-orange-500 text-xl"></i><div><p class="text-sm font-bold text-gray-900">Деньги</p><p class="text-[11px] text-gray-500">полная стоимость часа, операции</p></div></div>
+                    </div>
+                </div>
+                <!-- Формула -->
+                <div class="flex-1 bg-purple-50 border-2 border-purple-200 p-5 rounded-3xl shadow-md flex flex-col justify-center">
+                    <span class="text-[10px] font-black text-purple-600 uppercase tracking-widest mb-2">Простая формула</span>
+                    <p class="text-sm text-purple-900 font-bold mb-3">Ручные часы = объём × минуты на операцию ÷ 60</p>
+                    <div class="bg-white p-3 rounded-xl border border-purple-100 mb-2 text-center">
+                        <p class="text-xs text-gray-500">1 000 заявок × 20 мин ÷ 60</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-purple-600 to-orange-500 p-3 rounded-xl shadow-md text-white text-center">
+                        <p class="text-2xl font-black">333 часа / мес</p>
+                        <p class="text-[10px] opacity-80 uppercase">точка отсчёта</p>
+                    </div>
+                </div>
+            </div>
+
+            <p class="font-bold text-base md:text-lg text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
+                Без исходной точки — <span class="gradient-text">любое «стало лучше» остаётся ощущением</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 5: Тезис 4 — Целевая модель -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-5">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <span class="text-xs font-bold text-purple-500 uppercase tracking-widest mb-2">Тезис 4</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-8 text-center text-gray-900">Целевая модель — <span class="gradient-text">новое распределение работы</span></h2>
+
+            <!-- Две дорожки -->
+            <div class="w-full max-w-5xl mb-4">
+                <div class="bg-purple-50 border-2 border-purple-200 rounded-2xl p-4 mb-2 shadow-sm">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="w-10 h-10 bg-purple-200 rounded-xl flex items-center justify-center text-purple-700"><i class="ph-fill ph-robot text-xl"></i></div>
+                        <span class="font-black text-purple-800 uppercase tracking-widest text-xs">Что делает агент · 800 заявок × 2 мин</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 overflow-x-auto">
+                        <div class="bg-white px-2 py-1.5 rounded-lg border border-purple-100 text-[11px] text-purple-900 whitespace-nowrap"><i class="ph-fill ph-download text-purple-500"></i> Принимает</div>
+                        <i class="ph-bold ph-caret-right text-purple-400 text-xs"></i>
+                        <div class="bg-white px-2 py-1.5 rounded-lg border border-purple-100 text-[11px] text-purple-900 whitespace-nowrap"><i class="ph-fill ph-tag text-purple-500"></i> Классифицирует</div>
+                        <i class="ph-bold ph-caret-right text-purple-400 text-xs"></i>
+                        <div class="bg-white px-2 py-1.5 rounded-lg border border-purple-100 text-[11px] text-purple-900 whitespace-nowrap"><i class="ph-fill ph-database text-purple-500"></i> Собирает данные</div>
+                        <i class="ph-bold ph-caret-right text-purple-400 text-xs"></i>
+                        <div class="bg-white px-2 py-1.5 rounded-lg border border-purple-100 text-[11px] text-purple-900 whitespace-nowrap"><i class="ph-fill ph-pencil text-purple-500"></i> Готовит ответ</div>
+                    </div>
+                </div>
+                <div class="bg-blue-50 border-2 border-blue-200 rounded-2xl p-4 shadow-sm">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="w-10 h-10 bg-blue-200 rounded-xl flex items-center justify-center text-blue-700"><i class="ph-fill ph-user-focus text-xl"></i></div>
+                        <span class="font-black text-blue-800 uppercase tracking-widest text-xs">Что делает человек · 200 сложных × 12 мин</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 overflow-x-auto">
+                        <div class="bg-white px-2 py-1.5 rounded-lg border border-blue-100 text-[11px] text-blue-900 whitespace-nowrap"><i class="ph-fill ph-check-square text-blue-500"></i> Проверяет</div>
+                        <i class="ph-bold ph-caret-right text-blue-400 text-xs"></i>
+                        <div class="bg-white px-2 py-1.5 rounded-lg border border-blue-100 text-[11px] text-blue-900 whitespace-nowrap"><i class="ph-fill ph-warning text-blue-500"></i> Разбирает исключения</div>
+                        <i class="ph-bold ph-caret-right text-blue-400 text-xs"></i>
+                        <div class="bg-white px-2 py-1.5 rounded-lg border border-blue-100 text-[11px] text-blue-900 whitespace-nowrap"><i class="ph-fill ph-stamp text-blue-500"></i> Утверждает</div>
+                        <i class="ph-bold ph-caret-right text-blue-400 text-xs"></i>
+                        <div class="bg-white px-2 py-1.5 rounded-lg border border-blue-100 text-[11px] text-blue-900 whitespace-nowrap"><i class="ph-fill ph-shield-check text-blue-500"></i> Отвечает за результат</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Расчёт было/стало -->
+            <div class="flex flex-col md:flex-row items-center gap-3 w-full max-w-4xl mb-4">
+                <div class="flex-1 bg-gray-50 border border-gray-200 p-4 rounded-2xl text-center">
+                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Было</span>
+                    <p class="text-3xl font-black text-gray-800">333 часа</p>
+                    <p class="text-[10px] text-gray-500">ручной работы / мес</p>
+                </div>
+                <div class="bg-gradient-to-br from-purple-600 to-orange-500 text-white px-4 py-2 rounded-full font-black text-sm shadow-lg">−80%</div>
+                <div class="flex-1 bg-purple-50 border-2 border-purple-300 p-4 rounded-2xl text-center shadow-lg">
+                    <span class="text-[10px] font-bold text-purple-500 uppercase tracking-widest">Стало</span>
+                    <p class="text-3xl font-black gradient-text">66,7 часа</p>
+                    <p class="text-[10px] text-purple-600">человеческого участия / мес</p>
+                </div>
+            </div>
+
+            <p class="font-bold text-base md:text-lg text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
+                Человек подключается там, <span class="gradient-text">где действительно нужен</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 6: Тезис 5 — Время ≠ деньги -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-6">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <span class="text-xs font-bold text-purple-500 uppercase tracking-widest mb-2">Тезис 5</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-6 text-center text-gray-900">Сэкономленные часы<br>не всегда <span class="gradient-text">уменьшают бюджет</span></h2>
+
+            <!-- Часы ≠ деньги -->
+            <div class="flex items-center justify-center gap-3 w-full max-w-3xl mb-5">
+                <div class="bg-blue-50 border-2 border-blue-200 px-5 py-3 rounded-2xl text-center">
+                    <i class="ph-fill ph-clock text-blue-500 text-2xl"></i>
+                    <p class="text-sm font-bold text-blue-900 mt-1">Часы</p>
+                </div>
+                <div class="text-3xl font-black text-gray-300">≠</div>
+                <div class="bg-orange-50 border-2 border-orange-200 px-5 py-3 rounded-2xl text-center">
+                    <i class="ph-fill ph-coins text-orange-500 text-2xl"></i>
+                    <p class="text-sm font-bold text-orange-900 mt-1">Деньги</p>
+                </div>
+            </div>
+
+            <!-- Три типа эффекта -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 w-full max-w-5xl mb-5">
+                <div class="bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-300 p-5 rounded-3xl shadow-md relative">
+                    <div class="absolute -top-3 left-5 w-9 h-9 bg-green-500 text-white rounded-2xl flex items-center justify-center font-black shadow-lg border-4 border-white">1</div>
+                    <div class="mt-2">
+                        <i class="ph-fill ph-arrow-down text-green-600 text-2xl"></i>
+                        <h3 class="font-black text-green-900 text-base mt-1">Прямая экономия</h3>
+                        <p class="text-xs text-green-800 mt-1">Расходы реально исчезли из бюджета</p>
+                    </div>
+                </div>
+                <div class="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-300 p-5 rounded-3xl shadow-md relative">
+                    <div class="absolute -top-3 left-5 w-9 h-9 bg-blue-500 text-white rounded-2xl flex items-center justify-center font-black shadow-lg border-4 border-white">2</div>
+                    <div class="mt-2">
+                        <i class="ph-fill ph-shield-check text-blue-600 text-2xl"></i>
+                        <h3 class="font-black text-blue-900 text-base mt-1">Предотвращённые затраты</h3>
+                        <p class="text-xs text-blue-800 mt-1">Не пришлось нанимать новых людей при росте</p>
+                    </div>
+                </div>
+                <div class="bg-gradient-to-br from-purple-50 to-purple-100 border-2 border-purple-300 p-5 rounded-3xl shadow-md relative">
+                    <div class="absolute -top-3 left-5 w-9 h-9 bg-purple-500 text-white rounded-2xl flex items-center justify-center font-black shadow-lg border-4 border-white">3</div>
+                    <div class="mt-2">
+                        <i class="ph-fill ph-trend-up text-purple-600 text-2xl"></i>
+                        <h3 class="font-black text-purple-900 text-base mt-1">Высвобождённая мощность</h3>
+                        <p class="text-xs text-purple-800 mt-1">Люди занялись более ценной работой</p>
+                    </div>
+                </div>
+            </div>
+
+            <p class="font-bold text-base md:text-lg text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
+                Эффект нужно <span class="gradient-text">честно классифицировать</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 7: Тезис 6 — Эквивалент полной ставки -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-7">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <span class="text-xs font-bold text-purple-500 uppercase tracking-widest mb-2">Тезис 6</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-8 text-center text-gray-900">Эквивалент полной ставки —<br><span class="gradient-text">часы на языке бизнеса</span></h2>
+
+            <!-- Расчёт -->
+            <div class="bg-white border border-gray-200 rounded-3xl shadow-lg p-5 w-full max-w-4xl mb-4">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-center">
+                    <div class="bg-purple-50 p-3 rounded-xl border border-purple-200 text-center">
+                        <span class="text-[10px] font-bold text-purple-600 uppercase tracking-widest">В месяц</span>
+                        <p class="text-2xl font-black text-gray-900">266 ч</p>
+                    </div>
+                    <div class="bg-blue-50 p-3 rounded-xl border border-blue-200 text-center">
+                        <span class="text-[10px] font-bold text-blue-600 uppercase tracking-widest">В год</span>
+                        <p class="text-2xl font-black text-gray-900">3 196 ч</p>
+                    </div>
+                    <div class="bg-orange-50 p-3 rounded-xl border border-orange-200 text-center">
+                        <span class="text-[10px] font-bold text-orange-600 uppercase tracking-widest">Норма года</span>
+                        <p class="text-2xl font-black text-gray-900">2 080 ч</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-purple-600 to-orange-500 p-3 rounded-xl shadow-lg text-white text-center">
+                        <span class="text-[10px] font-bold uppercase tracking-widest opacity-80">Эквивалент ставки</span>
+                        <p class="text-2xl font-black">1,54</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Три варианта реализации -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-2 w-full max-w-4xl mb-4">
+                <div class="bg-green-50 border border-green-200 p-3 rounded-xl text-center"><i class="ph-fill ph-receipt text-green-500 text-xl"></i><p class="text-xs text-green-900 font-bold mt-1">Прямая экономия</p><p class="text-[10px] text-green-700">если сокращаем расходы</p></div>
+                <div class="bg-blue-50 border border-blue-200 p-3 rounded-xl text-center"><i class="ph-fill ph-shield-check text-blue-500 text-xl"></i><p class="text-xs text-blue-900 font-bold mt-1">Отказ от найма</p><p class="text-[10px] text-blue-700">при росте объёма</p></div>
+                <div class="bg-purple-50 border border-purple-200 p-3 rounded-xl text-center"><i class="ph-fill ph-trend-up text-purple-500 text-xl"></i><p class="text-[11px] text-purple-900 font-bold mt-1">Ценные задачи</p><p class="text-[10px] text-purple-700">продажи, продукт, качество</p></div>
+            </div>
+
+            <div class="bg-orange-50 border border-orange-200 rounded-xl px-4 py-2 max-w-3xl w-full text-center mb-4">
+                <p class="text-xs text-orange-900"><i class="ph-fill ph-warning text-orange-500"></i> Это снижение трудоёмкости процесса, а <strong>не обязательно увольнение</strong></p>
+            </div>
+
+            <p class="font-bold text-base md:text-lg text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
+                Не «агент заменил человека», а <span class="gradient-text">изменил потребность процесса во времени</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 8: Тезис 7 — Полная стоимость сотрудника -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-8">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <span class="text-xs font-bold text-purple-500 uppercase tracking-widest mb-2">Тезис 7</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-6 text-center text-gray-900">Сотрудник стоит больше, <span class="gradient-text">чем его оклад</span></h2>
+
+            <div class="flex flex-col md:flex-row gap-4 w-full max-w-5xl mb-4 items-stretch">
+                <!-- Айсберг -->
+                <div class="flex-1">
+                    <div class="bg-gradient-to-b from-blue-100 to-blue-200 p-4 rounded-t-3xl border-2 border-blue-300 text-center">
+                        <span class="text-[10px] font-bold text-blue-700 uppercase tracking-widest">Над водой</span>
+                        <h3 class="font-black text-blue-900 text-lg mt-1">Оклад</h3>
+                    </div>
+                    <div class="bg-gradient-to-b from-indigo-200 via-indigo-300 to-indigo-500 p-4 rounded-b-3xl border-2 border-indigo-400 border-t-0 text-white">
+                        <span class="text-[10px] font-bold uppercase tracking-widest opacity-90">Под водой</span>
+                        <div class="grid grid-cols-2 gap-1.5 mt-2">
+                            <div class="bg-white/20 p-1.5 rounded-lg flex items-center gap-1.5 text-[11px] backdrop-blur"><i class="ph-fill ph-receipt"></i> Налоги, взносы</div>
+                            <div class="bg-white/20 p-1.5 rounded-lg flex items-center gap-1.5 text-[11px] backdrop-blur"><i class="ph-fill ph-gift"></i> Бонусы, льготы</div>
+                            <div class="bg-white/20 p-1.5 rounded-lg flex items-center gap-1.5 text-[11px] backdrop-blur"><i class="ph-fill ph-laptop"></i> Техника и ПО</div>
+                            <div class="bg-white/20 p-1.5 rounded-lg flex items-center gap-1.5 text-[11px] backdrop-blur"><i class="ph-fill ph-buildings"></i> Рабочее место</div>
+                            <div class="bg-white/20 p-1.5 rounded-lg flex items-center gap-1.5 text-[11px] backdrop-blur"><i class="ph-fill ph-user-circle"></i> Управление</div>
+                            <div class="bg-white/20 p-1.5 rounded-lg flex items-center gap-1.5 text-[11px] backdrop-blur"><i class="ph-fill ph-graduation-cap"></i> Обучение</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Расчёт стоимости часа -->
+                <div class="flex-1 bg-purple-50 border-2 border-purple-200 p-5 rounded-3xl shadow-md flex flex-col justify-center">
+                    <span class="text-[10px] font-black text-purple-600 uppercase tracking-widest mb-2">Стоимость часа · пример</span>
+                    <div class="space-y-2">
+                        <div class="bg-white p-2 rounded-lg border border-purple-100 flex justify-between items-center"><span class="text-xs text-gray-600">Оклад / мес</span><span class="text-sm font-bold text-gray-900">120 000 ₽</span></div>
+                        <div class="bg-white p-2 rounded-lg border border-purple-100 flex justify-between items-center"><span class="text-xs text-gray-600">Год</span><span class="text-sm font-bold text-gray-900">1 440 000 ₽</span></div>
+                        <div class="bg-white p-2 rounded-lg border border-purple-100 flex justify-between items-center"><span class="text-xs text-gray-600">× коэффициент 1,3</span><span class="text-sm font-bold text-gray-900">1 872 000 ₽</span></div>
+                        <div class="bg-gradient-to-r from-purple-600 to-orange-500 p-2 rounded-lg text-white flex justify-between items-center shadow-md"><span class="text-xs">÷ 2 080 часов</span><span class="text-base font-black">~ 900 ₽ / час</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <p class="font-bold text-base md:text-lg text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
+                Коэффициент полной стоимости <span class="gradient-text">обычно 1,25–1,5 от оклада</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 9: Тезис 8 — Прямая экономия -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-9">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <span class="text-xs font-bold text-green-600 uppercase tracking-widest mb-2">Тезис 8 · Тип эффекта 1</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-6 text-center text-gray-900">Прямая экономия —<br><span class="gradient-text">расходы реально исчезли</span></h2>
+
+            <div class="flex flex-col md:flex-row gap-4 w-full max-w-5xl mb-4 items-stretch">
+                <!-- Что меняется -->
+                <div class="flex-1 bg-white border border-gray-200 p-5 rounded-3xl shadow-sm">
+                    <h3 class="font-bold text-gray-700 uppercase tracking-widest text-xs mb-3">Где это видно</h3>
+                    <ul class="text-sm text-gray-700 space-y-2">
+                        <li class="bg-green-50 p-2 rounded-lg flex items-center gap-2 border border-green-100"><i class="ph-fill ph-handshake text-green-500"></i> Сократили подрядчиков</li>
+                        <li class="bg-green-50 p-2 rounded-lg flex items-center gap-2 border border-green-100"><i class="ph-fill ph-file-minus text-green-500"></i> Не продлили контракты</li>
+                        <li class="bg-green-50 p-2 rounded-lg flex items-center gap-2 border border-green-100"><i class="ph-fill ph-arrow-down text-green-500"></i> Снизили количество ставок</li>
+                        <li class="bg-green-50 p-2 rounded-lg flex items-center gap-2 border border-green-100"><i class="ph-fill ph-package text-green-500"></i> Закрыли платную ручную операцию</li>
+                    </ul>
+                </div>
+                <!-- Расчёт -->
+                <div class="flex-1 bg-green-50 border-2 border-green-300 p-5 rounded-3xl shadow-md">
+                    <h3 class="font-bold text-green-700 uppercase tracking-widest text-xs mb-3 text-center">Расчёт · пример</h3>
+                    <div class="space-y-2">
+                        <div class="bg-white p-2 rounded-lg border border-green-100 flex justify-between"><span class="text-xs text-gray-600">Сокращено</span><span class="text-sm font-bold text-gray-900">2 ставки</span></div>
+                        <div class="bg-white p-2 rounded-lg border border-green-100 flex justify-between"><span class="text-xs text-gray-600">Полная стоимость одной</span><span class="text-sm font-bold text-gray-900">1 872 000 ₽ / год</span></div>
+                        <div class="bg-gradient-to-r from-green-500 to-emerald-600 p-3 rounded-lg text-white text-center shadow-md">
+                            <span class="text-[10px] uppercase font-bold opacity-80">Эффект</span>
+                            <p class="text-xl font-black">3 744 000 ₽ / год</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-2 max-w-3xl w-full text-center mb-4">
+                <p class="text-xs text-yellow-900"><i class="ph-fill ph-info text-yellow-600"></i> Не каждый ИИ-проект обязан вести к сокращениям, чтобы быть ценным</p>
+            </div>
+
+            <p class="font-bold text-base md:text-lg text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
+                Самый понятный для финансов эффект — <span class="gradient-text">виден прямо в бюджете</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 10: Тезис 9 — Предотвращённые затраты -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-10">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <span class="text-xs font-bold text-blue-600 uppercase tracking-widest mb-2">Тезис 9 · Тип эффекта 2</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-6 text-center text-gray-900">Рост без <span class="gradient-text">линейного найма</span></h2>
+
+            <!-- Простой график двух линий -->
+            <div class="bg-white border border-gray-200 rounded-3xl shadow-lg p-5 w-full max-w-4xl mb-4">
+                <div class="grid grid-cols-2 gap-6">
+                    <div>
+                        <p class="text-[10px] text-blue-600 font-bold uppercase tracking-widest mb-2">Объём заявок</p>
+                        <div class="space-y-1">
+                            <div class="flex items-end gap-2"><div class="bg-blue-200 w-6 h-3 rounded"></div><span class="text-xs text-gray-600">Янв</span></div>
+                            <div class="flex items-end gap-2"><div class="bg-blue-300 w-10 h-4 rounded"></div><span class="text-xs text-gray-600">Апр</span></div>
+                            <div class="flex items-end gap-2"><div class="bg-blue-400 w-16 h-5 rounded"></div><span class="text-xs text-gray-600">Июл</span></div>
+                            <div class="flex items-end gap-2"><div class="bg-blue-500 w-24 h-6 rounded"></div><span class="text-xs text-gray-600">Окт</span></div>
+                            <div class="flex items-end gap-2"><div class="bg-gradient-to-r from-blue-600 to-purple-600 w-32 h-7 rounded"></div><span class="text-xs text-gray-800 font-bold">Дек +30%</span></div>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-orange-600 font-bold uppercase tracking-widest mb-2">Численность команды</p>
+                        <div class="space-y-1">
+                            <div class="flex items-end gap-2"><div class="bg-orange-200 w-6 h-3 rounded"></div><span class="text-xs text-gray-600">Янв</span></div>
+                            <div class="flex items-end gap-2"><div class="bg-orange-300 w-7 h-4 rounded"></div><span class="text-xs text-gray-600">Апр</span></div>
+                            <div class="flex items-end gap-2"><div class="bg-orange-300 w-7 h-5 rounded"></div><span class="text-xs text-gray-600">Июл</span></div>
+                            <div class="flex items-end gap-2"><div class="bg-orange-400 w-8 h-6 rounded"></div><span class="text-xs text-gray-600">Окт</span></div>
+                            <div class="flex items-end gap-2"><div class="bg-orange-500 w-8 h-7 rounded"></div><span class="text-xs text-gray-800 font-bold">Дек = той же</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Расчёт -->
+            <div class="bg-blue-50 border-2 border-blue-300 p-4 rounded-2xl max-w-4xl w-full mb-4 shadow-md">
+                <p class="text-[10px] font-bold text-blue-600 uppercase tracking-widest mb-2 text-center">Расчёт · избежали 3 ставок</p>
+                <div class="flex items-center justify-center gap-3 text-center">
+                    <div class="bg-white p-2 rounded-lg border border-blue-100"><span class="text-[10px] text-gray-500 uppercase font-bold">Ставок</span><p class="text-lg font-black text-gray-900">3</p></div>
+                    <span class="text-xl font-black text-blue-400">×</span>
+                    <div class="bg-white p-2 rounded-lg border border-blue-100"><span class="text-[10px] text-gray-500 uppercase font-bold">Полная стоимость</span><p class="text-lg font-black text-gray-900">1,87 млн ₽</p></div>
+                    <span class="text-xl font-black text-blue-400">=</span>
+                    <div class="bg-gradient-to-br from-blue-600 to-purple-600 p-2 rounded-lg shadow-md text-white"><span class="text-[10px] uppercase font-bold opacity-80">Эффект</span><p class="text-lg font-black">5,6 млн ₽ / год</p></div>
+                </div>
+            </div>
+
+            <p class="font-bold text-base md:text-lg text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
+                Это эффект не про сокращение, а <span class="gradient-text">про масштабируемость</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 11: Тезис 10 — Ценность мощности -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-11">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <span class="text-xs font-bold text-purple-600 uppercase tracking-widest mb-2">Тезис 10 · Тип эффекта 3</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-6 text-center text-gray-900">Высвобождённое время ценно, <br>только если <span class="gradient-text">направлено в полезную работу</span></h2>
+
+            <!-- Поток времени -->
+            <div class="flex items-center w-full max-w-5xl mb-4">
+                <div class="bg-gray-50 border border-gray-200 p-3 rounded-2xl shadow-sm text-center w-28 shrink-0">
+                    <i class="ph-fill ph-repeat text-gray-400 text-3xl"></i>
+                    <p class="text-xs font-bold text-gray-700 mt-1">Рутина</p>
+                </div>
+                <div class="flex-1 flex flex-col items-center mx-3">
+                    <i class="ph-bold ph-arrow-right text-3xl gradient-text"></i>
+                    <span class="text-[10px] font-black text-purple-600 uppercase tracking-widest mt-1">Поток времени</span>
+                </div>
+                <div class="grid grid-cols-2 gap-2 flex-[2]">
+                    <div class="bg-purple-50 border border-purple-200 p-2 rounded-xl text-center"><i class="ph-fill ph-users-three text-purple-500 text-lg"></i><p class="text-[11px] text-purple-900 mt-0.5 font-bold">Клиенты</p></div>
+                    <div class="bg-blue-50 border border-blue-200 p-2 rounded-xl text-center"><i class="ph-fill ph-medal text-blue-500 text-lg"></i><p class="text-[11px] text-blue-900 mt-0.5 font-bold">Качество</p></div>
+                    <div class="bg-orange-50 border border-orange-200 p-2 rounded-xl text-center"><i class="ph-fill ph-rocket text-orange-500 text-lg"></i><p class="text-[11px] text-orange-900 mt-0.5 font-bold">Продукт</p></div>
+                    <div class="bg-green-50 border border-green-200 p-2 rounded-xl text-center"><i class="ph-fill ph-chart-line-up text-green-500 text-lg"></i><p class="text-[11px] text-green-900 mt-0.5 font-bold">Аналитика</p></div>
+                </div>
+            </div>
+
+            <!-- Формула с коэффициентом -->
+            <div class="bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 p-1 rounded-2xl shadow-xl w-full max-w-4xl mb-3">
+                <div class="bg-white rounded-[14px] p-3 text-center">
+                    <p class="text-[10px] font-black text-purple-600 uppercase tracking-widest mb-1">Формула</p>
+                    <p class="text-sm md:text-lg font-black text-gray-900">Ценность <span class="gradient-text">=</span> часы <span class="gradient-text">×</span> стоимость часа <span class="gradient-text">×</span> доля полезной загрузки</p>
+                </div>
+            </div>
+            <div class="bg-purple-50 border border-purple-200 rounded-xl px-4 py-2 max-w-3xl w-full text-center mb-4">
+                <p class="text-sm text-purple-900">266 ч × 900 ₽ × 50% = <span class="font-black text-lg gradient-text">119 835 ₽ / мес</span></p>
+                <p class="text-[10px] text-purple-700 mt-1">Считаем консервативно: не всё время превращается в результат</p>
+            </div>
+
+            <p class="font-bold text-base md:text-lg text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
+                Перевод внимания <span class="gradient-text">из низкоценной работы в высокоценную</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 12: Тезис 11 — Экономика одной операции -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-12">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <span class="text-xs font-bold text-purple-500 uppercase tracking-widest mb-2">Тезис 11</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-6 text-center text-gray-900">Что произошло со <span class="gradient-text">стоимостью одной операции?</span></h2>
+
+            <div class="flex flex-col md:flex-row items-center gap-4 w-full max-w-4xl mb-4">
+                <div class="flex-1 bg-gray-50 border-2 border-gray-300 p-6 rounded-3xl text-center">
+                    <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">До ИИ</span>
+                    <p class="text-5xl md:text-6xl font-black text-gray-700 my-2">300 ₽</p>
+                    <p class="text-xs text-gray-500">за операцию</p>
+                </div>
+                <div class="flex flex-col items-center">
+                    <i class="ph-bold ph-arrow-right text-3xl gradient-text hidden md:block"></i>
+                    <i class="ph-bold ph-arrow-down text-3xl gradient-text md:hidden"></i>
+                    <div class="bg-gradient-to-br from-green-500 to-emerald-600 text-white px-3 py-1 rounded-full text-xs font-black mt-1 shadow-lg">−60%</div>
+                </div>
+                <div class="flex-1 bg-purple-50 border-2 border-purple-300 p-6 rounded-3xl text-center shadow-xl">
+                    <span class="text-xs font-bold text-purple-500 uppercase tracking-widest">После ИИ</span>
+                    <p class="text-5xl md:text-6xl font-black gradient-text my-2">120 ₽</p>
+                    <p class="text-xs text-purple-600">за операцию</p>
+                </div>
+            </div>
+
+            <!-- Структура новой стоимости -->
+            <div class="bg-white border border-gray-200 rounded-2xl shadow-md p-4 w-full max-w-4xl mb-3">
+                <p class="text-[10px] font-black text-purple-600 uppercase tracking-widest mb-2 text-center">Из чего складывается новая стоимость · 120 000 ₽ / мес</p>
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="bg-blue-50 p-2 rounded-lg border border-blue-100 text-center"><i class="ph-fill ph-user text-blue-500"></i><p class="text-[11px] text-gray-700 mt-1">Человек</p><p class="text-xs font-bold text-gray-900">60 т.₽</p></div>
+                    <div class="bg-purple-50 p-2 rounded-lg border border-purple-100 text-center"><i class="ph-fill ph-key text-purple-500"></i><p class="text-[11px] text-gray-700 mt-1">Модели</p><p class="text-xs font-bold text-gray-900">40 т.₽</p></div>
+                    <div class="bg-orange-50 p-2 rounded-lg border border-orange-100 text-center"><i class="ph-fill ph-wrench text-orange-500"></i><p class="text-[11px] text-gray-700 mt-1">Поддержка</p><p class="text-xs font-bold text-gray-900">20 т.₽</p></div>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-r from-purple-50 to-orange-50 border border-purple-200 rounded-xl px-4 py-2 max-w-3xl w-full text-center mb-4">
+                <p class="text-sm text-gray-800">На объёме 10 000 операций: эффект <span class="text-xl font-black gradient-text">1,8 млн ₽ / мес</span></p>
+            </div>
+
+            <p class="font-bold text-base md:text-lg text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
+                Чем больше повторяемых операций — <span class="gradient-text">тем сильнее эффект</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 13: Тезис 12 — Пропускная способность -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-13">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <span class="text-xs font-bold text-purple-500 uppercase tracking-widest mb-2">Тезис 12</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-6 text-center text-gray-900">Та же команда — <span class="gradient-text">больше работы</span></h2>
+
+            <div class="flex flex-col md:flex-row gap-4 w-full max-w-5xl mb-4 items-stretch">
+                <div class="flex-1 bg-gray-50 border border-gray-200 p-5 rounded-3xl">
+                    <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">До ИИ</span>
+                    <div class="flex items-end gap-3 mt-2 mb-3">
+                        <div class="text-center"><i class="ph-fill ph-users text-gray-500 text-2xl"></i><p class="text-xl font-black text-gray-700">10</p><p class="text-[10px] text-gray-500">человек</p></div>
+                        <span class="text-xl font-black text-gray-400 pb-2">=</span>
+                        <div class="bg-gray-200 rounded-xl px-3 py-2 flex-1 text-center"><p class="text-xl font-black text-gray-800">10 000</p><p class="text-[10px] text-gray-600 uppercase">операций</p></div>
+                    </div>
+                    <div class="bg-white px-2 py-1 rounded-lg text-center text-[11px] text-gray-700">1 000 операций / человека</div>
+                </div>
+                <div class="flex-1 bg-purple-50 border-2 border-purple-300 p-5 rounded-3xl shadow-lg">
+                    <span class="text-xs font-bold text-purple-500 uppercase tracking-widest">После ИИ</span>
+                    <div class="flex items-end gap-3 mt-2 mb-3">
+                        <div class="text-center"><i class="ph-fill ph-users text-purple-600 text-2xl"></i><p class="text-xl font-black text-purple-800">10</p><p class="text-[10px] text-purple-600">человек</p></div>
+                        <span class="text-xl font-black text-purple-400 pb-2">=</span>
+                        <div class="bg-gradient-to-br from-purple-600 to-orange-500 text-white rounded-xl px-3 py-2 flex-1 text-center shadow-md"><p class="text-xl font-black">25 000</p><p class="text-[10px] uppercase opacity-80">операций</p></div>
+                    </div>
+                    <div class="bg-white px-2 py-1 rounded-lg text-center text-[11px] text-purple-900 border border-purple-100"><strong>2 500</strong> операций / человека</div>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-r from-purple-50 to-orange-50 border border-purple-200 rounded-xl px-4 py-2 max-w-3xl w-full text-center mb-3">
+                <p class="text-sm text-gray-800">Рост производительности на человека: <span class="text-xl font-black gradient-text">+150%</span></p>
+            </div>
+
+            <div class="bg-orange-50 border border-orange-200 rounded-xl px-4 py-2 max-w-3xl w-full text-center mb-4">
+                <p class="text-xs text-orange-900"><i class="ph-fill ph-warning text-orange-500"></i> Работает только если процесс действительно перестроен, а не «дали инструмент в старый хаос»</p>
+            </div>
+
+            <p class="font-bold text-base md:text-lg text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
+                Компания растёт быстрее, <span class="gradient-text">чем её затраты</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 14: Кейс — ИИ-разработка 250 vs 500 -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-14">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <span class="text-xs font-bold text-orange-500 uppercase tracking-widest mb-2">Кейс · ИИ-ориентированная разработка</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-6 text-center text-gray-900">250 сильных специалистов с ИИ —<br><span class="gradient-text">больше, чем 500 в старой системе</span></h2>
+
+            <!-- Сравнение двух команд -->
+            <div class="flex flex-col md:flex-row gap-4 w-full max-w-5xl mb-4 items-stretch">
+                <!-- Старая модель -->
+                <div class="flex-1 bg-gray-50 border border-gray-200 p-5 rounded-3xl text-center">
+                    <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Старая модель</span>
+                    <div class="grid grid-cols-10 gap-0.5 my-3">
+                        <i class="ph-fill ph-user text-gray-500 text-sm"></i><i class="ph-fill ph-user text-gray-500 text-sm"></i><i class="ph-fill ph-user text-gray-500 text-sm"></i><i class="ph-fill ph-user text-gray-500 text-sm"></i><i class="ph-fill ph-user text-gray-500 text-sm"></i><i class="ph-fill ph-user text-gray-500 text-sm"></i><i class="ph-fill ph-user text-gray-500 text-sm"></i><i class="ph-fill ph-user text-gray-500 text-sm"></i><i class="ph-fill ph-user text-gray-500 text-sm"></i><i class="ph-fill ph-user text-gray-500 text-sm"></i>
+                        <i class="ph-fill ph-user text-gray-500 text-sm"></i><i class="ph-fill ph-user text-gray-500 text-sm"></i><i class="ph-fill ph-user text-gray-500 text-sm"></i><i class="ph-fill ph-user text-gray-500 text-sm"></i><i class="ph-fill ph-user text-gray-500 text-sm"></i><i class="ph-fill ph-user text-gray-500 text-sm"></i><i class="ph-fill ph-user text-gray-500 text-sm"></i><i class="ph-fill ph-user text-gray-500 text-sm"></i><i class="ph-fill ph-user text-gray-500 text-sm"></i><i class="ph-fill ph-user text-gray-500 text-sm"></i>
+                        <i class="ph-fill ph-user text-gray-500 text-sm"></i><i class="ph-fill ph-user text-gray-500 text-sm"></i><i class="ph-fill ph-user text-gray-500 text-sm"></i><i class="ph-fill ph-user text-gray-500 text-sm"></i><i class="ph-fill ph-user text-gray-500 text-sm"></i><i class="ph-fill ph-user text-gray-500 text-sm"></i><i class="ph-fill ph-user text-gray-500 text-sm"></i><i class="ph-fill ph-user text-gray-500 text-sm"></i><i class="ph-fill ph-user text-gray-500 text-sm"></i><i class="ph-fill ph-user text-gray-500 text-sm"></i>
+                        <i class="ph-fill ph-user text-gray-500 text-sm"></i><i class="ph-fill ph-user text-gray-500 text-sm"></i><i class="ph-fill ph-user text-gray-500 text-sm"></i><i class="ph-fill ph-user text-gray-500 text-sm"></i><i class="ph-fill ph-user text-gray-500 text-sm"></i><i class="ph-fill ph-user text-gray-500 text-sm"></i><i class="ph-fill ph-user text-gray-500 text-sm"></i><i class="ph-fill ph-user text-gray-500 text-sm"></i><i class="ph-fill ph-user text-gray-500 text-sm"></i><i class="ph-fill ph-user text-gray-500 text-sm"></i>
+                    </div>
+                    <p class="text-3xl font-black text-gray-700">500 чел.</p>
+                    <p class="text-sm text-gray-500 mt-1">~ 30 млн $ / год</p>
+                </div>
+                <!-- Новая модель -->
+                <div class="flex-1 bg-purple-50 border-2 border-purple-300 p-5 rounded-3xl text-center shadow-xl">
+                    <span class="text-xs font-bold text-purple-500 uppercase tracking-widest">Новая модель</span>
+                    <div class="grid grid-cols-10 gap-0.5 my-3">
+                        <i class="ph-fill ph-user text-purple-600 text-sm"></i><i class="ph-fill ph-user text-purple-600 text-sm"></i><i class="ph-fill ph-user text-purple-600 text-sm"></i><i class="ph-fill ph-user text-purple-600 text-sm"></i><i class="ph-fill ph-user text-purple-600 text-sm"></i><i class="ph-fill ph-user text-purple-600 text-sm"></i><i class="ph-fill ph-user text-purple-600 text-sm"></i><i class="ph-fill ph-user text-purple-600 text-sm"></i><i class="ph-fill ph-user text-purple-600 text-sm"></i><i class="ph-fill ph-user text-purple-600 text-sm"></i>
+                        <i class="ph-fill ph-user text-purple-600 text-sm"></i><i class="ph-fill ph-user text-purple-600 text-sm"></i><i class="ph-fill ph-user text-purple-600 text-sm"></i><i class="ph-fill ph-user text-purple-600 text-sm"></i><i class="ph-fill ph-user text-purple-600 text-sm"></i><i class="ph-fill ph-user text-purple-600 text-sm"></i><i class="ph-fill ph-user text-purple-600 text-sm"></i><i class="ph-fill ph-user text-purple-600 text-sm"></i><i class="ph-fill ph-user text-purple-600 text-sm"></i><i class="ph-fill ph-user text-purple-600 text-sm"></i>
+                        <i class="ph-fill ph-robot text-orange-500 text-sm"></i><i class="ph-fill ph-robot text-orange-500 text-sm"></i><i class="ph-fill ph-robot text-orange-500 text-sm"></i><i class="ph-fill ph-robot text-orange-500 text-sm"></i><i class="ph-fill ph-robot text-orange-500 text-sm"></i><i class="ph-fill ph-robot text-orange-500 text-sm"></i><i class="ph-fill ph-robot text-orange-500 text-sm"></i><i class="ph-fill ph-robot text-orange-500 text-sm"></i><i class="ph-fill ph-robot text-orange-500 text-sm"></i><i class="ph-fill ph-robot text-orange-500 text-sm"></i>
+                        <i class="ph-fill ph-robot text-orange-500 text-sm"></i><i class="ph-fill ph-robot text-orange-500 text-sm"></i><i class="ph-fill ph-robot text-orange-500 text-sm"></i><i class="ph-fill ph-robot text-orange-500 text-sm"></i><i class="ph-fill ph-robot text-orange-500 text-sm"></i><i class="ph-fill ph-robot text-orange-500 text-sm"></i><i class="ph-fill ph-robot text-orange-500 text-sm"></i><i class="ph-fill ph-robot text-orange-500 text-sm"></i><i class="ph-fill ph-robot text-orange-500 text-sm"></i><i class="ph-fill ph-robot text-orange-500 text-sm"></i>
+                    </div>
+                    <p class="text-3xl font-black gradient-text">250 чел. + ИИ-агенты</p>
+                    <p class="text-sm text-purple-700 mt-1">~ 15 млн $ / год</p>
+                </div>
+            </div>
+
+            <!-- Производственная линия -->
+            <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-3 w-full max-w-5xl mb-3">
+                <p class="text-[10px] font-black text-purple-600 uppercase tracking-widest mb-2 text-center">Цепочка ИИ-ориентированной разработки</p>
+                <div class="flex flex-wrap items-center justify-center gap-1.5 text-[11px]">
+                    <span class="bg-purple-50 border border-purple-100 px-2 py-1 rounded-lg text-purple-900">Цель</span>
+                    <i class="ph-bold ph-caret-right text-purple-400"></i>
+                    <span class="bg-purple-50 border border-purple-100 px-2 py-1 rounded-lg text-purple-900">Спецификация</span>
+                    <i class="ph-bold ph-caret-right text-purple-400"></i>
+                    <span class="bg-purple-50 border border-purple-100 px-2 py-1 rounded-lg text-purple-900">Требования</span>
+                    <i class="ph-bold ph-caret-right text-purple-400"></i>
+                    <span class="bg-purple-50 border border-purple-100 px-2 py-1 rounded-lg text-purple-900">Тесты</span>
+                    <i class="ph-bold ph-caret-right text-purple-400"></i>
+                    <span class="bg-purple-50 border border-purple-100 px-2 py-1 rounded-lg text-purple-900">Код</span>
+                    <i class="ph-bold ph-caret-right text-purple-400"></i>
+                    <span class="bg-purple-50 border border-purple-100 px-2 py-1 rounded-lg text-purple-900">Ревью</span>
+                    <i class="ph-bold ph-caret-right text-purple-400"></i>
+                    <span class="bg-gradient-to-br from-purple-600 to-orange-500 text-white px-2 py-1 rounded-lg font-black">Релиз</span>
+                </div>
+            </div>
+
+            <div class="bg-orange-50 border border-orange-200 rounded-xl px-4 py-2 max-w-3xl w-full text-center mb-3">
+                <p class="text-xs text-orange-900"><i class="ph-fill ph-warning text-orange-500"></i> Просто сократить людей и оставить старые процессы — это потеря знаний и рост рисков</p>
+            </div>
+
+            <p class="font-bold text-base md:text-lg text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
+                Эффект — только при <span class="gradient-text">перестройке операционной модели</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 15: Тезис 13 — Цена ошибок -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-15">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <span class="text-xs font-bold text-purple-500 uppercase tracking-widest mb-2">Тезис 13</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-6 text-center text-gray-900">Ошибка — это <span class="gradient-text">деньги, время, риск, доверие</span></h2>
+
+            <!-- Расходящиеся последствия -->
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-2 w-full max-w-5xl mb-4">
+                <div class="bg-red-50 border border-red-200 p-2.5 rounded-2xl flex items-center gap-2"><i class="ph-fill ph-arrows-clockwise text-red-500 text-xl"></i><span class="text-[11px] text-red-900 font-bold">Исправления и переделки</span></div>
+                <div class="bg-orange-50 border border-orange-200 p-2.5 rounded-2xl flex items-center gap-2"><i class="ph-fill ph-chat-circle-dots text-orange-500 text-xl"></i><span class="text-[11px] text-orange-900 font-bold">Повторная коммуникация</span></div>
+                <div class="bg-yellow-50 border border-yellow-200 p-2.5 rounded-2xl flex items-center gap-2"><i class="ph-fill ph-clock-clockwise text-yellow-600 text-xl"></i><span class="text-[11px] text-yellow-900 font-bold">Нарушение сроков</span></div>
+                <div class="bg-purple-50 border border-purple-200 p-2.5 rounded-2xl flex items-center gap-2"><i class="ph-fill ph-arrow-bend-up-right text-purple-500 text-xl"></i><span class="text-[11px] text-purple-900 font-bold">Эскалации</span></div>
+                <div class="bg-pink-50 border border-pink-200 p-2.5 rounded-2xl flex items-center gap-2"><i class="ph-fill ph-money text-pink-500 text-xl"></i><span class="text-[11px] text-pink-900 font-bold">Штрафы, компенсации</span></div>
+                <div class="bg-blue-50 border border-blue-200 p-2.5 rounded-2xl flex items-center gap-2"><i class="ph-fill ph-shield-warning text-blue-500 text-xl"></i><span class="text-[11px] text-blue-900 font-bold">Регуляторные риски</span></div>
+            </div>
+
+            <!-- Формула и пример -->
+            <div class="bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 p-1 rounded-2xl shadow-xl w-full max-w-5xl mb-3">
+                <div class="bg-white rounded-[14px] p-3 text-center">
+                    <p class="text-[10px] font-black text-purple-600 uppercase tracking-widest mb-1">Формула</p>
+                    <p class="text-sm md:text-lg font-black text-gray-900">Экономия <span class="gradient-text">=</span> объём <span class="gradient-text">×</span> снижение доли ошибок <span class="gradient-text">×</span> цена одной ошибки</p>
+                </div>
+            </div>
+            <div class="bg-purple-50 border border-purple-200 rounded-xl px-4 py-2 max-w-3xl w-full text-center mb-4">
+                <p class="text-sm text-purple-900">1 000 × 5% (с 8% до 3%) × 2 000 ₽ = <span class="font-black text-lg gradient-text">100 000 ₽ / мес</span></p>
+            </div>
+
+            <p class="font-bold text-base md:text-lg text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
+                Снижение ошибок — это <span class="gradient-text">отдельный финансовый эффект</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 16: Тезис 14 — Рост выручки через маржу -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-16">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <span class="text-xs font-bold text-purple-500 uppercase tracking-widest mb-2">Тезис 14</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-6 text-center text-gray-900">ИИ влияет не только на затраты,<br>но и на <span class="gradient-text">рост валовой маржи</span></h2>
+
+            <!-- Воронка с подсветкой агента -->
+            <div class="w-full max-w-3xl mb-4">
+                <div class="bg-blue-100 border-2 border-blue-300 px-5 py-2 rounded-t-3xl text-center">
+                    <div class="flex items-center justify-between"><span class="font-bold text-blue-900 text-sm">Лиды</span><span class="text-[10px] bg-purple-500 text-white px-2 py-0.5 rounded-full"><i class="ph-fill ph-robot"></i> Быстрая обработка</span></div>
+                </div>
+                <div class="bg-blue-200 border-x-2 border-blue-300 mx-4 px-5 py-2 text-center">
+                    <div class="flex items-center justify-between"><span class="font-bold text-blue-900 text-sm">Квалификация</span><span class="text-[10px] bg-purple-500 text-white px-2 py-0.5 rounded-full"><i class="ph-fill ph-robot"></i> Готовый менеджер</span></div>
+                </div>
+                <div class="bg-blue-300 border-x-2 border-blue-400 mx-10 px-5 py-2 text-center">
+                    <div class="flex items-center justify-between"><span class="font-bold text-blue-900 text-sm">Предложение</span><span class="text-[10px] bg-purple-500 text-white px-2 py-0.5 rounded-full"><i class="ph-fill ph-robot"></i> Персонализация</span></div>
+                </div>
+                <div class="bg-gradient-to-br from-purple-600 to-orange-500 mx-16 px-5 py-3 text-center rounded-b-3xl shadow-2xl">
+                    <span class="font-black text-white text-base"><i class="ph-fill ph-check-circle"></i> Сделка</span>
+                </div>
+            </div>
+
+            <!-- Расчёт прироста маржи -->
+            <div class="bg-white border border-gray-200 rounded-3xl shadow-lg p-4 w-full max-w-5xl mb-3">
+                <p class="text-[10px] font-black text-purple-600 uppercase tracking-widest mb-2 text-center">Прирост валовой маржи · пример</p>
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-2 items-center text-center">
+                    <div class="bg-blue-50 p-2 rounded-lg border border-blue-100"><span class="text-[10px] text-gray-500 uppercase font-bold">Лидов</span><p class="text-base font-black text-gray-900">1 000</p></div>
+                    <div class="bg-purple-50 p-2 rounded-lg border border-purple-100"><span class="text-[10px] text-gray-500 uppercase font-bold">Конверсия</span><p class="text-base font-black text-gray-900">+1 п.п.</p></div>
+                    <div class="bg-orange-50 p-2 rounded-lg border border-orange-100"><span class="text-[10px] text-gray-500 uppercase font-bold">Чек</span><p class="text-base font-black text-gray-900">100 000 ₽</p></div>
+                    <div class="bg-green-50 p-2 rounded-lg border border-green-100"><span class="text-[10px] text-gray-500 uppercase font-bold">Маржа</span><p class="text-base font-black text-gray-900">40%</p></div>
+                    <div class="bg-gradient-to-br from-purple-600 to-orange-500 p-2 rounded-lg shadow-md text-white"><span class="text-[10px] uppercase font-bold opacity-80">Эффект</span><p class="text-base font-black">+400 000 ₽ / мес</p></div>
+                </div>
+            </div>
+
+            <p class="font-bold text-base md:text-lg text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
+                Маржа сильнее выручки — <span class="gradient-text">показывает прибыль для бизнеса</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 17: Тезис 15 — Клиентская экономика -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-17">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <span class="text-xs font-bold text-purple-500 uppercase tracking-widest mb-2">Тезис 15</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-6 text-center text-gray-900">Если ИИ влияет на клиента —<br><span class="gradient-text">считаем клиентскую экономику</span></h2>
+
+            <!-- 5 показателей вокруг клиента -->
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3 w-full max-w-5xl mb-4">
+                <div class="bg-white border border-blue-200 p-3 rounded-2xl shadow-sm">
+                    <div class="flex items-center gap-2 mb-1"><i class="ph-fill ph-magnet text-blue-500 text-lg"></i><h3 class="font-bold text-blue-700 text-xs uppercase tracking-widest">Стоимость привлечения</h3></div>
+                    <p class="text-[11px] text-gray-600">Сколько стоит новый клиент</p>
+                </div>
+                <div class="bg-gradient-to-br from-purple-600 to-orange-500 p-3 rounded-2xl shadow-xl text-white flex flex-col items-center justify-center">
+                    <i class="ph-fill ph-user-circle text-3xl"></i>
+                    <span class="text-[10px] font-black uppercase tracking-widest mt-1">Клиент</span>
+                </div>
+                <div class="bg-white border border-purple-200 p-3 rounded-2xl shadow-sm">
+                    <div class="flex items-center gap-2 mb-1"><i class="ph-fill ph-infinity text-purple-500 text-lg"></i><h3 class="font-bold text-purple-700 text-xs uppercase tracking-widest">Пожизненная ценность</h3></div>
+                    <p class="text-[11px] text-gray-600">Сколько приносит за всё время</p>
+                </div>
+                <div class="bg-white border border-green-200 p-3 rounded-2xl shadow-sm">
+                    <div class="flex items-center gap-2 mb-1"><i class="ph-fill ph-percent text-green-500 text-lg"></i><h3 class="font-bold text-green-700 text-xs uppercase tracking-widest">Валовая маржа</h3></div>
+                    <p class="text-[11px] text-gray-600">Сколько остаётся после прямых затрат</p>
+                </div>
+                <div class="bg-white border border-orange-200 p-3 rounded-2xl shadow-sm">
+                    <div class="flex items-center gap-2 mb-1"><i class="ph-fill ph-clock-counter-clockwise text-orange-500 text-lg"></i><h3 class="font-bold text-orange-700 text-xs uppercase tracking-widest">Срок окупаемости</h3></div>
+                    <p class="text-[11px] text-gray-600">Когда клиент окупает привлечение</p>
+                </div>
+                <div class="bg-white border border-pink-200 p-3 rounded-2xl shadow-sm">
+                    <div class="flex items-center gap-2 mb-1"><i class="ph-fill ph-headset text-pink-500 text-lg"></i><h3 class="font-bold text-pink-700 text-xs uppercase tracking-widest">Стоимость обслуживания</h3></div>
+                    <p class="text-[11px] text-gray-600">Сколько стоит поддерживать</p>
+                </div>
+            </div>
+
+            <!-- Пример -->
+            <div class="bg-purple-50 border border-purple-200 rounded-xl px-4 py-2 max-w-4xl w-full text-center mb-4">
+                <p class="text-sm text-purple-900">Стоимость привлечения упала с <strong>50 000 ₽ → 35 000 ₽</strong>, срок окупаемости — с <strong>3,6 мес → 2,5 мес</strong></p>
+            </div>
+
+            <p class="font-bold text-base md:text-lg text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
+                Эффект ИИ — это эффект <span class="gradient-text">на экономику клиента</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 18: Тезис 16 — Полная стоимость владения -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-18">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <span class="text-xs font-bold text-purple-500 uppercase tracking-widest mb-2">Тезис 16</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-6 text-center text-gray-900">У ИИ-решения есть не только выгода —<br><span class="gradient-text">есть стоимость владения</span></h2>
+
+            <!-- Многослойный пирог затрат -->
+            <div class="w-full max-w-3xl mb-4">
+                <div class="bg-gradient-to-r from-purple-500 to-purple-600 p-3 rounded-t-3xl text-white flex items-center justify-between shadow-md">
+                    <span class="font-bold flex items-center gap-2 text-sm"><i class="ph-fill ph-code"></i> Разработка</span>
+                    <span class="text-[11px] opacity-80">Старт</span>
+                </div>
+                <div class="bg-gradient-to-r from-blue-400 to-blue-500 p-3 text-white flex items-center justify-between shadow-md">
+                    <span class="font-bold flex items-center gap-2 text-sm"><i class="ph-fill ph-plugs"></i> Интеграции</span>
+                    <span class="text-[11px] opacity-80">CRM, ERP, базы знаний</span>
+                </div>
+                <div class="bg-gradient-to-r from-orange-400 to-orange-500 p-3 text-white flex items-center justify-between shadow-md">
+                    <span class="font-bold flex items-center gap-2 text-sm"><i class="ph-fill ph-key"></i> Модели и токены</span>
+                    <span class="text-[11px] opacity-80">Стоимость работы ИИ</span>
+                </div>
+                <div class="bg-gradient-to-r from-yellow-400 to-yellow-500 p-3 text-white flex items-center justify-between shadow-md">
+                    <span class="font-bold flex items-center gap-2 text-sm"><i class="ph-fill ph-cloud"></i> Инфраструктура</span>
+                    <span class="text-[11px] opacity-80">Серверы, хранилище</span>
+                </div>
+                <div class="bg-gradient-to-r from-green-400 to-green-500 p-3 rounded-b-3xl text-white flex items-center justify-between shadow-md">
+                    <span class="font-bold flex items-center gap-2 text-sm"><i class="ph-fill ph-wrench"></i> Поддержка, безопасность, обучение</span>
+                    <span class="text-[11px] opacity-80">Постоянно</span>
+                </div>
+            </div>
+
+            <!-- Пример чистого эффекта -->
+            <div class="bg-white border border-gray-200 rounded-2xl shadow-md p-4 w-full max-w-4xl mb-3">
+                <div class="flex items-center justify-around gap-3 text-center">
+                    <div class="flex-1">
+                        <span class="text-[10px] text-green-700 font-bold uppercase tracking-widest">Выгода</span>
+                        <p class="text-2xl font-black text-green-700">300 000 ₽</p>
+                    </div>
+                    <span class="text-2xl font-black text-gray-400">−</span>
+                    <div class="flex-1">
+                        <span class="text-[10px] text-red-700 font-bold uppercase tracking-widest">Стоимость</span>
+                        <p class="text-2xl font-black text-red-700">220 000 ₽</p>
+                    </div>
+                    <span class="text-2xl font-black text-gray-400">=</span>
+                    <div class="flex-1 bg-gradient-to-br from-purple-600 to-orange-500 p-2 rounded-xl text-white shadow-md">
+                        <span class="text-[10px] uppercase font-bold opacity-80">Чистый эффект</span>
+                        <p class="text-2xl font-black">80 000 ₽</p>
+                    </div>
+                </div>
+            </div>
+
+            <p class="font-bold text-base md:text-lg text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
+                Зрелый кейс показывает <span class="gradient-text">обе стороны: выгоду и затраты</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 19: Тезис 17 — Доходность, окупаемость, ценность во времени -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-19">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <span class="text-xs font-bold text-purple-500 uppercase tracking-widest mb-2">Тезис 17</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-6 text-center text-gray-900">ИИ-проект — это <span class="gradient-text">инвестиционное решение</span></h2>
+
+            <!-- Три показателя -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 w-full max-w-5xl mb-4">
+                <div class="bg-white border-2 border-purple-200 p-5 rounded-3xl shadow-md">
+                    <div class="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600 mb-2"><i class="ph-fill ph-percent text-2xl"></i></div>
+                    <h3 class="font-black text-purple-900 text-base mb-1">Доходность</h3>
+                    <p class="text-[11px] text-purple-800 mb-2">(эффект − стоимость) ÷ стоимость</p>
+                    <div class="bg-purple-50 rounded-lg px-2 py-1 text-center"><p class="text-sm font-bold text-purple-900">Пример: <span class="gradient-text">175%</span></p></div>
+                </div>
+                <div class="bg-white border-2 border-blue-200 p-5 rounded-3xl shadow-md">
+                    <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mb-2"><i class="ph-fill ph-clock-counter-clockwise text-2xl"></i></div>
+                    <h3 class="font-black text-blue-900 text-base mb-1">Срок окупаемости</h3>
+                    <p class="text-[11px] text-blue-800 mb-2">Когда вернутся вложения</p>
+                    <div class="bg-blue-50 rounded-lg px-2 py-1 text-center"><p class="text-sm font-bold text-blue-900">Пример: <span class="gradient-text">4 месяца</span></p></div>
+                </div>
+                <div class="bg-white border-2 border-orange-200 p-5 rounded-3xl shadow-md">
+                    <div class="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-600 mb-2"><i class="ph-fill ph-chart-line-up text-2xl"></i></div>
+                    <h3 class="font-black text-orange-900 text-base mb-1">Ценность во времени</h3>
+                    <p class="text-[11px] text-orange-800 mb-2">Деньги сегодня дороже, чем завтра</p>
+                    <div class="bg-orange-50 rounded-lg px-2 py-1 text-center"><p class="text-sm font-bold text-orange-900">Для больших проектов</p></div>
+                </div>
+            </div>
+
+            <!-- Инвест-карточка -->
+            <div class="bg-gradient-to-br from-purple-600 to-orange-500 p-1 rounded-2xl shadow-xl w-full max-w-4xl mb-3">
+                <div class="bg-white rounded-[14px] p-3">
+                    <p class="text-[10px] font-black text-purple-600 uppercase tracking-widest mb-2 text-center">Инвестиционная карточка проекта</p>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-center">
+                        <div class="bg-purple-50 p-2 rounded-lg border border-purple-100"><span class="text-[10px] text-gray-500 uppercase font-bold">Вложения</span><p class="text-sm font-black text-gray-900">4 млн ₽</p></div>
+                        <div class="bg-green-50 p-2 rounded-lg border border-green-100"><span class="text-[10px] text-gray-500 uppercase font-bold">Эффект / год</span><p class="text-sm font-black text-gray-900">11 млн ₽</p></div>
+                        <div class="bg-orange-50 p-2 rounded-lg border border-orange-100"><span class="text-[10px] text-gray-500 uppercase font-bold">Доходность</span><p class="text-sm font-black text-gray-900">175%</p></div>
+                        <div class="bg-pink-50 p-2 rounded-lg border border-pink-100"><span class="text-[10px] text-gray-500 uppercase font-bold">Окупаемость</span><p class="text-sm font-black text-gray-900">4 мес</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <p class="font-bold text-base md:text-lg text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
+                Так проект говорит <span class="gradient-text">на одном языке с финансами</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 20: Тезис 18 — Масштабирование меняет кривую затрат -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-20">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <span class="text-xs font-bold text-purple-500 uppercase tracking-widest mb-2">Тезис 18</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-6 text-center text-gray-900">Главный стратегический эффект — <br><span class="gradient-text">изменение кривой затрат</span></h2>
+
+            <!-- График двух кривых -->
+            <div class="bg-white border border-gray-200 rounded-3xl shadow-lg p-5 w-full max-w-4xl mb-4">
+                <svg viewBox="0 0 400 200" class="w-full h-44">
+                    <line x1="40" y1="180" x2="380" y2="180" stroke="#cbd5e1" stroke-width="1"/>
+                    <line x1="40" y1="20" x2="40" y2="180" stroke="#cbd5e1" stroke-width="1"/>
+                    <path d="M 40 170 Q 200 100 380 30" stroke="#94a3b8" stroke-width="3" fill="none"/>
+                    <text x="250" y="40" fill="#64748b" font-size="11" font-weight="bold">Старая модель: линейный рост</text>
+                    <path d="M 40 160 Q 100 140 200 120 T 380 100" stroke="url(#gradLine)" stroke-width="4" fill="none"/>
+                    <defs>
+                        <linearGradient id="gradLine" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#7c3aed"/>
+                            <stop offset="100%" stop-color="#f97316"/>
+                        </linearGradient>
+                    </defs>
+                    <text x="220" y="95" fill="#7c3aed" font-size="11" font-weight="bold">Новая модель: пологий рост</text>
+                    <text x="200" y="195" fill="#64748b" font-size="10" text-anchor="middle">Объём</text>
+                    <text x="20" y="100" fill="#64748b" font-size="10" transform="rotate(-90 20 100)" text-anchor="middle">Затраты</text>
+                </svg>
+            </div>
+
+            <!-- Коэффициент масштабирования -->
+            <div class="flex items-center justify-center gap-3 w-full max-w-3xl mb-3">
+                <div class="bg-blue-50 border-2 border-blue-200 p-3 rounded-2xl text-center flex-1">
+                    <span class="text-[10px] font-bold text-blue-600 uppercase tracking-widest">Объём</span>
+                    <p class="text-2xl font-black text-blue-700">+100%</p>
+                </div>
+                <span class="text-2xl font-black text-gray-400">÷</span>
+                <div class="bg-orange-50 border-2 border-orange-200 p-3 rounded-2xl text-center flex-1">
+                    <span class="text-[10px] font-bold text-orange-600 uppercase tracking-widest">Затраты</span>
+                    <p class="text-2xl font-black text-orange-700">+25%</p>
+                </div>
+                <span class="text-2xl font-black text-gray-400">=</span>
+                <div class="bg-gradient-to-br from-purple-600 to-orange-500 p-3 rounded-2xl text-white shadow-md text-center flex-1">
+                    <span class="text-[10px] uppercase font-bold opacity-80">Эффективность</span>
+                    <p class="text-2xl font-black">×4</p>
+                </div>
+            </div>
+
+            <p class="font-bold text-base md:text-lg text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
+                Сильны не те, кто чуть дешевле работает сегодня, а те, кто <span class="gradient-text">умеет масштабироваться без линейного роста затрат</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 21: Тезис 19 — Сценарии финансового эффекта -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-21">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <span class="text-xs font-bold text-purple-500 uppercase tracking-widest mb-2">Тезис 19</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-6 text-center text-gray-900">Не одна цифра — <span class="gradient-text">три сценария</span></h2>
+
+            <!-- Три столбца сценариев -->
+            <div class="grid grid-cols-3 gap-3 w-full max-w-5xl mb-4 items-end">
+                <div class="bg-yellow-50 border-2 border-yellow-300 p-4 rounded-3xl shadow-md text-center">
+                    <div class="bg-gradient-to-t from-yellow-400 to-yellow-200 rounded-t-xl mx-auto" style="height: 70px; width: 50%"></div>
+                    <h3 class="font-black text-yellow-700 text-sm mt-2">Осторожный</h3>
+                    <p class="text-xl font-black text-yellow-700 mt-1">1,1 млн ₽</p>
+                    <p class="text-[10px] text-yellow-600">автоматизация 30%</p>
+                    <p class="text-[10px] text-yellow-600">окупаемость 9 мес</p>
+                </div>
+                <div class="bg-purple-50 border-2 border-purple-300 p-4 rounded-3xl shadow-xl text-center transform md:scale-105">
+                    <div class="bg-gradient-to-t from-purple-600 to-purple-400 rounded-t-xl mx-auto" style="height: 110px; width: 50%"></div>
+                    <h3 class="font-black text-purple-700 text-sm mt-2">Базовый</h3>
+                    <p class="text-xl font-black gradient-text mt-1">2,4 млн ₽</p>
+                    <p class="text-[10px] text-purple-600">автоматизация 50%</p>
+                    <p class="text-[10px] text-purple-600">окупаемость 5 мес</p>
+                </div>
+                <div class="bg-green-50 border-2 border-green-300 p-4 rounded-3xl shadow-md text-center">
+                    <div class="bg-gradient-to-t from-green-500 to-green-300 rounded-t-xl mx-auto" style="height: 150px; width: 50%"></div>
+                    <h3 class="font-black text-green-700 text-sm mt-2">Оптимистичный</h3>
+                    <p class="text-xl font-black text-green-700 mt-1">4,1 млн ₽</p>
+                    <p class="text-[10px] text-green-600">автоматизация 70%</p>
+                    <p class="text-[10px] text-green-600">окупаемость 3 мес</p>
+                </div>
+            </div>
+
+            <!-- Что варьируем -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 w-full max-w-4xl mb-3">
+                <div class="bg-white border border-gray-200 p-2 rounded-lg text-center text-[11px] text-gray-700"><i class="ph-fill ph-robot text-purple-500"></i> Доля автоматизации</div>
+                <div class="bg-white border border-gray-200 p-2 rounded-lg text-center text-[11px] text-gray-700"><i class="ph-fill ph-warning text-orange-500"></i> Доля исключений</div>
+                <div class="bg-white border border-gray-200 p-2 rounded-lg text-center text-[11px] text-gray-700"><i class="ph-fill ph-coins text-green-500"></i> Стоимость часа</div>
+                <div class="bg-white border border-gray-200 p-2 rounded-lg text-center text-[11px] text-gray-700"><i class="ph-fill ph-arrows-out text-blue-500"></i> Темп масштабирования</div>
+            </div>
+
+            <p class="font-bold text-base md:text-lg text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
+                Не обещание, а <span class="gradient-text">управляемая экономическая гипотеза</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 22: Тезис 20 — Итог первой части -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-22">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <span class="text-xs font-bold text-purple-500 uppercase tracking-widest mb-2">Тезис 20 · Итог части 1</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-6 text-center text-gray-900">Результат трансформации —<br><span class="gradient-text">новая экономика процесса</span></h2>
+
+            <!-- Формула -->
+            <div class="bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 p-1 rounded-2xl shadow-2xl w-full max-w-5xl mb-4">
+                <div class="bg-white rounded-[14px] p-4">
+                    <p class="text-[10px] font-black text-purple-600 uppercase tracking-widest mb-2 text-center">Главная формула</p>
+                    <p class="text-sm md:text-lg font-black text-gray-900 text-center leading-relaxed">
+                        ИИ-трансформация <span class="gradient-text">=</span> процесс <span class="gradient-text">+</span> агент <span class="gradient-text">+</span> человек <span class="gradient-text">+</span> данные <span class="gradient-text">+</span> метрики <span class="gradient-text">+</span> экономика операции <span class="gradient-text">+</span> окупаемость <span class="gradient-text">+</span> масштабирование
+                    </p>
+                </div>
+            </div>
+
+            <!-- Цепочка -->
+            <div class="flex flex-col md:flex-row items-stretch gap-2 w-full max-w-5xl mb-4">
+                <div class="flex-1 bg-gray-50 border border-gray-200 p-3 rounded-2xl text-center">
+                    <div class="w-10 h-10 bg-gray-200 rounded-2xl flex items-center justify-center text-gray-600 mx-auto mb-1"><i class="ph-fill ph-clock-counter-clockwise text-xl"></i></div>
+                    <h3 class="font-black text-gray-700 text-[11px] uppercase tracking-widest">Было</h3>
+                </div>
+                <div class="flex items-center justify-center"><i class="ph-bold ph-arrow-right text-xl text-purple-400 hidden md:block"></i><i class="ph-bold ph-arrow-down text-xl text-purple-400 md:hidden"></i></div>
+                <div class="flex-1 bg-purple-50 border-2 border-purple-300 p-3 rounded-2xl text-center shadow-md">
+                    <div class="w-10 h-10 bg-purple-200 rounded-2xl flex items-center justify-center text-purple-700 mx-auto mb-1"><i class="ph-fill ph-arrows-clockwise text-xl"></i></div>
+                    <h3 class="font-black text-purple-700 text-[11px] uppercase tracking-widest">Стало</h3>
+                </div>
+                <div class="flex items-center justify-center"><i class="ph-bold ph-arrow-right text-xl text-orange-400 hidden md:block"></i><i class="ph-bold ph-arrow-down text-xl text-orange-400 md:hidden"></i></div>
+                <div class="flex-1 bg-orange-50 border-2 border-orange-300 p-3 rounded-2xl text-center shadow-md">
+                    <div class="w-10 h-10 bg-orange-200 rounded-2xl flex items-center justify-center text-orange-700 mx-auto mb-1"><i class="ph-fill ph-coins text-xl"></i></div>
+                    <h3 class="font-black text-orange-700 text-[11px] uppercase tracking-widest">Эффект</h3>
+                </div>
+                <div class="flex items-center justify-center"><i class="ph-bold ph-arrow-right text-xl text-pink-400 hidden md:block"></i><i class="ph-bold ph-arrow-down text-xl text-pink-400 md:hidden"></i></div>
+                <div class="flex-1 bg-gradient-to-br from-purple-600 to-orange-500 p-3 rounded-2xl text-center shadow-xl text-white">
+                    <div class="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center text-white mx-auto mb-1"><i class="ph-fill ph-arrows-out text-xl"></i></div>
+                    <h3 class="font-black text-[11px] uppercase tracking-widest">Масштаб</h3>
+                </div>
+            </div>
+
+            <p class="font-bold text-base md:text-lg text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
+                Бизнесу нужен <span class="gradient-text">не агент — а изменённый процесс</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 23: Тезис 21 — Демо-день -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-23">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <span class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Часть 2. Демо-день и формат презентации</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-6 text-center text-gray-900">Тезис 21 · Демо-день — это<br><span class="gradient-text">защита бизнес-кейса, а не шоу технологий</span></h2>
+
+            <!-- Прожектор не на роботе, а на процессе -->
+            <div class="flex flex-col md:flex-row gap-4 w-full max-w-5xl mb-4 items-stretch">
+                <div class="flex-1 bg-gray-50 border border-gray-200 p-5 rounded-3xl relative">
+                    <div class="absolute -top-3 left-5 bg-red-500 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow"><i class="ph-bold ph-x mr-1"></i>Не показываем</div>
+                    <div class="mt-3 space-y-2">
+                        <div class="bg-white p-2 rounded-lg flex items-center gap-2 border border-gray-200"><i class="ph-fill ph-robot text-gray-400"></i><span class="text-xs text-gray-700">«Какой у нас классный агент»</span></div>
+                        <div class="bg-white p-2 rounded-lg flex items-center gap-2 border border-gray-200"><i class="ph-fill ph-cursor-click text-gray-400"></i><span class="text-xs text-gray-700">25 функций интерфейса</span></div>
+                        <div class="bg-white p-2 rounded-lg flex items-center gap-2 border border-gray-200"><i class="ph-fill ph-confetti text-gray-400"></i><span class="text-xs text-gray-700">Шоу технологий</span></div>
+                    </div>
+                </div>
+                <div class="flex-[1.3] bg-purple-50 border-2 border-purple-300 p-5 rounded-3xl shadow-lg relative">
+                    <div class="absolute -top-3 left-5 bg-purple-600 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow"><i class="ph-bold ph-check mr-1"></i>Показываем</div>
+                    <div class="mt-3 space-y-2">
+                        <div class="bg-white p-2 rounded-lg flex items-center gap-2 border border-purple-100"><i class="ph-fill ph-flow-arrow text-purple-500"></i><span class="text-xs text-purple-900 font-bold">Как изменился процесс</span></div>
+                        <div class="bg-white p-2 rounded-lg flex items-center gap-2 border border-purple-100"><i class="ph-fill ph-coins text-purple-500"></i><span class="text-xs text-purple-900 font-bold">Как изменилась экономика</span></div>
+                        <div class="bg-white p-2 rounded-lg flex items-center gap-2 border border-purple-100"><i class="ph-fill ph-user-focus text-purple-500"></i><span class="text-xs text-purple-900 font-bold">Кто отвечает за результат</span></div>
+                        <div class="bg-white p-2 rounded-lg flex items-center gap-2 border border-purple-100"><i class="ph-fill ph-arrows-out text-purple-500"></i><span class="text-xs text-purple-900 font-bold">Как масштабировать</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <p class="font-bold text-base md:text-lg text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
+                Защищаем <span class="gradient-text">бизнес-кейс трансформации</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 24: Тезис 22 — Начало презентации -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-24">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <span class="text-xs font-bold text-orange-500 uppercase tracking-widest mb-2">Тезис 22</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-6 text-center text-gray-900">Начинаем не с агента, <br>а с <span class="gradient-text">процесса и точки отсчёта</span></h2>
+
+            <!-- Макет первого слайда -->
+            <div class="bg-white border-2 border-purple-300 rounded-3xl shadow-2xl p-5 w-full max-w-4xl mb-4">
+                <div class="bg-gradient-to-r from-purple-50 to-orange-50 p-2.5 rounded-xl mb-3 text-center">
+                    <span class="text-[10px] font-black text-purple-600 uppercase tracking-widest">Так выглядит первый слайд</span>
+                </div>
+                <h3 class="font-black text-gray-900 text-lg mb-3 text-center">Обработка клиентского запроса</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                    <div class="bg-red-50 border border-red-200 p-3 rounded-xl">
+                        <p class="text-[10px] font-bold text-red-600 uppercase tracking-widest mb-1">3 главные боли</p>
+                        <ul class="text-xs text-red-900 space-y-1">
+                            <li>• Ручной сбор данных</li>
+                            <li>• Зависимость от эксперта</li>
+                            <li>• Нет статуса для клиента</li>
+                        </ul>
+                    </div>
+                    <div class="bg-purple-50 border border-purple-200 p-3 rounded-xl">
+                        <p class="text-[10px] font-bold text-purple-600 uppercase tracking-widest mb-1">3 числа точки отсчёта</p>
+                        <ul class="text-xs text-purple-900 space-y-1">
+                            <li>• 8 часов на запрос</li>
+                            <li>• 1 800 ₽ — стоимость операции</li>
+                            <li>• 300 запросов / месяц</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="bg-orange-50 border border-orange-200 px-3 py-2 rounded-lg text-center"><p class="text-xs text-orange-900">Стоимость процесса: <strong>540 000 ₽ / месяц</strong></p></div>
+            </div>
+
+            <p class="font-bold text-base md:text-lg text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
+                Без «было» — «стало» <span class="gradient-text">не производит впечатления</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 25: Тезис 23 — Целевая модель (То Be) -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-25">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <span class="text-xs font-bold text-orange-500 uppercase tracking-widest mb-2">Тезис 23</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-6 text-center text-gray-900">Целевая модель показывает<br><span class="gradient-text">новую логику работы</span></h2>
+
+            <div class="w-full max-w-5xl mb-4">
+                <!-- Дорожка агента -->
+                <div class="bg-purple-50 border-2 border-purple-200 rounded-2xl p-3 mb-2 shadow-sm">
+                    <div class="flex items-center gap-3 mb-2"><div class="w-9 h-9 bg-purple-200 rounded-xl flex items-center justify-center text-purple-700"><i class="ph-fill ph-robot"></i></div><span class="font-black text-purple-800 uppercase tracking-widest text-xs">Что делает агент</span></div>
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-1.5">
+                        <div class="bg-white p-1.5 rounded-lg border border-purple-100 text-[11px] text-purple-900 text-center">Классифицирует</div>
+                        <div class="bg-white p-1.5 rounded-lg border border-purple-100 text-[11px] text-purple-900 text-center">Достаёт данные</div>
+                        <div class="bg-white p-1.5 rounded-lg border border-purple-100 text-[11px] text-purple-900 text-center">Готовит черновик</div>
+                        <div class="bg-white p-1.5 rounded-lg border border-purple-100 text-[11px] text-purple-900 text-center">Оценивает уверенность</div>
+                        <div class="bg-white p-1.5 rounded-lg border border-purple-100 text-[11px] text-purple-900 text-center">Эскалирует сложные</div>
+                    </div>
+                </div>
+                <!-- Дорожка человека -->
+                <div class="bg-blue-50 border-2 border-blue-200 rounded-2xl p-3 mb-2 shadow-sm">
+                    <div class="flex items-center gap-3 mb-2"><div class="w-9 h-9 bg-blue-200 rounded-xl flex items-center justify-center text-blue-700"><i class="ph-fill ph-user-focus"></i></div><span class="font-black text-blue-800 uppercase tracking-widest text-xs">Что делает человек</span></div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-1.5">
+                        <div class="bg-white p-1.5 rounded-lg border border-blue-100 text-[11px] text-blue-900 text-center">Проверяет сложные случаи</div>
+                        <div class="bg-white p-1.5 rounded-lg border border-blue-100 text-[11px] text-blue-900 text-center">Утверждает финальный ответ</div>
+                        <div class="bg-white p-1.5 rounded-lg border border-blue-100 text-[11px] text-blue-900 text-center">Улучшает правила работы</div>
+                    </div>
+                </div>
+                <!-- Данные и метрики -->
+                <div class="bg-gradient-to-r from-purple-50 to-orange-50 border border-purple-100 rounded-xl p-2">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-center">
+                        <div class="text-[11px] text-gray-700"><i class="ph-fill ph-database text-blue-500"></i> База знаний</div>
+                        <div class="text-[11px] text-gray-700"><i class="ph-fill ph-buildings text-purple-500"></i> CRM, история</div>
+                        <div class="text-[11px] text-gray-700"><i class="ph-fill ph-shield-check text-green-500"></i> Контроль качества</div>
+                        <div class="text-[11px] text-gray-700"><i class="ph-fill ph-chart-bar text-orange-500"></i> Авто-метрики</div>
+                    </div>
+                </div>
+            </div>
+
+            <p class="font-bold text-base md:text-lg text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
+                5–7 шагов, роль человека и <span class="gradient-text">откуда берётся контекст</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 26: Тезис 24 — Объяснить агента (граф навыков) -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-26">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <span class="text-xs font-bold text-orange-500 uppercase tracking-widest mb-2">Тезис 24</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-6 text-center text-gray-900">Не чёрный ящик — <span class="gradient-text">граф навыков агента</span></h2>
+
+            <!-- Граф навыков: центр + 8 навыков -->
+            <div class="relative w-full max-w-5xl mb-4">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                    <div class="bg-white border border-blue-200 p-2.5 rounded-2xl text-center shadow-sm"><i class="ph-fill ph-tag text-blue-500 text-xl"></i><p class="text-[11px] text-gray-700 font-bold mt-1">Классификация</p></div>
+                    <div class="bg-white border border-purple-200 p-2.5 rounded-2xl text-center shadow-sm"><i class="ph-fill ph-magnifying-glass text-purple-500 text-xl"></i><p class="text-[11px] text-gray-700 font-bold mt-1">Поиск по знаниям</p></div>
+                    <div class="bg-white border border-orange-200 p-2.5 rounded-2xl text-center shadow-sm"><i class="ph-fill ph-database text-orange-500 text-xl"></i><p class="text-[11px] text-gray-700 font-bold mt-1">Работа с CRM</p></div>
+                    <div class="bg-white border border-green-200 p-2.5 rounded-2xl text-center shadow-sm"><i class="ph-fill ph-pencil text-green-500 text-xl"></i><p class="text-[11px] text-gray-700 font-bold mt-1">Генерация ответа</p></div>
+                </div>
+                <!-- Центр -->
+                <div class="flex justify-center my-3">
+                    <div class="bg-gradient-to-br from-purple-600 to-orange-500 p-4 rounded-3xl text-white text-center shadow-2xl border-4 border-white">
+                        <i class="ph-fill ph-robot text-4xl"></i>
+                        <p class="text-sm font-black mt-1">АГЕНТ</p>
+                        <p class="text-[10px] opacity-80">помощник поддержки</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                    <div class="bg-white border border-pink-200 p-2.5 rounded-2xl text-center shadow-sm"><i class="ph-fill ph-target text-pink-500 text-xl"></i><p class="text-[11px] text-gray-700 font-bold mt-1">Оценка уверенности</p></div>
+                    <div class="bg-white border border-red-200 p-2.5 rounded-2xl text-center shadow-sm"><i class="ph-fill ph-arrow-bend-up-right text-red-500 text-xl"></i><p class="text-[11px] text-gray-700 font-bold mt-1">Эскалация</p></div>
+                    <div class="bg-white border border-yellow-200 p-2.5 rounded-2xl text-center shadow-sm"><i class="ph-fill ph-clipboard-text text-yellow-600 text-xl"></i><p class="text-[11px] text-gray-700 font-bold mt-1">Логирование</p></div>
+                    <div class="bg-white border border-blue-200 p-2.5 rounded-2xl text-center shadow-sm"><i class="ph-fill ph-chart-bar text-blue-500 text-xl"></i><p class="text-[11px] text-gray-700 font-bold mt-1">Метрики</p></div>
+                </div>
+            </div>
+
+            <p class="font-bold text-base md:text-lg text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
+                Понятен как <span class="gradient-text">сотрудник в оргструктуре</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 27: Тезис 25 — Роль человека (H0-H3) -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-27">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <span class="text-xs font-bold text-orange-500 uppercase tracking-widest mb-2">Тезис 25</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-6 text-center text-gray-900">Роль человека: <span class="gradient-text">четыре уровня участия</span></h2>
+
+            <!-- Шкала H0-H3 -->
+            <div class="w-full max-w-5xl mb-4">
+                <div class="hidden md:flex justify-between text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1 px-4">
+                    <span><i class="ph-fill ph-robot mr-1"></i> Больше автономии ИИ</span>
+                    <span><i class="ph-fill ph-user-focus ml-1"></i> Больше контроля человека</span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                    <div class="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-300 p-4 rounded-3xl shadow-md text-center relative">
+                        <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-black shadow border-4 border-white">H0</div>
+                        <div class="mt-3"><i class="ph-fill ph-eye text-blue-500 text-2xl"></i></div>
+                        <h3 class="font-black text-blue-700 text-sm mt-1">Оператор</h3>
+                        <p class="text-[11px] text-blue-800 mt-1">Только следит, всё на автомате</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-purple-50 to-purple-100 border-2 border-purple-300 p-4 rounded-3xl shadow-md text-center relative">
+                        <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-10 h-10 bg-purple-500 text-white rounded-full flex items-center justify-center text-sm font-black shadow border-4 border-white">H1</div>
+                        <div class="mt-3"><i class="ph-fill ph-check-square text-purple-500 text-2xl"></i></div>
+                        <h3 class="font-black text-purple-700 text-sm mt-1">Супервайзер</h3>
+                        <p class="text-[11px] text-purple-800 mt-1">Принимает решения по ключевым шагам</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-orange-50 to-orange-100 border-2 border-orange-300 p-4 rounded-3xl shadow-md text-center relative">
+                        <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-10 h-10 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-black shadow border-4 border-white">H2</div>
+                        <div class="mt-3"><i class="ph-fill ph-flag-banner text-orange-500 text-2xl"></i></div>
+                        <h3 class="font-black text-orange-700 text-sm mt-1">Менеджер</h3>
+                        <p class="text-[11px] text-orange-800 mt-1">Принимает контекст и направляет работу</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-pink-50 to-pink-100 border-2 border-pink-300 p-4 rounded-3xl shadow-md text-center relative">
+                        <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-10 h-10 bg-pink-500 text-white rounded-full flex items-center justify-center text-sm font-black shadow border-4 border-white">H3</div>
+                        <div class="mt-3"><i class="ph-fill ph-pen-nib text-pink-500 text-2xl"></i></div>
+                        <h3 class="font-black text-pink-700 text-sm mt-1">Соавтор</h3>
+                        <p class="text-[11px] text-pink-800 mt-1">Работает вместе с агентом, делит ответственность</p>
+                    </div>
+                </div>
+            </div>
+
+            <p class="font-bold text-base md:text-lg text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
+                Уровень участия зависит от <span class="gradient-text">риска и зрелости процесса</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 28: Тезис 26 — Один полный сценарий -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-28">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <span class="text-xs font-bold text-orange-500 uppercase tracking-widest mb-2">Тезис 26</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-6 text-center text-gray-900">Один понятный сценарий —<br><span class="gradient-text">от начала до конца</span></h2>
+
+            <!-- Лента сценария -->
+            <div class="flex flex-wrap items-stretch justify-center gap-1.5 w-full max-w-5xl mb-3">
+                <div class="bg-white border-2 border-blue-300 px-3 py-3 rounded-2xl shadow-md text-center flex-1 min-w-[110px]">
+                    <div class="text-2xl mb-1">📨</div>
+                    <span class="text-[10px] font-black text-blue-700 uppercase tracking-widest">Запрос</span>
+                </div>
+                <i class="ph-bold ph-caret-right text-purple-400 text-xl self-center"></i>
+                <div class="bg-white border-2 border-purple-300 px-3 py-3 rounded-2xl shadow-md text-center flex-1 min-w-[110px]">
+                    <div class="text-2xl mb-1">🤖</div>
+                    <span class="text-[10px] font-black text-purple-700 uppercase tracking-widest">Агент</span>
+                </div>
+                <i class="ph-bold ph-caret-right text-purple-400 text-xl self-center"></i>
+                <div class="bg-white border-2 border-blue-300 px-3 py-3 rounded-2xl shadow-md text-center flex-1 min-w-[110px]">
+                    <div class="text-2xl mb-1">👤</div>
+                    <span class="text-[10px] font-black text-blue-700 uppercase tracking-widest">Контроль</span>
+                </div>
+                <i class="ph-bold ph-caret-right text-purple-400 text-xl self-center"></i>
+                <div class="bg-white border-2 border-green-300 px-3 py-3 rounded-2xl shadow-md text-center flex-1 min-w-[110px]">
+                    <div class="text-2xl mb-1">✅</div>
+                    <span class="text-[10px] font-black text-green-700 uppercase tracking-widest">Результат</span>
+                </div>
+                <i class="ph-bold ph-caret-right text-purple-400 text-xl self-center"></i>
+                <div class="bg-gradient-to-br from-purple-600 to-orange-500 text-white px-3 py-3 rounded-2xl shadow-xl text-center flex-1 min-w-[110px]">
+                    <div class="text-2xl mb-1">📊</div>
+                    <span class="text-[10px] font-black uppercase tracking-widest">Метрика</span>
+                </div>
+            </div>
+
+            <!-- Что показывать в каждой зоне -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 w-full max-w-5xl mb-3">
+                <div class="bg-blue-50 border border-blue-200 p-3 rounded-2xl"><p class="text-xs text-blue-900"><strong>Что пришло:</strong> реальный запрос клиента, его контекст</p></div>
+                <div class="bg-purple-50 border border-purple-200 p-3 rounded-2xl"><p class="text-xs text-purple-900"><strong>Логика агента:</strong> какие источники, почему именно так</p></div>
+                <div class="bg-orange-50 border border-orange-200 p-3 rounded-2xl"><p class="text-xs text-orange-900"><strong>Решение человека:</strong> подтвердил / правил / отказался</p></div>
+                <div class="bg-green-50 border border-green-200 p-3 rounded-2xl"><p class="text-xs text-green-900"><strong>Метрика:</strong> время, тип кейса, стоимость операции</p></div>
+            </div>
+
+            <p class="font-bold text-base md:text-lg text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
+                Лучше один сценарий, <span class="gradient-text">чем десять поверхностных функций</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 29: Тезис 27 — Дашборд -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-29">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <span class="text-xs font-bold text-orange-500 uppercase tracking-widest mb-2">Тезис 27</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-6 text-center text-gray-900">Дашборд — доказательство<br><span class="gradient-text">управляемости и эффекта</span></h2>
+
+            <!-- Макет дашборда -->
+            <div class="bg-white border border-gray-200 rounded-3xl shadow-2xl p-5 w-full max-w-5xl mb-3">
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    <div class="bg-blue-50 border border-blue-200 p-3 rounded-2xl">
+                        <div class="flex items-center gap-2 mb-1"><i class="ph-fill ph-clock text-blue-500"></i><span class="text-[10px] text-blue-600 font-bold uppercase">Время обработки</span></div>
+                        <p class="text-xl font-black text-gray-900">4 мин <span class="text-[10px] text-green-600">↓ −80%</span></p>
+                    </div>
+                    <div class="bg-purple-50 border border-purple-200 p-3 rounded-2xl">
+                        <div class="flex items-center gap-2 mb-1"><i class="ph-fill ph-robot text-purple-500"></i><span class="text-[10px] text-purple-600 font-bold uppercase">Автоматизация</span></div>
+                        <p class="text-xl font-black text-gray-900">80%</p>
+                    </div>
+                    <div class="bg-orange-50 border border-orange-200 p-3 rounded-2xl">
+                        <div class="flex items-center gap-2 mb-1"><i class="ph-fill ph-user text-orange-500"></i><span class="text-[10px] text-orange-600 font-bold uppercase">Участие человека</span></div>
+                        <p class="text-xl font-black text-gray-900">20%</p>
+                    </div>
+                    <div class="bg-red-50 border border-red-200 p-3 rounded-2xl">
+                        <div class="flex items-center gap-2 mb-1"><i class="ph-fill ph-bug text-red-500"></i><span class="text-[10px] text-red-600 font-bold uppercase">Ошибки</span></div>
+                        <p class="text-xl font-black text-gray-900">3% <span class="text-[10px] text-green-600">↓ −5 п.п.</span></p>
+                    </div>
+                    <div class="bg-green-50 border border-green-200 p-3 rounded-2xl">
+                        <div class="flex items-center gap-2 mb-1"><i class="ph-fill ph-hourglass text-green-500"></i><span class="text-[10px] text-green-600 font-bold uppercase">Экономия</span></div>
+                        <p class="text-xl font-black text-gray-900">266 ч / мес</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-purple-600 to-orange-500 p-3 rounded-2xl text-white shadow-md">
+                        <div class="flex items-center gap-2 mb-1"><i class="ph-fill ph-coins"></i><span class="text-[10px] font-bold uppercase opacity-80">Стоимость операции</span></div>
+                        <p class="text-xl font-black">120 ₽ <span class="text-[10px] opacity-80">было 300</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-2 max-w-3xl w-full text-center mb-3">
+                <p class="text-xs text-yellow-900"><i class="ph-fill ph-info text-yellow-600"></i> Маркируем честно: <strong>факт пилота / тест / прогноз</strong></p>
+            </div>
+
+            <p class="font-bold text-base md:text-lg text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
+                Это приборная панель <span class="gradient-text">новой операционной модели</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 30: Тезис 28 — Защита эффекта простой логикой -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-30">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <span class="text-xs font-bold text-orange-500 uppercase tracking-widest mb-2">Тезис 28</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-6 text-center text-gray-900">Защита эффекта — <span class="gradient-text">простая логика, которой верят</span></h2>
+
+            <!-- Лестница расчёта -->
+            <div class="w-full max-w-5xl mb-3 space-y-1">
+                <div class="bg-blue-100 border border-blue-200 p-2.5 rounded-lg flex items-center gap-3"><span class="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-[11px] font-bold shrink-0">1</span><span class="text-xs text-blue-900 font-bold flex-1">Сколько операций / мес</span><span class="text-xs text-blue-700">1 000</span></div>
+                <div class="bg-blue-100 border border-blue-200 p-2.5 rounded-lg flex items-center gap-3 ml-3"><span class="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-[11px] font-bold shrink-0">2</span><span class="text-xs text-blue-900 font-bold flex-1">Время до / после</span><span class="text-xs text-blue-700">20 → 8 мин</span></div>
+                <div class="bg-purple-100 border border-purple-200 p-2.5 rounded-lg flex items-center gap-3 ml-6"><span class="w-6 h-6 bg-purple-500 text-white rounded-full flex items-center justify-center text-[11px] font-bold shrink-0">3</span><span class="text-xs text-purple-900 font-bold flex-1">Экономия часов</span><span class="text-xs text-purple-700">200 ч</span></div>
+                <div class="bg-purple-100 border border-purple-200 p-2.5 rounded-lg flex items-center gap-3 ml-9"><span class="w-6 h-6 bg-purple-500 text-white rounded-full flex items-center justify-center text-[11px] font-bold shrink-0">4</span><span class="text-xs text-purple-900 font-bold flex-1">Стоимость часа</span><span class="text-xs text-purple-700">1 500 ₽</span></div>
+                <div class="bg-orange-100 border border-orange-200 p-2.5 rounded-lg flex items-center gap-3 ml-12"><span class="w-6 h-6 bg-orange-500 text-white rounded-full flex items-center justify-center text-[11px] font-bold shrink-0">5</span><span class="text-xs text-orange-900 font-bold flex-1">Стоимость ИИ-решения</span><span class="text-xs text-orange-700">80 т.₽ / мес</span></div>
+                <div class="bg-orange-100 border border-orange-200 p-2.5 rounded-lg flex items-center gap-3 ml-16"><span class="w-6 h-6 bg-orange-500 text-white rounded-full flex items-center justify-center text-[11px] font-bold shrink-0">6</span><span class="text-xs text-orange-900 font-bold flex-1">Тип эффекта</span><span class="text-xs text-orange-700">прямая экономия</span></div>
+                <div class="bg-gradient-to-r from-purple-600 to-orange-500 p-2.5 rounded-lg flex items-center gap-3 ml-20 text-white shadow-md"><span class="w-6 h-6 bg-white/20 text-white rounded-full flex items-center justify-center text-[11px] font-bold shrink-0">7</span><span class="text-xs font-black flex-1">Чистый эффект</span><span class="text-xs font-bold">220 000 ₽ / мес</span></div>
+            </div>
+
+            <p class="font-bold text-base md:text-lg text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
+                На демо-дне доверие <span class="gradient-text">сильнее математической сложности</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 31: Тезис 29 — Финальный слайд: что дальше? -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-31">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <span class="text-xs font-bold text-orange-500 uppercase tracking-widest mb-2">Тезис 29</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-6 text-center text-gray-900">Финал отвечает на вопрос:<br><span class="gradient-text">что дальше?</span></h2>
+
+            <div class="flex flex-col md:flex-row gap-4 w-full max-w-5xl mb-4 items-stretch">
+                <!-- Готово / нужно / риски -->
+                <div class="flex-[1.4] bg-white border border-gray-200 p-5 rounded-3xl shadow-sm">
+                    <div class="space-y-2">
+                        <div class="bg-green-50 border border-green-200 p-2.5 rounded-xl flex items-center gap-3"><i class="ph-fill ph-check-circle text-green-500 text-xl"></i><div><p class="text-[10px] font-bold text-green-700 uppercase">Готово</p><p class="text-xs text-green-900">Пилот, метрики, формула эффекта</p></div></div>
+                        <div class="bg-yellow-50 border border-yellow-200 p-2.5 rounded-xl flex items-center gap-3"><i class="ph-fill ph-warning text-yellow-600 text-xl"></i><div><p class="text-[10px] font-bold text-yellow-700 uppercase">Нужно доработать</p><p class="text-xs text-yellow-900">Подключить CRM и базу знаний</p></div></div>
+                        <div class="bg-purple-50 border border-purple-200 p-2.5 rounded-xl flex items-center gap-3"><i class="ph-fill ph-arrows-out text-purple-500 text-xl"></i><div><p class="text-[10px] font-bold text-purple-700 uppercase">При масштабировании</p><p class="text-xs text-purple-900">Снижение времени обработки на 40–60%</p></div></div>
+                    </div>
+                </div>
+                <!-- Дорожная карта 30/90 -->
+                <div class="flex-1 bg-gradient-to-br from-purple-600 to-orange-500 p-5 rounded-3xl shadow-xl text-white flex flex-col justify-center">
+                    <span class="text-[10px] font-black uppercase tracking-widest opacity-80 mb-2">Дорожная карта</span>
+                    <div class="space-y-2">
+                        <div class="bg-white/15 p-2.5 rounded-xl backdrop-blur border border-white/20">
+                            <div class="flex items-center gap-2"><span class="bg-white/30 text-white text-[10px] font-black px-2 py-0.5 rounded-full">30 дней</span><span class="text-xs font-bold">Доказать</span></div>
+                            <p class="text-[10px] opacity-90 mt-1">Подключить данные, пилот, метрики</p>
+                        </div>
+                        <div class="bg-white/15 p-2.5 rounded-xl backdrop-blur border border-white/20">
+                            <div class="flex items-center gap-2"><span class="bg-white/30 text-white text-[10px] font-black px-2 py-0.5 rounded-full">90 дней</span><span class="text-xs font-bold">Масштабировать</span></div>
+                            <p class="text-[10px] opacity-90 mt-1">Дашборд, обучение, регламент</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-purple-50 border-2 border-purple-200 rounded-xl px-4 py-2 max-w-4xl w-full text-center mb-3">
+                <p class="text-sm text-purple-900"><strong>От руководства:</strong> доступ к данным · владелец процесса · бюджет на интеграцию · решение о масштабировании</p>
+            </div>
+
+            <p class="font-bold text-base md:text-lg text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
+                Демо-день — это <span class="gradient-text">точка принятия решения</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 32: Тезис 30 — История изменения экономики -->
+    <div class="slide-container px-4 md:px-12 opacity-0 pointer-events-none translate-y-8" id="slide-32">
+        <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
+            <span class="text-xs font-bold text-purple-500 uppercase tracking-widest mb-2">Тезис 30 · Финал</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-6 text-center text-gray-900">Хорошая презентация — это<br><span class="gradient-text">история изменения экономики</span></h2>
+
+            <!-- Дуга истории -->
+            <div class="w-full max-w-5xl mb-4">
+                <div class="flex flex-col md:flex-row items-stretch justify-between gap-2">
+                    <div class="flex-1 bg-red-50 border-2 border-red-200 p-3 rounded-2xl text-center shadow-sm">
+                        <i class="ph-fill ph-warning-octagon text-red-500 text-2xl"></i>
+                        <h3 class="font-black text-red-700 uppercase tracking-widest text-[10px] mt-1">Была боль</h3>
+                    </div>
+                    <i class="ph-bold ph-arrow-right text-xl text-gray-400 self-center hidden md:block"></i>
+                    <div class="flex-1 bg-blue-50 border-2 border-blue-200 p-3 rounded-2xl text-center shadow-sm">
+                        <i class="ph-fill ph-flow-arrow text-blue-500 text-2xl"></i>
+                        <h3 class="font-black text-blue-700 uppercase tracking-widest text-[10px] mt-1">Был процесс</h3>
+                    </div>
+                    <i class="ph-bold ph-arrow-right text-xl text-gray-400 self-center hidden md:block"></i>
+                    <div class="flex-1 bg-purple-50 border-2 border-purple-200 p-3 rounded-2xl text-center shadow-md">
+                        <i class="ph-fill ph-arrows-clockwise text-purple-500 text-2xl"></i>
+                        <h3 class="font-black text-purple-700 uppercase tracking-widest text-[10px] mt-1">Новая модель</h3>
+                    </div>
+                    <i class="ph-bold ph-arrow-right text-xl text-gray-400 self-center hidden md:block"></i>
+                    <div class="flex-1 bg-orange-50 border-2 border-orange-200 p-3 rounded-2xl text-center shadow-md">
+                        <i class="ph-fill ph-chart-line-up text-orange-500 text-2xl"></i>
+                        <h3 class="font-black text-orange-700 uppercase tracking-widest text-[10px] mt-1">Метрики выросли</h3>
+                    </div>
+                    <i class="ph-bold ph-arrow-right text-xl text-gray-400 self-center hidden md:block"></i>
+                    <div class="flex-1 bg-gradient-to-br from-purple-600 to-orange-500 p-3 rounded-2xl text-center shadow-xl text-white">
+                        <i class="ph-fill ph-coins text-2xl"></i>
+                        <h3 class="font-black uppercase tracking-widest text-[10px] mt-1">Экономика изменилась</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5 финальных понятий -->
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-2 w-full max-w-5xl mb-4">
+                <div class="bg-white border border-purple-200 p-3 rounded-2xl shadow-sm text-center">
+                    <i class="ph-fill ph-robot text-purple-500 text-xl"></i>
+                    <h3 class="font-bold text-purple-700 text-xs mt-1">Агент</h3>
+                    <p class="text-[10px] text-gray-500">Инструмент</p>
+                </div>
+                <div class="bg-white border border-blue-200 p-3 rounded-2xl shadow-sm text-center">
+                    <i class="ph-fill ph-user-focus text-blue-500 text-xl"></i>
+                    <h3 class="font-bold text-blue-700 text-xs mt-1">Человек</h3>
+                    <p class="text-[10px] text-gray-500">Владелец результата</p>
+                </div>
+                <div class="bg-white border border-green-200 p-3 rounded-2xl shadow-sm text-center">
+                    <i class="ph-fill ph-chart-bar text-green-500 text-xl"></i>
+                    <h3 class="font-bold text-green-700 text-xs mt-1">Метрики</h3>
+                    <p class="text-[10px] text-gray-500">Доказательство</p>
+                </div>
+                <div class="bg-white border border-orange-200 p-3 rounded-2xl shadow-sm text-center">
+                    <i class="ph-fill ph-coins text-orange-500 text-xl"></i>
+                    <h3 class="font-bold text-orange-700 text-xs mt-1">Экономика</h3>
+                    <p class="text-[10px] text-gray-500">Причина масштабировать</p>
+                </div>
+                <div class="bg-gradient-to-br from-purple-600 to-orange-500 p-3 rounded-2xl shadow-lg text-white text-center">
+                    <i class="ph-fill ph-map-trifold text-xl"></i>
+                    <h3 class="font-bold text-xs mt-1">Дорожная карта</h3>
+                    <p class="text-[10px] opacity-80">Путь к внедрению</p>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 p-1 rounded-2xl shadow-2xl w-full max-w-3xl">
+                <div class="bg-white px-5 py-3 rounded-xl text-center">
+                    <p class="text-sm md:text-base font-black text-gray-900">На демо-дне вы защищаете не агента — <span class="gradient-text">вы защищаете новую экономику процесса</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const totalSlides = 33;
+        let currentSlide = 0;
+        const progressBar = document.getElementById('progress-bar');
+        const body = document.body;
+        const params = new URLSearchParams(window.location.search);
+        const exportMode =
+            params.has('pdf') ||
+            params.get('mode') === 'pdf' ||
+            window.location.hash === '#pdf';
+
+        function updateProgress() {
+            if (!progressBar) return;
+            const progress = ((currentSlide + 1) / totalSlides) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        function updateSlides() {
+            for (let i = 0; i < totalSlides; i++) {
+                const slide = document.getElementById(`slide-${i}`);
+                if (!slide) continue;
+
+                if (i === currentSlide) {
+                    slide.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-8', '-translate-y-8');
+                    slide.classList.add('opacity-100', 'translate-y-0');
+                } else if (i < currentSlide) {
+                    slide.classList.remove('opacity-100', 'translate-y-0', 'translate-y-8');
+                    slide.classList.add('opacity-0', 'pointer-events-none', '-translate-y-8');
+                } else {
+                    slide.classList.remove('opacity-100', 'translate-y-0', '-translate-y-8');
+                    slide.classList.add('opacity-0', 'pointer-events-none', 'translate-y-8');
+                }
+            }
+            updateProgress();
+        }
+
+        function showAllSlidesForPdf() {
+            body.classList.add('pdf-export-mode');
+            for (let i = 0; i < totalSlides; i++) {
+                const slide = document.getElementById(`slide-${i}`);
+                if (!slide) continue;
+                slide.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-8', '-translate-y-8');
+                slide.classList.add('opacity-100');
+                slide.style.transform = 'none';
+                slide.style.pointerEvents = 'auto';
+            }
+            if (progressBar) progressBar.style.width = '100%';
+        }
+
+        function restoreInteractiveMode() {
+            body.classList.remove('pdf-export-mode');
+            for (let i = 0; i < totalSlides; i++) {
+                const slide = document.getElementById(`slide-${i}`);
+                if (!slide) continue;
+                slide.style.transform = '';
+                slide.style.pointerEvents = '';
+            }
+            updateSlides();
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlides();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlides();
+            }
+        }
+
+        window.addEventListener('beforeprint', () => { showAllSlidesForPdf(); });
+        window.addEventListener('afterprint', () => { if (!exportMode) restoreInteractiveMode(); });
+
+        if (exportMode) {
+            showAllSlidesForPdf();
+            return;
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (['ArrowRight', ' ', 'Enter', 'PageDown'].includes(e.key)) {
+                nextSlide();
+            } else if (['ArrowLeft', 'PageUp', 'Backspace'].includes(e.key)) {
+                prevSlide();
+            }
+        });
+
+        window.addEventListener('mousedown', (e) => {
+            if (e.target.closest('a') || e.target.closest('button') || e.target.closest('.code-block')) return;
+            if (e.button === 0) nextSlide();
+            if (e.button === 2) prevSlide();
+        });
+
+        window.addEventListener('contextmenu', e => e.preventDefault());
+
+        let touchStartX = 0;
+        window.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        window.addEventListener('touchend', e => {
+            const touchEndX = e.changedTouches[0].screenX;
+            const swipeThreshold = 50;
+            if (touchStartX - touchEndX > swipeThreshold) {
+                nextSlide();
+            } else if (touchEndX - touchStartX > swipeThreshold) {
+                prevSlide();
+            }
+        }, { passive: true });
+
+        updateSlides();
+    });
+</script>
+
+</body>
+</html>
