@@ -50,6 +50,7 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
+            align-items: center;
         }
 
         .gradient-text {
@@ -118,7 +119,7 @@
 
     <!-- СЛАЙД 1: Title -->
     <div class="slide-container items-center p-6 md:p-12 opacity-100 translate-y-0" id="slide-0">
-        <div class="content-z text-center w-full max-w-5xl px-4">
+        <div class="content-z text-center w-full max-w-5xl mx-auto px-4">
             <!-- Блок Иконок -->
             <div class="flex justify-center items-center gap-4 md:gap-8 mb-6 md:mb-10">
                 <i class="ph-duotone ph-cpu text-4xl md:text-6xl text-purple-400"></i>
@@ -140,15 +141,15 @@
 
     <!-- СЛАЙД 2: О спикере -->
     <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-1">
-        <div class="content-z w-full max-w-6xl flex flex-col md:flex-row items-center gap-8 md:gap-16">
-            <div class="w-full md:w-2/5 flex flex-col items-center">
+        <div class="content-z w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-16 items-center">
+            <div class="w-full md:col-span-5 flex flex-col items-center">
                 <div class="w-40 h-40 md:w-56 md:h-56 lg:w-72 lg:h-72 rounded-full gradient-bg p-1 lg:p-1.5 mb-4 lg:mb-8 shadow-2xl shadow-purple-500/20 shrink-0">
                     <img src="https://avatars.githubusercontent.com/u/8148517?v=4" alt="Андрей Кузьминых" class="w-full h-full rounded-full border-[3px] lg:border-4 border-white object-cover bg-white">
                 </div>
                 <h2 class="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 text-center">Андрей Кузьминых</h2>
                 <p class="text-sm md:text-lg lg:text-xl font-medium text-gray-500 mt-2 text-center">Founder — Andre AI Technologies</p>
             </div>
-            <div class="w-full md:w-3/5">
+            <div class="w-full md:col-span-7">
                 <ul class="space-y-3 lg:space-y-6 text-sm md:text-lg lg:text-[22px] text-gray-700 leading-tight">
                     <li class="flex items-center gap-3 lg:gap-5">
                         <div class="w-8 h-8 lg:w-12 lg:h-12 rounded-lg lg:rounded-xl bg-orange-50 flex items-center justify-center shrink-0"><i class="ph-fill ph-star text-lg lg:text-2xl text-orange-500"></i></div>
@@ -185,7 +186,7 @@
 
     <!-- СЛАЙД 3: Программа курса -->
     <div class="slide-container items-center p-4 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-2">
-        <div class="content-z w-full max-w-6xl">
+        <div class="content-z w-full max-w-6xl mx-auto">
             <h2 class="text-3xl md:text-5xl lg:text-[54px] font-black mb-6 md:mb-12 text-center text-gray-900">Программа <span class="gradient-text">курса</span></h2>
             
             <div class="grid grid-cols-1 md:grid-cols-2 auto-rows-fr gap-x-4 gap-y-3 lg:gap-x-12 lg:gap-y-5 text-sm md:text-base lg:text-xl w-full">
@@ -239,10 +240,10 @@
 
     <!-- СЛАЙД 4: Модуль 1 -->
     <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-3">
-        <div class="content-z w-full max-w-6xl flex flex-col md:flex-row items-center gap-8 lg:gap-16">
-            <div class="w-full md:w-[55%] space-y-4 md:space-y-6 lg:space-y-8">
+        <div class="content-z w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-16 items-center">
+            <div class="w-full md:col-span-7 space-y-4 md:space-y-6 lg:space-y-8">
                 <div>
-                    <span class="text-orange-500 font-bold tracking-[0.2em] uppercase text-xs md:text-sm mb-2 block flex items-center gap-2"><i class="ph-fill ph-flag"></i> Модуль 1</span>
+                    <span class="text-orange-500 font-bold tracking-[0.2em] uppercase text-xs md:text-sm mb-2 flex items-center gap-2"><i class="ph-fill ph-flag"></i> Модуль 1</span>
                     <h2 class="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 leading-tight">Введение в стратегию <br class="hidden lg:block">внедрения ИИ</h2>
                 </div>
                 <div>
@@ -264,7 +265,7 @@
                     </ul>
                 </div>
             </div>
-            <div class="w-full md:w-[45%] flex justify-center md:justify-end">
+            <div class="w-full md:col-span-5 flex justify-center md:justify-end">
                 <div class="w-full max-w-sm lg:max-w-md flex flex-col gap-3 lg:gap-4">
                     <div class="bg-gray-50 border border-gray-200 p-3 lg:p-5 rounded-lg lg:rounded-xl flex items-center gap-3 lg:gap-5 opacity-50">
                         <div class="bg-gray-300 text-white text-xs lg:text-sm font-bold px-3 py-1 lg:px-4 lg:py-1.5 rounded-full shrink-0">Ур. 1</div>
@@ -289,10 +290,10 @@
 
     <!-- СЛАЙД 5: Модуль 2 -->
     <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-4">
-        <div class="content-z w-full max-w-6xl flex flex-col md:flex-row items-center gap-8 lg:gap-16">
-            <div class="w-full md:w-[55%] space-y-4 md:space-y-6 lg:space-y-8">
+        <div class="content-z w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-16 items-center">
+            <div class="w-full md:col-span-7 space-y-4 md:space-y-6 lg:space-y-8">
                 <div>
-                    <span class="text-purple-600 font-bold tracking-[0.2em] uppercase text-xs md:text-sm mb-2 block flex items-center gap-2"><i class="ph-fill ph-git-branch"></i> Модуль 2</span>
+                    <span class="text-purple-600 font-bold tracking-[0.2em] uppercase text-xs md:text-sm mb-2 flex items-center gap-2"><i class="ph-fill ph-git-branch"></i> Модуль 2</span>
                     <h2 class="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 leading-tight">Моделирование <br class="hidden lg:block">бизнес-процессов</h2>
                 </div>
                 <div class="border-l-4 border-orange-500 pl-4 lg:pl-6 py-1 lg:py-2 bg-orange-50/30 rounded-r-lg">
@@ -316,7 +317,7 @@
                     </ul>
                 </div>
             </div>
-            <div class="w-full md:w-[45%] flex flex-col justify-center items-center gap-4 lg:gap-6">
+            <div class="w-full md:col-span-5 flex flex-col justify-center items-center gap-4 lg:gap-6">
                 <!-- Визуал: AS-IS -> TO-BE -->
                 <div class="w-full max-w-xs bg-white border border-gray-200 shadow-sm rounded-xl lg:rounded-2xl p-4 lg:p-6 relative flex flex-col items-center">
                     <div class="absolute -top-3 lg:-top-4 bg-gray-200 text-gray-600 font-bold px-3 py-1 lg:px-5 lg:py-1.5 rounded-full text-xs lg:text-sm">AS-IS Процесс</div>
@@ -349,10 +350,10 @@
 
     <!-- СЛАЙД 6: Модуль 3 -->
     <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-5">
-        <div class="content-z w-full max-w-6xl flex flex-col md:flex-row items-center gap-8 lg:gap-16">
-            <div class="w-full md:w-[55%] space-y-4 md:space-y-6 lg:space-y-8">
+        <div class="content-z w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-16 items-center">
+            <div class="w-full md:col-span-7 space-y-4 md:space-y-6 lg:space-y-8">
                 <div>
-                    <span class="text-orange-500 font-bold tracking-[0.2em] uppercase text-xs md:text-sm mb-2 block flex items-center gap-2"><i class="ph-fill ph-code-block"></i> Модуль 3</span>
+                    <span class="text-orange-500 font-bold tracking-[0.2em] uppercase text-xs md:text-sm mb-2 flex items-center gap-2"><i class="ph-fill ph-code-block"></i> Модуль 3</span>
                     <h2 class="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 leading-tight">Проектирование и разработка агентов</h2>
                 </div>
                 <div>
@@ -372,7 +373,7 @@
                     </ul>
                 </div>
             </div>
-            <div class="w-full md:w-[45%] flex justify-center md:justify-end">
+            <div class="w-full md:col-span-5 flex justify-center md:justify-end">
                 <!-- Визуал: архитектура -->
                 <div class="w-full max-w-sm lg:max-w-md flex flex-col gap-2 lg:gap-3">
                     <div class="w-full bg-white border border-gray-200 rounded-xl lg:rounded-2xl p-3 lg:p-5 flex flex-col items-center shadow-sm relative z-30">
@@ -410,10 +411,10 @@
 
     <!-- СЛАЙД 7: Модуль 4 -->
     <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-6">
-        <div class="content-z w-full max-w-6xl flex flex-col md:flex-row items-center gap-8 lg:gap-16">
-            <div class="w-full md:w-[55%] space-y-4 md:space-y-6 lg:space-y-8">
+        <div class="content-z w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-16 items-center">
+            <div class="w-full md:col-span-7 space-y-4 md:space-y-6 lg:space-y-8">
                 <div>
-                    <span class="text-purple-600 font-bold tracking-[0.2em] uppercase text-xs md:text-sm mb-2 block flex items-center gap-2"><i class="ph-fill ph-share-network"></i> Модуль 4</span>
+                    <span class="text-purple-600 font-bold tracking-[0.2em] uppercase text-xs md:text-sm mb-2 flex items-center gap-2"><i class="ph-fill ph-share-network"></i> Модуль 4</span>
                     <h2 class="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 leading-tight">Мультиагентные системы</h2>
                 </div>
                 <div class="border-l-4 border-orange-500 pl-4 lg:pl-6 py-1 lg:py-2 bg-orange-50/30 rounded-r-lg">
@@ -437,7 +438,7 @@
                     </ul>
                 </div>
             </div>
-            <div class="w-full md:w-[45%] flex justify-center items-center">
+            <div class="w-full md:col-span-5 flex justify-center items-center">
                 <!-- Визуал: Граф агентов -->
                 <div class="relative w-64 h-64 md:w-80 md:h-80 lg:w-[400px] lg:h-[400px]">
                     <svg class="absolute inset-0 w-full h-full" style="z-index: 1;">
@@ -474,10 +475,10 @@
 
     <!-- СЛАЙД 8: Модуль 5 -->
     <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-7">
-        <div class="content-z w-full max-w-6xl flex flex-col md:flex-row items-center gap-8 lg:gap-16">
-            <div class="w-full md:w-[55%] space-y-4 md:space-y-6 lg:space-y-8">
+        <div class="content-z w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-16 items-center">
+            <div class="w-full md:col-span-7 space-y-4 md:space-y-6 lg:space-y-8">
                 <div>
-                    <span class="text-orange-500 font-bold tracking-[0.2em] uppercase text-xs md:text-sm mb-2 block flex items-center gap-2"><i class="ph-fill ph-rocket"></i> Модуль 5</span>
+                    <span class="text-orange-500 font-bold tracking-[0.2em] uppercase text-xs md:text-sm mb-2 flex items-center gap-2"><i class="ph-fill ph-rocket"></i> Модуль 5</span>
                     <h2 class="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 leading-tight">Продвинутые техники разработки</h2>
                 </div>
                 <div>
@@ -498,7 +499,7 @@
                     </ul>
                 </div>
             </div>
-            <div class="w-full md:w-[45%] flex justify-center md:justify-end">
+            <div class="w-full md:col-span-5 flex justify-center md:justify-end">
                 <!-- Визуал: Pipeline -->
                 <div class="flex items-center w-full max-w-sm lg:max-w-full justify-between">
                     <div class="flex flex-col items-center shrink-0">
@@ -532,10 +533,10 @@
 
     <!-- СЛАЙД 9: Модуль 6 -->
     <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-8">
-        <div class="content-z w-full max-w-6xl flex flex-col md:flex-row items-center gap-8 lg:gap-16">
-            <div class="w-full md:w-[55%] space-y-4 md:space-y-6 lg:space-y-8">
+        <div class="content-z w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-16 items-center">
+            <div class="w-full md:col-span-7 space-y-4 md:space-y-6 lg:space-y-8">
                 <div>
-                    <span class="text-purple-600 font-bold tracking-[0.2em] uppercase text-xs md:text-sm mb-2 block flex items-center gap-2"><i class="ph-fill ph-chart-line-up"></i> Модуль 6</span>
+                    <span class="text-purple-600 font-bold tracking-[0.2em] uppercase text-xs md:text-sm mb-2 flex items-center gap-2"><i class="ph-fill ph-chart-line-up"></i> Модуль 6</span>
                     <h2 class="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 leading-tight">Тестирование и масштабирование AI</h2>
                 </div>
                 <div class="border-l-4 border-orange-500 pl-4 lg:pl-6 py-1 lg:py-2 bg-orange-50/30 rounded-r-lg">
@@ -559,7 +560,7 @@
                     </ul>
                 </div>
             </div>
-            <div class="w-full md:w-[45%] flex justify-center md:justify-end">
+            <div class="w-full md:col-span-5 flex justify-center md:justify-end">
                 <!-- Визуал: dashboard метрик -->
                 <div class="w-full max-w-sm lg:max-w-md bg-white rounded-xl lg:rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-gray-100 p-5 lg:p-8">
                     <div class="flex items-center justify-between mb-5 lg:mb-8">
@@ -594,10 +595,10 @@
 
     <!-- СЛАЙД 10: Модуль 7 -->
     <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-9">
-        <div class="content-z w-full max-w-6xl flex flex-col md:flex-row items-center gap-8 lg:gap-16">
-            <div class="w-full md:w-[55%] space-y-4 md:space-y-6 lg:space-y-8">
+        <div class="content-z w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-16 items-center">
+            <div class="w-full md:col-span-7 space-y-4 md:space-y-6 lg:space-y-8">
                 <div>
-                    <span class="text-orange-500 font-bold tracking-[0.2em] uppercase text-xs md:text-sm mb-2 block flex items-center gap-2"><i class="ph-fill ph-users-three"></i> Модуль 7</span>
+                    <span class="text-orange-500 font-bold tracking-[0.2em] uppercase text-xs md:text-sm mb-2 flex items-center gap-2"><i class="ph-fill ph-users-three"></i> Модуль 7</span>
                     <h2 class="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 leading-tight">Управление изменениями</h2>
                 </div>
                 <div class="border-l-4 border-purple-500 pl-4 lg:pl-6 py-1 lg:py-2 bg-purple-50/30 rounded-r-lg">
@@ -620,7 +621,7 @@
                     </ul>
                 </div>
             </div>
-            <div class="w-full md:w-[45%] flex justify-center">
+            <div class="w-full md:col-span-5 flex justify-center">
                 <!-- Визуал: Human-AI collaboration -->
                 <div class="flex items-center gap-4 lg:gap-8 w-full justify-center">
                     <div class="w-24 h-24 md:w-32 md:h-32 lg:w-40 lg:h-40 rounded-full bg-orange-50 border-[3px] lg:border-[6px] border-orange-200 flex items-center justify-center shadow-lg relative shrink-0">
@@ -642,10 +643,10 @@
 
     <!-- СЛАЙД 11: Модуль 8 -->
     <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-10">
-        <div class="content-z w-full max-w-6xl flex flex-col md:flex-row items-center gap-8 lg:gap-16">
-            <div class="w-full md:w-[55%] space-y-4 md:space-y-6 lg:space-y-8">
+        <div class="content-z w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-16 items-center">
+            <div class="w-full md:col-span-7 space-y-4 md:space-y-6 lg:space-y-8">
                 <div>
-                    <span class="text-purple-600 font-bold tracking-[0.2em] uppercase text-xs md:text-sm mb-2 block flex items-center gap-2"><i class="ph-fill ph-coins"></i> Модуль 8</span>
+                    <span class="text-purple-600 font-bold tracking-[0.2em] uppercase text-xs md:text-sm mb-2 flex items-center gap-2"><i class="ph-fill ph-coins"></i> Модуль 8</span>
                     <h2 class="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 leading-tight">ROI и экономические эффекты</h2>
                 </div>
                 <div class="border-l-4 border-orange-500 pl-4 lg:pl-6 py-1 lg:py-2 bg-orange-50/30 rounded-r-lg">
@@ -668,7 +669,7 @@
                     </ul>
                 </div>
             </div>
-            <div class="w-full md:w-[45%] flex justify-center md:justify-end">
+            <div class="w-full md:col-span-5 flex justify-center md:justify-end">
                 <!-- Визуал: график ROI -->
                 <div class="w-full max-w-sm lg:max-w-md relative bg-white p-6 lg:p-8 rounded-xl lg:rounded-2xl border border-gray-100 shadow-xl">
                     <h4 class="text-base lg:text-lg font-bold text-gray-800 mb-4 lg:mb-6">Динамика эффективности</h4>
@@ -709,7 +710,7 @@
 
     <!-- СЛАЙД 12: Финал -->
     <div class="slide-container items-center p-6 md:p-12 opacity-0 pointer-events-none translate-y-8" id="slide-11">
-        <div class="content-z w-full max-w-5xl text-center">
+        <div class="content-z w-full max-w-5xl mx-auto text-center">
             <!-- Уменьшена иконка сверху -->
             <div class="mb-4 md:mb-6 inline-block p-4 md:p-6 rounded-full bg-gradient-to-br from-purple-50 to-orange-50 shadow-inner">
                 <i class="ph-fill ph-presentation-chart text-5xl md:text-[70px] text-purple-600 drop-shadow-sm"></i>
