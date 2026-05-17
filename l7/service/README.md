@@ -26,10 +26,10 @@ export HEDRA_API_KEY=sk_hedra_2nH_wGiV6G3rYDAxZeOq9Qs0BNai68nvullGOPQyMOyP1mDWCU
 curl -L "https://i.ibb.co/VcCKP5Kg/photo-2026-05-18-01-41-54.jpg" -o l7/data/avatar.jpg
 
 # пробный прогон — 1 слайд
-python -m l7.service.generate --lecture l7 --limit 1
+python3 -m l7.service.generate --lecture l7 --limit 1
 
 # боевой прогон — все 50
-python -m l7.service.generate --lecture l7
+python3 -m l7.service.generate --lecture l7
 ```
 
 ## CLI флаги
@@ -81,11 +81,11 @@ l7/
 
 ```bash
 # unit + integration
-python -m pytest l7/tests/unit l7/tests/integration
+python3 -m pytest l7/tests/unit l7/tests/integration
 
 # e2e с реальной Hedra (требует HEDRA_API_KEY, ondemand)
-HEDRA_API_KEY=... python -m pytest l7/tests/e2e/test_one_slide_real_hedra.py
+HEDRA_API_KEY=... python3 -m pytest l7/tests/e2e/test_one_slide_real_hedra.py
 
 # e2e UI (playwright)
-python -m pytest l7/tests/e2e/test_html_player_playwright.py
+python3 -m pytest l7/tests/e2e/test_html_player_playwright.py
 ```

@@ -44,7 +44,7 @@ cd ~/automation
 source .venv/bin/activate
 export HEDRA_API_KEY=sk_hedra_...    # из gcloud secret manager или env
 curl -L "https://i.ibb.co/VcCKP5Kg/photo-2026-05-18-01-41-54.jpg" -o l7/data/avatar.jpg
-python -m l7.service.generate --lecture l7
+python3 -m l7.service.generate --lecture l7
 ```
 
 Подробнее: [`l7/service/README.md`](./service/README.md).
@@ -74,7 +74,7 @@ BDD-юзкейсы → NR/NFR с ID → архитектура → тесты �
 ## Тесты
 
 ```bash
-python -m pytest l7/tests/unit l7/tests/integration -q
+python3 -m pytest l7/tests/unit l7/tests/integration -q
 ```
 
 Сегодня: 25 / 25 зелёных.
