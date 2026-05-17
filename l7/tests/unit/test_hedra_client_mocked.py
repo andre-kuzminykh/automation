@@ -12,12 +12,19 @@ from l7.service.hedra_client import HedraClient, HedraError
 
 
 def _make_session(responses):
-    """responses: list of dicts {status, json}; returns a MagicMock session."""
+    """responses: list of dicts {status, json}; returns a MagicMock session.
+
+    When the scripted list is exhausted, returns 404 — keeps tests
+    tolerant of the multi-endpoint discovery in list_voices().
+    """
     session = MagicMock()
     iterator = iter(responses)
 
     def _request(method, url, **kwargs):
-        item = next(iterator)
+        try:
+            item = next(iterator)
+        except StopIteration:
+            item = {"status": 404, "json": {"error": "exhausted"}}
         resp = MagicMock()
         resp.status_code = item["status"]
         resp.json.return_value = item.get("json", {})

@@ -152,17 +152,58 @@ class HedraClient:
         )
 
     # ----------------------------------------------------------------- voices
-    def list_voices(self) -> list[dict[str, Any]]:
-        """GET /voices — list available TTS voices."""
-        resp = self._request("GET", "/voices")
-        data = resp.json()
+    _VOICES_ATTEMPTS = (
+        # (path, params) — covering known Hedra variants where user-owned
+        # cloned voices live behind a query flag or a separate path.
+        ("/voices", None),
+        ("/voices", {"include_user_voices": "true"}),
+        ("/voices", {"owner": "me"}),
+        ("/voices", {"type": "cloned"}),
+        ("/voices", {"is_public": "false"}),
+        ("/voices/user", None),
+        ("/user/voices", None),
+        ("/account/voices", None),
+        ("/me/voices", None),
+    )
+
+    @staticmethod
+    def _extract_voices(data: Any) -> list[dict] | None:
         if isinstance(data, list):
             return data
         if isinstance(data, dict):
-            for key in ("voices", "items", "data"):
-                if key in data and isinstance(data[key], list):
+            for key in ("voices", "items", "data", "results"):
+                if isinstance(data.get(key), list):
                     return data[key]
-        raise HedraError(f"list_voices: unexpected shape {type(data).__name__}")
+        return None
+
+    def list_voices(self) -> list[dict[str, Any]]:
+        """Aggregate voices from every endpoint we know Hedra might use.
+
+        Returns a list of unique voices (deduped by id). Each item carries
+        a `_source` key showing which path produced it.
+        """
+        seen: dict[str, dict] = {}
+        for path, params in self._VOICES_ATTEMPTS:
+            try:
+                resp = self._request("GET", path, params=params)
+            except HedraError as exc:
+                LOGGER.info(
+                    "voices_endpoint_skipped",
+                    extra={"path": path, "params": params, "err": str(exc)[:80]},
+                )
+                continue
+            voices = self._extract_voices(resp.json())
+            if not voices:
+                continue
+            for v in voices:
+                vid = str(v.get("id") or v.get("voice_id") or "")
+                if not vid or vid in seen:
+                    continue
+                v["_source"] = f"{path}?{params}" if params else path
+                seen[vid] = v
+        if not seen:
+            raise HedraError("list_voices: no voices returned by any endpoint")
+        return list(seen.values())
 
     def resolve_voice_id(self, *, name_hint: str = "aisala") -> str:
         """Find a voice by display name (case-insensitive). Hedra
