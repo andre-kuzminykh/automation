@@ -1,0 +1,30 @@
+# Secrets (NFR-F5-1)
+.env
+.env.*
+*.key
+*.pem
+secrets/
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Build / cache
+.tmp/
+*.log
+.coverage
+htmlcov/
+
+# Manifest staging artefacts
+*.json.tmp
+*.broken.json
