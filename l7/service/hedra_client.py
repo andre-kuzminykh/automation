@@ -276,22 +276,26 @@ class HedraClient:
     # Hedra Avatar in the 2026 schema rejects inline text+voice with
     # "video generation without valid audio input". Audio must be pre-
     # generated as a separate asset and referenced by audio_id.
+    # Hedra's discriminator tags (discovered via 422 from /generations):
+    #   'video', 'text_to_speech', 'text_to_sound', 'image', 'image_to_image',
+    #   'image_upscale', 'video_upscale', 'audio_isolation',
+    #   'speech_to_speech', 'voice_clone', 'audio_from_video',
+    #   'video_with_audio', 'video_to_video', 'motion_control'
+    # For talking-head from text + voice clone, the right tag is
+    # `video_with_audio` (single call). If Hedra rejects inline text+voice,
+    # we fall back to `text_to_speech` → asset_id → `video`.
     _AUDIO_ATTEMPTS = (
-        # (path, payload_template). {text}, {voice_id} are substituted.
-        ("/audio", {"text": "{text}", "voice_id": "{voice_id}"}),
-        ("/audio/generate", {"text": "{text}", "voice_id": "{voice_id}"}),
-        ("/tts", {"text": "{text}", "voice_id": "{voice_id}"}),
         ("/generations", {
-            "type": "audio",
-            "text_prompt": "{text}",
-            "voice_id": "{voice_id}",
-        }),
-        ("/generations", {
-            "type": "audio",
+            "type": "text_to_speech",
             "generated_audio_inputs": {
                 "text_prompt": "{text}",
                 "voice_id": "{voice_id}",
             },
+        }),
+        ("/generations", {
+            "type": "text_to_speech",
+            "text_prompt": "{text}",
+            "voice_id": "{voice_id}",
         }),
     )
 
@@ -369,22 +373,22 @@ class HedraClient:
             "duration_ms": duration_seconds_max * 1000,
         }
         if audio_id:
+            # Two-step path: audio was pre-generated, use type=video.
             video_inputs["audio_id"] = audio_id
+            payload_type = "video"
         else:
-            # Legacy inline TTS — may not work for Hedra Avatar 2026 but
-            # kept for the few models (e.g., Hedra Character 3) that still
-            # accept text+voice in one call.
+            # One-shot path: text + voice synthesised inline.
             video_inputs["text_prompt"] = text
             video_inputs["voice_id"] = voice_id
+            payload_type = "video_with_audio"
 
         payload = {
-            "type": "video",
+            "type": payload_type,
             "ai_model_id": ai_model_id,
             "start_keyframe_id": avatar_asset_id,
             "generated_video_inputs": video_inputs,
         }
         if audio_id:
-            # Some Hedra schemas expect audio_id at the top level too.
             payload["audio_id"] = audio_id
         LOGGER.info("submit_generation_payload",
                     extra={"payload": payload})

@@ -94,9 +94,12 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         help="explicit Hedra voice_id UUID; if set, skips /voices lookup",
     )
     p.add_argument(
-        "--no-two-step-audio",
+        "--two-step-audio",
         action="store_true",
-        help="skip pre-generating audio (legacy inline TTS, for Character 3)",
+        help=(
+            "Generate audio first via type=text_to_speech, then video. "
+            "Use this if a one-shot type=video_with_audio call fails."
+        ),
     )
     return p.parse_args(argv)
 
@@ -274,7 +277,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 
         try:
             audio_id: str | None = None
-            if not args.no_two_step_audio:
+            if args.two_step_audio:
                 log.info("slide_audio_submit", extra={"slide": slide.id})
                 audio_path, audio_gen_id = client.submit_audio_generation(
                     text=slide.narration, voice_id=voice_id

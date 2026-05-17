@@ -61,7 +61,7 @@ def test_upload_asset_binary(hedra_env, tmp_path: Path):
     assert "files" in call.kwargs
 
 
-# T-U-HC-3a — without audio_id, payload includes legacy inline text+voice.
+# T-U-HC-3a — one-shot: type=video_with_audio, inline text+voice.
 def test_submit_generation_payload_inline_tts(hedra_env):
     session = _make_session([{"status": 200, "json": {"id": "gen_77"}}])
     client = HedraClient(session=session)
@@ -75,7 +75,7 @@ def test_submit_generation_payload_inline_tts(hedra_env):
     )
     assert gid == "gen_77"
     body = session.request.call_args.kwargs["json"]
-    assert body["type"] == "video"
+    assert body["type"] == "video_with_audio"
     assert body["ai_model_id"] == "model-abc-uuid"
     assert body["start_keyframe_id"] == "asset_x"
     inputs = body["generated_video_inputs"]
@@ -105,11 +105,11 @@ def test_submit_generation_payload_with_audio_id(hedra_env):
     assert "voice_id" not in inputs
 
 
-# T-U-HC-7 — audio generation tries multiple endpoints, picks the first 2xx.
+# T-U-HC-7 — audio generation uses type=text_to_speech and tries shapes
+# until one succeeds.
 def test_submit_audio_generation_fallback(hedra_env):
     session = _make_session([
-        {"status": 404, "json": {"error": "not found"}},
-        {"status": 404, "json": {"error": "not found"}},
+        {"status": 422, "json": {"messages": ["wrong shape"]}},
         {"status": 200, "json": {"id": "audio_42"}},
     ])
     client = HedraClient(session=session)
@@ -117,6 +117,7 @@ def test_submit_audio_generation_fallback(hedra_env):
         text="hello", voice_id="voice-uuid"
     )
     assert audio_id == "audio_42"
+    assert "/generations" in path
 
 
 # T-U-HC-6 — resolve_video_model_id picks the closest model by name.
