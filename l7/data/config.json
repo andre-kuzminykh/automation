@@ -1,7 +1,13 @@
 {
   "hedra": {
     "api_base": "https://api.hedra.com/web-app/public",
-    "model": "Hedra Avatar 540p",
+    "model": "Hedra Avatar",
+    "model_id_known": "26f0fc66-152b-40ab-abed-76c43df99bc8",
+    "model_alternatives": {
+      "Hedra Avatar":      "26f0fc66-152b-40ab-abed-76c43df99bc8",
+      "Hedra Character 3": "d1dd37a3-e39a-4854-a298-6510289f9cf2",
+      "Hedra Omnia":       "ab372b84-432f-44f5-bacc-c2542465f712"
+    },
     "resolution": "540p",
     "aspect_ratio": "1:1",
     "voice_id": "aisala",
