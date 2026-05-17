@@ -83,6 +83,16 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help="print all Hedra models (id + name) and exit",
     )
+    p.add_argument(
+        "--list-voices",
+        action="store_true",
+        help="print all Hedra voices (id + name) and exit",
+    )
+    p.add_argument(
+        "--voice-id",
+        default=None,
+        help="explicit Hedra voice_id UUID; if set, skips /voices lookup",
+    )
     return p.parse_args(argv)
 
 
@@ -178,6 +188,20 @@ def main(argv: Sequence[str] | None = None) -> int:
             print(f"{mid}\t{mtype:8s}\t{name}")
         print(f"\nTotal: {len(models)} models")
         return 0
+
+    if args.list_voices:
+        try:
+            voices = client.list_voices()
+        except HedraError as exc:
+            log.error("list_voices_failed", extra={"err": str(exc)})
+            return 2
+        for v in voices:
+            vid = v.get("id") or v.get("voice_id") or "?"
+            name = v.get("name") or v.get("display_name") or "?"
+            lang = v.get("language") or v.get("locale") or ""
+            print(f"{vid}\t{lang:8s}\t{name}")
+        print(f"\nTotal: {len(voices)} voices")
+        return 0
     avatar_asset_id = manifest.data.get("avatar_asset_id")
     if not avatar_asset_id:
         if not paths["avatar"].exists():
@@ -204,6 +228,25 @@ def main(argv: Sequence[str] | None = None) -> int:
         manifest.write_atomic()
     log.info("ai_model_id_resolved", extra={"ai_model_id": ai_model_id})
 
+    # Resolve the voice id (UUID). Hedra rejects display-name `voice_id`
+    # values with "video generation without valid audio input".
+    voice_id = (
+        args.voice_id
+        or manifest.data.get("voice_id_uuid")
+    )
+    voice_hint = config["hedra"].get("voice_id", "aisala")
+    if not voice_id:
+        try:
+            voice_id = client.resolve_voice_id(name_hint=voice_hint)
+        except HedraError as exc:
+            log.error("voice_resolution_failed", extra={"err": str(exc)})
+            return 2
+        manifest.set_top("voice_id_uuid", voice_id)
+        manifest.set_top("voice_name", voice_hint)
+        manifest.write_atomic()
+    log.info("voice_id_resolved",
+             extra={"voice_id": voice_id, "voice_name": voice_hint})
+
     ok, skipped, failed = [], [], []
     consecutive_failures = 0
 
@@ -228,7 +271,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 ai_model_id=ai_model_id,
                 avatar_asset_id=avatar_asset_id,
                 text=slide.narration,
-                voice_id=config["hedra"]["voice_id"],
+                voice_id=voice_id,
                 resolution=config["hedra"]["resolution"],
                 aspect_ratio=config["hedra"]["aspect_ratio"],
             )

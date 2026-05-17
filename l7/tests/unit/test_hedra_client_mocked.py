@@ -109,6 +109,30 @@ def test_resolve_video_model_id_matches_avatar_keyword(hedra_env):
     assert mid == "uuid-hedra"
 
 
+def test_resolve_voice_id_by_name(hedra_env):
+    session = _make_session([
+        {"status": 200, "json": [
+            {"id": "v-en-1", "name": "Adam",   "language": "en"},
+            {"id": "v-ru-1", "name": "aisala", "language": "ru"},
+            {"id": "v-ru-2", "name": "Nikita", "language": "ru"},
+        ]},
+    ])
+    client = HedraClient(session=session)
+    assert client.resolve_voice_id(name_hint="aisala") == "v-ru-1"
+
+
+def test_resolve_voice_id_raises_when_unknown(hedra_env):
+    session = _make_session([
+        {"status": 200, "json": [
+            {"id": "v-1", "name": "Adam"},
+        ]},
+    ])
+    client = HedraClient(session=session)
+    with pytest.raises(HedraError) as exc:
+        client.resolve_voice_id(name_hint="nonexistent")
+    assert "not found" in str(exc.value)
+
+
 def test_resolve_video_model_id_raises_when_no_hedra_match(hedra_env):
     """Raise (not silently pick a Kling/Veo model) when no Hedra/avatar match."""
     session = _make_session([

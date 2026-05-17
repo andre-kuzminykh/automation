@@ -87,8 +87,14 @@ class MockHedra:
     def resolve_video_model_id(self, *, name_hint: str = "") -> str:
         return "mock-model-uuid"
 
+    def resolve_voice_id(self, *, name_hint: str = "") -> str:
+        return "mock-voice-uuid"
+
     def list_models(self) -> list:
         return [{"id": "mock-model-uuid", "name": "Mock Avatar 540p", "type": "video"}]
+
+    def list_voices(self) -> list:
+        return [{"id": "mock-voice-uuid", "name": "aisala", "language": "ru"}]
 
     def submit_generation(self, *, avatar_asset_id, text, **_kw) -> str:
         self.submitted.append(text)

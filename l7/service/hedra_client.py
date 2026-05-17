@@ -151,6 +151,54 @@ class HedraClient:
             f"{all_names}"
         )
 
+    # ----------------------------------------------------------------- voices
+    def list_voices(self) -> list[dict[str, Any]]:
+        """GET /voices — list available TTS voices."""
+        resp = self._request("GET", "/voices")
+        data = resp.json()
+        if isinstance(data, list):
+            return data
+        if isinstance(data, dict):
+            for key in ("voices", "items", "data"):
+                if key in data and isinstance(data[key], list):
+                    return data[key]
+        raise HedraError(f"list_voices: unexpected shape {type(data).__name__}")
+
+    def resolve_voice_id(self, *, name_hint: str = "aisala") -> str:
+        """Find a voice by display name (case-insensitive). Hedra
+        `voice_id` in /generations is a UUID; a name like `aisala` is
+        rejected with "video generation without valid audio input"."""
+        voices = self.list_voices()
+        LOGGER.info(
+            "voices_listed",
+            extra={"count": len(voices),
+                   "names_head": [v.get("name") for v in voices][:20]},
+        )
+
+        def voice_id(v: dict) -> str:
+            return str(v.get("id") or v.get("voice_id"))
+
+        # 1) exact name match
+        for v in voices:
+            if v.get("name") and v["name"].lower() == name_hint.lower():
+                return voice_id(v)
+        # 2) substring match
+        hint = name_hint.lower()
+        for v in voices:
+            if v.get("name") and hint in v["name"].lower():
+                return voice_id(v)
+        # 3) display_name fallback (some APIs expose both)
+        for v in voices:
+            for key in ("display_name", "label", "title"):
+                if v.get(key) and name_hint.lower() in str(v[key]).lower():
+                    return voice_id(v)
+
+        raise HedraError(
+            f"resolve_voice_id: voice {name_hint!r} not found. "
+            f"Pass --voice-id explicitly. Available ({len(voices)}): "
+            f"{[v.get('name') for v in voices]}"
+        )
+
     # ----------------------------------------------------------------- assets
     def create_image_asset(self, name: str) -> str:
         """POST /assets — create image asset metadata, return asset_id.
