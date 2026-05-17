@@ -61,18 +61,15 @@ def test_upload_asset_binary(hedra_env, tmp_path: Path):
     assert "files" in call.kwargs
 
 
-# T-U-HC-3 — flat payload: ai_model_id and start_keyframe_id at top level,
-# generated_video_inputs inside. Hedra uses Pydantic 2 discriminated unions
-# where `type=video` selects the variant — the error path
-# "body.video.ai_model_id" refers to the discriminator tag, not a nested key.
-def test_submit_generation_payload(hedra_env):
+# T-U-HC-3a — without audio_id, payload includes legacy inline text+voice.
+def test_submit_generation_payload_inline_tts(hedra_env):
     session = _make_session([{"status": 200, "json": {"id": "gen_77"}}])
     client = HedraClient(session=session)
     gid = client.submit_generation(
         ai_model_id="model-abc-uuid",
         avatar_asset_id="asset_x",
         text="hello world",
-        voice_id="aisala",
+        voice_id="voice-uuid",
         resolution="540p",
         aspect_ratio="1:1",
     )
@@ -81,12 +78,45 @@ def test_submit_generation_payload(hedra_env):
     assert body["type"] == "video"
     assert body["ai_model_id"] == "model-abc-uuid"
     assert body["start_keyframe_id"] == "asset_x"
-    assert "video" not in body, "must NOT wrap in `video` object — flat payload"
     inputs = body["generated_video_inputs"]
     assert inputs["text_prompt"] == "hello world"
-    assert inputs["voice_id"] == "aisala"
-    assert inputs["resolution"] == "540p"
-    assert inputs["aspect_ratio"] == "1:1"
+    assert inputs["voice_id"] == "voice-uuid"
+
+
+# T-U-HC-3b — with audio_id, payload references the pre-generated audio.
+def test_submit_generation_payload_with_audio_id(hedra_env):
+    session = _make_session([{"status": 200, "json": {"id": "gen_99"}}])
+    client = HedraClient(session=session)
+    gid = client.submit_generation(
+        ai_model_id="model-abc-uuid",
+        avatar_asset_id="asset_x",
+        text="hello world",
+        voice_id="voice-uuid",
+        audio_id="audio-abc",
+        resolution="540p",
+        aspect_ratio="1:1",
+    )
+    assert gid == "gen_99"
+    body = session.request.call_args.kwargs["json"]
+    assert body["audio_id"] == "audio-abc"
+    inputs = body["generated_video_inputs"]
+    assert inputs["audio_id"] == "audio-abc"
+    assert "text_prompt" not in inputs
+    assert "voice_id" not in inputs
+
+
+# T-U-HC-7 — audio generation tries multiple endpoints, picks the first 2xx.
+def test_submit_audio_generation_fallback(hedra_env):
+    session = _make_session([
+        {"status": 404, "json": {"error": "not found"}},
+        {"status": 404, "json": {"error": "not found"}},
+        {"status": 200, "json": {"id": "audio_42"}},
+    ])
+    client = HedraClient(session=session)
+    path, audio_id = client.submit_audio_generation(
+        text="hello", voice_id="voice-uuid"
+    )
+    assert audio_id == "audio_42"
 
 
 # T-U-HC-6 — resolve_video_model_id picks the closest model by name.

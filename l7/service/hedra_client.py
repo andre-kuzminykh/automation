@@ -272,6 +272,76 @@ class HedraClient:
                 files=files,
             )
 
+    # ------------------------------------------------------------------ audio
+    # Hedra Avatar in the 2026 schema rejects inline text+voice with
+    # "video generation without valid audio input". Audio must be pre-
+    # generated as a separate asset and referenced by audio_id.
+    _AUDIO_ATTEMPTS = (
+        # (path, payload_template). {text}, {voice_id} are substituted.
+        ("/audio", {"text": "{text}", "voice_id": "{voice_id}"}),
+        ("/audio/generate", {"text": "{text}", "voice_id": "{voice_id}"}),
+        ("/tts", {"text": "{text}", "voice_id": "{voice_id}"}),
+        ("/generations", {
+            "type": "audio",
+            "text_prompt": "{text}",
+            "voice_id": "{voice_id}",
+        }),
+        ("/generations", {
+            "type": "audio",
+            "generated_audio_inputs": {
+                "text_prompt": "{text}",
+                "voice_id": "{voice_id}",
+            },
+        }),
+    )
+
+    @staticmethod
+    def _fill_template(tpl: Any, *, text: str, voice_id: str) -> Any:
+        if isinstance(tpl, str):
+            return tpl.replace("{text}", text).replace("{voice_id}", voice_id)
+        if isinstance(tpl, dict):
+            return {k: HedraClient._fill_template(v, text=text, voice_id=voice_id)
+                    for k, v in tpl.items()}
+        return tpl
+
+    def submit_audio_generation(self, *, text: str, voice_id: str) -> tuple[str, str]:
+        """POST audio request, return (path_that_worked, response_id).
+
+        Tries multiple known shapes until one succeeds. The returned id is
+        either an audio asset_id or a generation_id depending on the
+        endpoint Hedra accepts.
+        """
+        last_err: HedraError | None = None
+        for path, tpl in self._AUDIO_ATTEMPTS:
+            payload = self._fill_template(tpl, text=text, voice_id=voice_id)
+            LOGGER.info("audio_attempt",
+                        extra={"path": path, "payload_keys": list(payload.keys())})
+            try:
+                resp = self._request("POST", path, json=payload)
+            except HedraError as exc:
+                LOGGER.info("audio_attempt_failed",
+                            extra={"path": path, "err": str(exc)[:200]})
+                last_err = exc
+                continue
+            data = resp.json() if resp.text else {}
+            audio_id = (
+                data.get("id")
+                or data.get("audio_id")
+                or data.get("asset_id")
+                or data.get("generation_id")
+            )
+            if audio_id:
+                LOGGER.info("audio_submit_ok",
+                            extra={"path": path, "audio_id": audio_id})
+                return path, str(audio_id)
+            last_err = HedraError(
+                f"{path} accepted but returned no id: {data}"
+            )
+        raise HedraError(
+            f"submit_audio_generation: no endpoint accepted the request. "
+            f"Last error: {last_err}"
+        )
+
     # ------------------------------------------------------------ generations
     def submit_generation(
         self,
@@ -280,6 +350,7 @@ class HedraClient:
         avatar_asset_id: str,
         text: str,
         voice_id: str = "aisala",
+        audio_id: str | None = None,
         resolution: str = "540p",
         aspect_ratio: str = "1:1",
         duration_seconds_max: int = 120,
@@ -292,18 +363,29 @@ class HedraClient:
         must be FLAT — the `video` segment in the error path is the tag,
         not a nested object.
         """
+        video_inputs: dict[str, Any] = {
+            "resolution": resolution,
+            "aspect_ratio": aspect_ratio,
+            "duration_ms": duration_seconds_max * 1000,
+        }
+        if audio_id:
+            video_inputs["audio_id"] = audio_id
+        else:
+            # Legacy inline TTS — may not work for Hedra Avatar 2026 but
+            # kept for the few models (e.g., Hedra Character 3) that still
+            # accept text+voice in one call.
+            video_inputs["text_prompt"] = text
+            video_inputs["voice_id"] = voice_id
+
         payload = {
             "type": "video",
             "ai_model_id": ai_model_id,
             "start_keyframe_id": avatar_asset_id,
-            "generated_video_inputs": {
-                "text_prompt": text,
-                "voice_id": voice_id,
-                "resolution": resolution,
-                "aspect_ratio": aspect_ratio,
-                "duration_ms": duration_seconds_max * 1000,
-            },
+            "generated_video_inputs": video_inputs,
         }
+        if audio_id:
+            # Some Hedra schemas expect audio_id at the top level too.
+            payload["audio_id"] = audio_id
         LOGGER.info("submit_generation_payload",
                     extra={"payload": payload})
         resp = self._request("POST", "/generations", json=payload)

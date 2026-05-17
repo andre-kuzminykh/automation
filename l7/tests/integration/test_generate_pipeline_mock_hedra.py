@@ -96,6 +96,9 @@ class MockHedra:
     def list_voices(self) -> list:
         return [{"id": "mock-voice-uuid", "name": "aisala", "language": "ru"}]
 
+    def submit_audio_generation(self, *, text, voice_id) -> tuple[str, str]:
+        return "/audio", f"audio_{len(self.submitted) + 1}"
+
     def submit_generation(self, *, avatar_asset_id, text, **_kw) -> str:
         self.submitted.append(text)
         gid = f"gen_{len(self.submitted)}"
