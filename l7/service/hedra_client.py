@@ -85,6 +85,53 @@ class HedraClient:
             )
         return resp
 
+    # ----------------------------------------------------------------- models
+    def list_models(self) -> list[dict[str, Any]]:
+        """GET /models — list available AI models, returns raw list."""
+        resp = self._request("GET", "/models")
+        data = resp.json()
+        if isinstance(data, list):
+            return data
+        if isinstance(data, dict):
+            for key in ("models", "items", "data"):
+                if key in data and isinstance(data[key], list):
+                    return data[key]
+        raise HedraError(f"list_models: unexpected shape {type(data).__name__}")
+
+    def resolve_video_model_id(
+        self, *, name_hint: str = "Hedra Avatar 540p"
+    ) -> str:
+        """Find a video model by name (case-insensitive substring) or fall
+        back to the first model with `type == "video"`."""
+        models = self.list_models()
+        LOGGER.info(
+            "models_listed",
+            extra={"count": len(models),
+                   "names": [m.get("name") for m in models][:10]},
+        )
+
+        def is_video(m: dict) -> bool:
+            t = (m.get("type") or m.get("model_type") or "").lower()
+            return t == "" or t == "video"
+
+        # 1) exact (case-insensitive) name match
+        for m in models:
+            if m.get("name") and m["name"].lower() == name_hint.lower():
+                return str(m.get("id") or m.get("ai_model_id"))
+        # 2) substring match in name
+        hint_lower = name_hint.lower()
+        for m in models:
+            if m.get("name") and hint_lower in m["name"].lower() and is_video(m):
+                return str(m.get("id") or m.get("ai_model_id"))
+        # 3) first video model
+        for m in models:
+            if is_video(m):
+                return str(m.get("id") or m.get("ai_model_id"))
+        raise HedraError(
+            f"resolve_video_model_id: no model matches {name_hint!r}; "
+            f"available={[m.get('name') for m in models]}"
+        )
+
     # ----------------------------------------------------------------- assets
     def create_image_asset(self, name: str) -> str:
         """POST /assets — create image asset metadata, return asset_id.
@@ -116,24 +163,24 @@ class HedraClient:
     def submit_generation(
         self,
         *,
+        ai_model_id: str,
         avatar_asset_id: str,
         text: str,
         voice_id: str = "aisala",
-        model_name: str = "Hedra Avatar 540p",
         resolution: str = "540p",
         aspect_ratio: str = "1:1",
         duration_seconds_max: int = 120,
     ) -> str:
         """POST /generations — submit a generation job, return generation_id.
 
-        The body shape follows Hedra's current public web-app API. If the
-        provider tightens the spec, only this method needs to change.
+        Current Hedra shape (2026): `body.video.ai_model_id` is required;
+        avatar, voice and text live inside the same `video` object.
         """
         payload = {
             "type": "video",
-            "ai_model_name": model_name,
-            "start_keyframe_id": avatar_asset_id,
-            "generated_video_inputs": {
+            "video": {
+                "ai_model_id": ai_model_id,
+                "start_keyframe_id": avatar_asset_id,
                 "text_prompt": text,
                 "voice_id": voice_id,
                 "resolution": resolution,

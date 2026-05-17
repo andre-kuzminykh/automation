@@ -84,6 +84,12 @@ class MockHedra:
     def upload_asset_binary(self, asset_id: str, path) -> None:
         return None
 
+    def resolve_video_model_id(self, *, name_hint: str = "") -> str:
+        return "mock-model-uuid"
+
+    def list_models(self) -> list:
+        return [{"id": "mock-model-uuid", "name": "Mock Avatar 540p", "type": "video"}]
+
     def submit_generation(self, *, avatar_asset_id, text, **_kw) -> str:
         self.submitted.append(text)
         gid = f"gen_{len(self.submitted)}"

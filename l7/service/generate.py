@@ -64,6 +64,20 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         "--poll-timeout", type=float, default=600.0,
         help="seconds before giving up on one slide",
     )
+    p.add_argument(
+        "--max-consecutive-failures", type=int, default=3,
+        help="abort the run after N consecutive submit failures",
+    )
+    p.add_argument(
+        "--model-name",
+        default="Hedra Avatar 540p",
+        help="model name hint for resolve_video_model_id",
+    )
+    p.add_argument(
+        "--ai-model-id",
+        default=None,
+        help="explicit Hedra ai_model_id; if set, skips /models lookup",
+    )
     return p.parse_args(argv)
 
 
@@ -159,7 +173,20 @@ def main(argv: Sequence[str] | None = None) -> int:
         manifest.set_top("avatar_asset_id", avatar_asset_id)
         manifest.write_atomic()
 
+    # Resolve the AI model ID once for the whole run.
+    ai_model_id = args.ai_model_id or manifest.data.get("ai_model_id")
+    if not ai_model_id:
+        try:
+            ai_model_id = client.resolve_video_model_id(name_hint=args.model_name)
+        except HedraError as exc:
+            log.error("model_resolution_failed", extra={"err": str(exc)})
+            return 2
+        manifest.set_top("ai_model_id", ai_model_id)
+        manifest.write_atomic()
+    log.info("ai_model_id_resolved", extra={"ai_model_id": ai_model_id})
+
     ok, skipped, failed = [], [], []
+    consecutive_failures = 0
 
     for slide in slides:
         target_file = paths["videos_dir"] / f"{slide.id}.mp4"
@@ -179,10 +206,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         try:
             log.info("slide_submit", extra={"slide": slide.id})
             generation_id = client.submit_generation(
+                ai_model_id=ai_model_id,
                 avatar_asset_id=avatar_asset_id,
                 text=slide.narration,
                 voice_id=config["hedra"]["voice_id"],
-                model_name=config["hedra"]["model"],
                 resolution=config["hedra"]["resolution"],
                 aspect_ratio=config["hedra"]["aspect_ratio"],
             )
@@ -194,6 +221,18 @@ def main(argv: Sequence[str] | None = None) -> int:
             )
             manifest.write_atomic()
             failed.append(slide.id)
+            consecutive_failures += 1
+            if consecutive_failures >= args.max_consecutive_failures:
+                log.error(
+                    "abort_consecutive_failures",
+                    extra={"count": consecutive_failures,
+                           "threshold": args.max_consecutive_failures},
+                )
+                print(
+                    f"ABORT: {consecutive_failures} consecutive submit failures "
+                    f"(structural error?). Stopping run."
+                )
+                break
             continue
 
         manifest.merge_slide_result(
@@ -291,6 +330,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             extra={"slide": slide.id, "size": size, "sha256": sha[:8]},
         )
         ok.append(slide.id)
+        consecutive_failures = 0
 
     # --- Summary (NR-F1-8) ----------------------------------------------------
     summary = (

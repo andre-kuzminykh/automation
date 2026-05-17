@@ -54,27 +54,54 @@ def test_upload_asset_binary(hedra_env, tmp_path: Path):
     assert "files" in call.kwargs
 
 
-# T-U-HC-3 — submit_generation passes model, voice, resolution, aspect_ratio.
+# T-U-HC-3 — submit_generation passes model id, voice, resolution, aspect_ratio
+# inside body.video (2026 Hedra schema).
 def test_submit_generation_payload(hedra_env):
     session = _make_session([{"status": 200, "json": {"id": "gen_77"}}])
     client = HedraClient(session=session)
     gid = client.submit_generation(
+        ai_model_id="model-abc-uuid",
         avatar_asset_id="asset_x",
         text="hello world",
         voice_id="aisala",
-        model_name="Hedra Avatar 540p",
         resolution="540p",
         aspect_ratio="1:1",
     )
     assert gid == "gen_77"
     body = session.request.call_args.kwargs["json"]
-    assert body["ai_model_name"] == "Hedra Avatar 540p"
-    assert body["start_keyframe_id"] == "asset_x"
-    inputs = body["generated_video_inputs"]
-    assert inputs["text_prompt"] == "hello world"
-    assert inputs["voice_id"] == "aisala"
-    assert inputs["resolution"] == "540p"
-    assert inputs["aspect_ratio"] == "1:1"
+    video = body["video"]
+    assert video["ai_model_id"] == "model-abc-uuid"
+    assert video["start_keyframe_id"] == "asset_x"
+    assert video["text_prompt"] == "hello world"
+    assert video["voice_id"] == "aisala"
+    assert video["resolution"] == "540p"
+    assert video["aspect_ratio"] == "1:1"
+
+
+# T-U-HC-6 — resolve_video_model_id picks the closest model by name.
+def test_resolve_video_model_id_by_name(hedra_env):
+    session = _make_session([
+        {"status": 200, "json": [
+            {"id": "uuid-old",  "name": "Character-1",       "type": "video"},
+            {"id": "uuid-540",  "name": "Hedra Avatar 540p", "type": "video"},
+            {"id": "uuid-720",  "name": "Hedra Avatar 720p", "type": "video"},
+        ]},
+    ])
+    client = HedraClient(session=session)
+    mid = client.resolve_video_model_id(name_hint="Hedra Avatar 540p")
+    assert mid == "uuid-540"
+
+
+def test_resolve_video_model_id_falls_back_to_first_video(hedra_env):
+    session = _make_session([
+        {"status": 200, "json": [
+            {"id": "uuid-img", "name": "Image gen",  "type": "image"},
+            {"id": "uuid-vid", "name": "MysteryVid", "type": "video"},
+        ]},
+    ])
+    client = HedraClient(session=session)
+    mid = client.resolve_video_model_id(name_hint="nonexistent")
+    assert mid == "uuid-vid"
 
 
 # T-U-HC-4 — get_generation_status returns parsed JSON.
