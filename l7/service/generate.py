@@ -78,6 +78,11 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         default=None,
         help="explicit Hedra ai_model_id; if set, skips /models lookup",
     )
+    p.add_argument(
+        "--list-models",
+        action="store_true",
+        help="print all Hedra models (id + name) and exit",
+    )
     return p.parse_args(argv)
 
 
@@ -159,6 +164,20 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     # --- Hedra setup ----------------------------------------------------------
     client = HedraClient()
+
+    if args.list_models:
+        try:
+            models = client.list_models()
+        except HedraError as exc:
+            log.error("list_models_failed", extra={"err": str(exc)})
+            return 2
+        for m in models:
+            mid = m.get("id") or m.get("ai_model_id") or "?"
+            name = m.get("name") or "?"
+            mtype = m.get("type") or m.get("model_type") or "?"
+            print(f"{mid}\t{mtype:8s}\t{name}")
+        print(f"\nTotal: {len(models)} models")
+        return 0
     avatar_asset_id = manifest.data.get("avatar_asset_id")
     if not avatar_asset_id:
         if not paths["avatar"].exists():

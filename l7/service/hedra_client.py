@@ -98,38 +98,57 @@ class HedraClient:
                     return data[key]
         raise HedraError(f"list_models: unexpected shape {type(data).__name__}")
 
+    # Hedra has dozens of "video" models from many vendors (Kling, Veo, etc.).
+    # The ones that drive a talking-head avatar from an image carry "Hedra",
+    # "Avatar" or "Character" in their name. Search those first.
+    _AVATAR_HINTS = ("hedra avatar", "hedra character", "character-3",
+                     "hedra avatar 540", "avatar 540", "avatar")
+
     def resolve_video_model_id(
         self, *, name_hint: str = "Hedra Avatar 540p"
     ) -> str:
-        """Find a video model by name (case-insensitive substring) or fall
-        back to the first model with `type == "video"`."""
+        """Find a Hedra avatar video model by name; fall back to the first
+        model whose name contains 'hedra' or 'avatar'.
+
+        Raises HedraError with the full model list if nothing matched —
+        the user can then pass `--ai-model-id` explicitly.
+        """
         models = self.list_models()
+        all_names = [m.get("name") for m in models]
         LOGGER.info(
             "models_listed",
             extra={"count": len(models),
-                   "names": [m.get("name") for m in models][:10]},
+                   "names_head": all_names[:20]},
         )
+
+        def model_id(m: dict) -> str:
+            return str(m.get("id") or m.get("ai_model_id"))
 
         def is_video(m: dict) -> bool:
             t = (m.get("type") or m.get("model_type") or "").lower()
             return t == "" or t == "video"
 
-        # 1) exact (case-insensitive) name match
+        # 1) exact case-insensitive name match.
         for m in models:
             if m.get("name") and m["name"].lower() == name_hint.lower():
-                return str(m.get("id") or m.get("ai_model_id"))
-        # 2) substring match in name
+                return model_id(m)
+
+        # 2) substring match in the user-provided hint.
         hint_lower = name_hint.lower()
         for m in models:
             if m.get("name") and hint_lower in m["name"].lower() and is_video(m):
-                return str(m.get("id") or m.get("ai_model_id"))
-        # 3) first video model
-        for m in models:
-            if is_video(m):
-                return str(m.get("id") or m.get("ai_model_id"))
+                return model_id(m)
+
+        # 3) Hedra-specific avatar keywords (in order of preference).
+        for kw in self._AVATAR_HINTS:
+            for m in models:
+                if m.get("name") and kw in m["name"].lower() and is_video(m):
+                    return model_id(m)
+
         raise HedraError(
-            f"resolve_video_model_id: no model matches {name_hint!r}; "
-            f"available={[m.get('name') for m in models]}"
+            "resolve_video_model_id: no Hedra avatar model found. "
+            f"Pass --ai-model-id explicitly. Available models ({len(models)}): "
+            f"{all_names}"
         )
 
     # ----------------------------------------------------------------- assets
@@ -173,21 +192,27 @@ class HedraClient:
     ) -> str:
         """POST /generations — submit a generation job, return generation_id.
 
-        Current Hedra shape (2026): `body.video.ai_model_id` is required;
-        avatar, voice and text live inside the same `video` object.
+        Current Hedra schema (2026):
+            body.video.ai_model_id            (required, UUID)
+            body.video.start_keyframe_id      (asset_id of avatar image)
+            body.video.generated_video_inputs (object with text/voice/etc.)
         """
         payload = {
             "type": "video",
             "video": {
                 "ai_model_id": ai_model_id,
                 "start_keyframe_id": avatar_asset_id,
-                "text_prompt": text,
-                "voice_id": voice_id,
-                "resolution": resolution,
-                "aspect_ratio": aspect_ratio,
-                "duration_ms": duration_seconds_max * 1000,
+                "generated_video_inputs": {
+                    "text_prompt": text,
+                    "voice_id": voice_id,
+                    "resolution": resolution,
+                    "aspect_ratio": aspect_ratio,
+                    "duration_ms": duration_seconds_max * 1000,
+                },
             },
         }
+        LOGGER.info("submit_generation_payload",
+                    extra={"payload": payload})
         resp = self._request("POST", "/generations", json=payload)
         data: dict[str, Any] = resp.json()
         gen_id = data.get("id") or data.get("generation_id")
