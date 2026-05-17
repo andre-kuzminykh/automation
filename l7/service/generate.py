@@ -230,9 +230,11 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     # Resolve the voice id (UUID). Hedra rejects display-name `voice_id`
     # values with "video generation without valid audio input".
+    # Precedence: --voice-id > manifest cache > config.voice_id_known > /voices lookup.
     voice_id = (
         args.voice_id
         or manifest.data.get("voice_id_uuid")
+        or config["hedra"].get("voice_id_known")
     )
     voice_hint = config["hedra"].get("voice_id", "aisala")
     if not voice_id:
@@ -241,9 +243,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         except HedraError as exc:
             log.error("voice_resolution_failed", extra={"err": str(exc)})
             return 2
-        manifest.set_top("voice_id_uuid", voice_id)
-        manifest.set_top("voice_name", voice_hint)
-        manifest.write_atomic()
+    manifest.set_top("voice_id_uuid", voice_id)
+    manifest.set_top("voice_name", voice_hint)
+    manifest.write_atomic()
     log.info("voice_id_resolved",
              extra={"voice_id": voice_id, "voice_name": voice_hint})
 

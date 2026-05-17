@@ -205,39 +205,44 @@ class HedraClient:
             raise HedraError("list_voices: no voices returned by any endpoint")
         return list(seen.values())
 
+    # Hedra preset voices expose "name"; user-cloned voices use "voice_name".
+    _VOICE_NAME_KEYS = ("name", "voice_name", "display_name", "label", "title", "slug")
+
     def resolve_voice_id(self, *, name_hint: str = "aisala") -> str:
-        """Find a voice by display name (case-insensitive). Hedra
-        `voice_id` in /generations is a UUID; a name like `aisala` is
-        rejected with "video generation without valid audio input"."""
+        """Find a voice by display name across multiple possible name keys."""
         voices = self.list_voices()
+        sample_names = []
+        for v in voices[:20]:
+            for k in self._VOICE_NAME_KEYS:
+                if v.get(k):
+                    sample_names.append(f"{k}={v[k]}")
+                    break
         LOGGER.info(
             "voices_listed",
-            extra={"count": len(voices),
-                   "names_head": [v.get("name") for v in voices][:20]},
+            extra={"count": len(voices), "names_head": sample_names},
         )
 
         def voice_id(v: dict) -> str:
             return str(v.get("id") or v.get("voice_id"))
 
-        # 1) exact name match
-        for v in voices:
-            if v.get("name") and v["name"].lower() == name_hint.lower():
-                return voice_id(v)
-        # 2) substring match
-        hint = name_hint.lower()
-        for v in voices:
-            if v.get("name") and hint in v["name"].lower():
-                return voice_id(v)
-        # 3) display_name fallback (some APIs expose both)
-        for v in voices:
-            for key in ("display_name", "label", "title"):
-                if v.get(key) and name_hint.lower() in str(v[key]).lower():
-                    return voice_id(v)
+        hint_lower = name_hint.lower()
+        # Two passes: exact match across all known name keys, then substring.
+        for exact in (True, False):
+            for v in voices:
+                for key in self._VOICE_NAME_KEYS:
+                    name = v.get(key)
+                    if not name:
+                        continue
+                    name_lower = str(name).lower()
+                    if exact and name_lower == hint_lower:
+                        return voice_id(v)
+                    if not exact and hint_lower in name_lower:
+                        return voice_id(v)
 
         raise HedraError(
             f"resolve_voice_id: voice {name_hint!r} not found. "
-            f"Pass --voice-id explicitly. Available ({len(voices)}): "
-            f"{[v.get('name') for v in voices]}"
+            f"Pass --voice-id explicitly. Sample names ({len(voices)} voices): "
+            f"{sample_names}"
         )
 
     # ----------------------------------------------------------------- assets
