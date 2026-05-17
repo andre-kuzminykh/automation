@@ -192,23 +192,22 @@ class HedraClient:
     ) -> str:
         """POST /generations — submit a generation job, return generation_id.
 
-        Current Hedra schema (2026):
-            body.video.ai_model_id            (required, UUID)
-            body.video.start_keyframe_id      (asset_id of avatar image)
-            body.video.generated_video_inputs (object with text/voice/etc.)
+        Hedra uses a Pydantic 2 discriminated union: `type=video` selects
+        the VideoGenerationRequest variant. Errors come back tagged with
+        the discriminator (`body.video.ai_model_id`), but the JSON itself
+        must be FLAT — the `video` segment in the error path is the tag,
+        not a nested object.
         """
         payload = {
             "type": "video",
-            "video": {
-                "ai_model_id": ai_model_id,
-                "start_keyframe_id": avatar_asset_id,
-                "generated_video_inputs": {
-                    "text_prompt": text,
-                    "voice_id": voice_id,
-                    "resolution": resolution,
-                    "aspect_ratio": aspect_ratio,
-                    "duration_ms": duration_seconds_max * 1000,
-                },
+            "ai_model_id": ai_model_id,
+            "start_keyframe_id": avatar_asset_id,
+            "generated_video_inputs": {
+                "text_prompt": text,
+                "voice_id": voice_id,
+                "resolution": resolution,
+                "aspect_ratio": aspect_ratio,
+                "duration_ms": duration_seconds_max * 1000,
             },
         }
         LOGGER.info("submit_generation_payload",

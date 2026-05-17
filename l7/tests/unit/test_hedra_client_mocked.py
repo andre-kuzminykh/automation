@@ -54,8 +54,10 @@ def test_upload_asset_binary(hedra_env, tmp_path: Path):
     assert "files" in call.kwargs
 
 
-# T-U-HC-3 — submit_generation places generated_video_inputs INSIDE body.video
-# (current 2026 Hedra schema discovered via 422 errors from /generations).
+# T-U-HC-3 — flat payload: ai_model_id and start_keyframe_id at top level,
+# generated_video_inputs inside. Hedra uses Pydantic 2 discriminated unions
+# where `type=video` selects the variant — the error path
+# "body.video.ai_model_id" refers to the discriminator tag, not a nested key.
 def test_submit_generation_payload(hedra_env):
     session = _make_session([{"status": 200, "json": {"id": "gen_77"}}])
     client = HedraClient(session=session)
@@ -69,10 +71,11 @@ def test_submit_generation_payload(hedra_env):
     )
     assert gid == "gen_77"
     body = session.request.call_args.kwargs["json"]
-    video = body["video"]
-    assert video["ai_model_id"] == "model-abc-uuid"
-    assert video["start_keyframe_id"] == "asset_x"
-    inputs = video["generated_video_inputs"]
+    assert body["type"] == "video"
+    assert body["ai_model_id"] == "model-abc-uuid"
+    assert body["start_keyframe_id"] == "asset_x"
+    assert "video" not in body, "must NOT wrap in `video` object — flat payload"
+    inputs = body["generated_video_inputs"]
     assert inputs["text_prompt"] == "hello world"
     assert inputs["voice_id"] == "aisala"
     assert inputs["resolution"] == "540p"
