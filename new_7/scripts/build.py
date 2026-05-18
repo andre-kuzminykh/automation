@@ -328,6 +328,139 @@ def emphasis_black(text: str) -> str:
             f'<p class="font-black text-[11px] md:text-base text-solar">{e(text)}</p></div>')
 
 
+# ============== дополнительные визуальные шаблоны =============================
+def flow_horizontal(steps: list[tuple[str, str]]) -> str:
+    """Pipeline шагов со стрелками. Последний шаг — тёмный акцент.
+    Desktop = горизонтально, mobile = вертикально (стрелки сверху-вниз)."""
+    n = len(steps)
+    parts = []
+    for i, (icon, lab) in enumerate(steps):
+        is_last = i == n - 1
+        bg = "bg-black border-2 border-solar text-white" if is_last else "bg-white border border-grayBase"
+        text_cls = "text-solar" if is_last else ""
+        font = "font-black" if is_last else "font-bold"
+        shadow = "shadow-xl" if is_last else "shadow-sm"
+        parts.append(
+            f'<div class="{bg} rounded-2xl p-2 md:p-3 {shadow} flex flex-col items-center text-center w-full md:flex-1 min-w-0">'
+            f'<i class="{icon} text-solar text-lg md:text-2xl mb-1 md:mb-2"></i>'
+            f'<p class="{font} text-[10px] md:text-xs leading-tight {text_cls}">{e(lab)}</p>'
+            f'</div>')
+        if not is_last:
+            parts.append(
+                '<i class="ph-bold ph-caret-right text-solar text-base md:text-2xl shrink-0 hidden md:block"></i>'
+                '<i class="ph-bold ph-caret-down text-solar text-base shrink-0 md:hidden self-center"></i>')
+    return ('<div class="flex flex-col md:flex-row items-stretch md:items-center justify-center '
+            'gap-1.5 md:gap-2 max-w-5xl mx-auto w-full mb-3 md:mb-6">' + "".join(parts) + '</div>')
+
+
+def bento(big: tuple[str, str, str, str], smalls: list[tuple[str, str]],
+          *, cols: str = "grid-cols-2 md:grid-cols-4") -> str:
+    """1 крупная карточка (icon, title, body, kicker) + N маленьких (icon, label).
+    Крупная занимает 2x2, мелкие — 1x1."""
+    big_icon, big_title, big_body, big_kicker = big
+    bigcard = (
+        f'<div class="bg-black border-2 border-solar rounded-[20px] md:rounded-3xl '
+        f'p-4 md:p-6 shadow-xl text-white col-span-2 md:row-span-2 flex flex-col justify-center">'
+        f'<div class="flex items-center gap-2 md:gap-3 mb-2 md:mb-3">'
+        f'<div class="w-9 h-9 md:w-12 md:h-12 bg-solar rounded-full flex items-center justify-center shrink-0"><i class="{big_icon} text-black text-base md:text-xl"></i></div>'
+        f'<p class="text-[10px] md:text-xs font-bold uppercase tracking-widest text-solar/70">{e(big_kicker)}</p></div>'
+        f'<h3 class="font-black text-sm md:text-2xl mb-1 md:mb-2 text-solar leading-tight">{e(big_title)}</h3>'
+        f'<p class="text-[11px] md:text-sm text-white/80 leading-snug">{e(big_body)}</p></div>')
+    smcards = "".join(
+        f'<div class="bg-white border border-grayBase rounded-2xl p-2 md:p-4 shadow-sm flex flex-col items-center text-center justify-center">'
+        f'<i class="{icon} text-solar text-base md:text-2xl mb-1 md:mb-2"></i>'
+        f'<p class="font-bold text-[10px] md:text-sm leading-tight">{e(lab)}</p></div>'
+        for icon, lab in smalls)
+    return (f'<div class="grid {cols} gap-2 md:gap-3 max-w-5xl mx-auto w-full mb-3 md:mb-6">'
+            + bigcard + smcards + '</div>')
+
+
+def cycle_loop(items: list[tuple[str, str]]) -> str:
+    """6 шагов в форме «петли»: первый — solar, последний — чёрный.
+    На desktop сетка 3x2, на mobile 2x3. items = list of (icon, label)."""
+    n = len(items)
+    cells = []
+    for i, (icon, t) in enumerate(items):
+        if i == 0:
+            bg = "bg-solar"; text_cls = "text-black"; icon_bg = "bg-black"
+            icon_text = "text-solar"
+        elif i == n - 1:
+            bg = "bg-black border-2 border-solar"; text_cls = "text-solar"
+            icon_bg = "bg-solar"; icon_text = "text-black"
+        else:
+            bg = "bg-white border border-grayBase"; text_cls = ""
+            icon_bg = "bg-grayBase"; icon_text = "text-black"
+        cells.append(
+            f'<div class="{bg} rounded-2xl p-2 md:p-4 shadow-sm flex items-center gap-2 md:gap-3 min-w-0">'
+            f'<div class="w-9 h-9 md:w-11 md:h-11 shrink-0 rounded-full {icon_bg} flex items-center justify-center {icon_text} font-black text-[11px] md:text-sm">'
+            f'<i class="{icon} text-base md:text-xl"></i></div>'
+            f'<div class="min-w-0 flex-1">'
+            f'<p class="text-[9px] md:text-[10px] font-bold uppercase tracking-widest opacity-60 mb-0.5">Шаг {i+1}</p>'
+            f'<p class="font-bold text-[11px] md:text-sm leading-tight {text_cls}">{e(t)}</p>'
+            f'</div></div>')
+    return ('<div class="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3 max-w-5xl mx-auto '
+            'w-full mb-3 md:mb-6">' + "".join(cells) + '</div>')
+
+
+def concentric_layers(rows: list[str]) -> str:
+    """Слои с прогрессирующим отступом — как «вложенность мышления»."""
+    n = len(rows)
+    out = []
+    for i, t in enumerate(rows):
+        indent_pct = i * 4
+        is_last = i == n - 1
+        bg = "bg-solar" if is_last else "bg-white border border-grayBase"
+        text_cls = "text-black"
+        shadow = "shadow-md" if is_last else "shadow-sm"
+        out.append(
+            f'<div class="{bg} rounded-2xl py-2 px-3 md:py-3 md:px-5 flex items-center gap-2 md:gap-3 {shadow} w-full" '
+            f'style="margin-left:{indent_pct}%; margin-right:{indent_pct}%;">'
+            f'<div class="w-7 h-7 md:w-9 md:h-9 shrink-0 rounded-full bg-white flex items-center justify-center text-black font-black text-xs md:text-base border border-grayBase">{i+1}</div>'
+            f'<p class="text-[11px] md:text-base font-bold leading-tight {text_cls}">{e(t)}</p>'
+            f'</div>')
+    return (f'<div class="flex flex-col gap-1.5 md:gap-2 max-w-4xl mx-auto w-full mb-3 md:mb-6">'
+            f'{"".join(out)}</div>')
+
+
+def step_progression(steps: list[tuple[str, str, str]]) -> str:
+    """Сегменты-«ступеньки»: time-label + content + connecting line.
+    items = list of (label, body, icon)."""
+    n = len(steps)
+    parts = []
+    for i, (lab, body, icon) in enumerate(steps):
+        is_last = i == n - 1
+        is_first = i == 0
+        bg = "bg-black border-2 border-solar text-white" if is_last else "bg-white border border-grayBase"
+        kicker_cls = "text-solar"
+        body_cls = "text-solar" if is_last else "text-black/80"
+        shadow = "shadow-xl" if is_last else "shadow-sm"
+        parts.append(
+            f'<div class="{bg} rounded-2xl md:rounded-3xl p-3 md:p-5 {shadow} relative">'
+            f'<div class="flex items-center gap-2 md:gap-3 mb-1 md:mb-2">'
+            f'<div class="w-9 h-9 md:w-11 md:h-11 rounded-full bg-solar text-black flex items-center justify-center shrink-0"><i class="{icon} text-base md:text-xl"></i></div>'
+            f'<p class="text-[10px] md:text-xs font-bold uppercase tracking-widest {kicker_cls}">{e(lab)}</p></div>'
+            f'<p class="font-black text-[12px] md:text-sm {body_cls} leading-snug">{e(body)}</p>'
+            f'</div>')
+    return ('<div class="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3 max-w-5xl mx-auto '
+            'w-full mb-3 md:mb-6">' + "".join(parts) + '</div>')
+
+
+def mega_stat(big_text: str, kicker: str, support: list[tuple[str, str]]) -> str:
+    """Большая центральная плашка + N маленьких карточек снизу."""
+    cards = "".join(
+        f'<div class="bg-white border border-grayBase rounded-2xl p-2 md:p-4 shadow-sm flex flex-col items-center text-center">'
+        f'<i class="{icon} text-solar text-lg md:text-2xl mb-1 md:mb-2"></i>'
+        f'<p class="font-bold text-[10px] md:text-sm">{e(t)}</p></div>'
+        for icon, t in support)
+    grid_cols = f"grid-cols-{min(len(support), 2)} md:grid-cols-{min(len(support), 4)}"
+    return ('<div class="w-full max-w-4xl mx-auto mb-3 md:mb-6">'
+            '<div class="bg-black border-2 border-solar rounded-[24px] md:rounded-[32px] '
+            'p-5 md:p-10 shadow-[0_0_40px_rgba(53,240,199,0.25)] text-white text-center mb-2 md:mb-4">'
+            f'<p class="text-2xl md:text-5xl lg:text-6xl font-black text-solar leading-tight mb-2 md:mb-3">{e(big_text)}</p>'
+            f'<p class="text-[10px] md:text-sm font-bold uppercase tracking-widest text-white/70">{e(kicker)}</p></div>'
+            f'<div class="grid {grid_cols} gap-2 md:gap-3">{cards}</div></div>')
+
+
 def wrap(idx: int, comment: str, body: str, *, dark: bool = False) -> str:
     bg = " bg-black text-white" if dark else ""
     state = "opacity-100 translate-y-0" if idx == 0 else "opacity-0 pointer-events-none translate-y-8"
@@ -436,17 +569,21 @@ def s4() -> str:
 
 
 def s5() -> str:
+    # Bento: одна крупная карточка-вывод + 4 маленькие про неизменённые элементы
     body = (
         H("Почему старые подходы перестают работать", "перестают работать")
         + S("Можно технически внедрить AI и остаться старой компанией по устройству")
-        + label("Что обычно остаётся прежним")
-        + grid_cards([
-            card_center("ph-fill ph-clipboard-text", "Должностные инструкции"),
-            card_center("ph-fill ph-chart-bar", "Старые KPI"),
-            card_center("ph-fill ph-graduation-cap", "Обучение «как раньше»"),
-            card_center("ph-fill ph-warning", "Размытая ответственность", dark=True),
-        ], "grid-cols-2 md:grid-cols-4")
-        + emphasis_black("KPI измеряют занятость, не эффект. Обучение учит кнопкам, а не работе по-новому")
+        + bento(
+            big=("ph-fill ph-warning-octagon",
+                 "AI внедрён, компания — нет",
+                 "Должностные инструкции не отражают реальность. Часть действий выполняет AI, но ответственность не пересобрана.",
+                 "Главная ловушка"),
+            smalls=[
+                ("ph-fill ph-clipboard-text", "Должностные инструкции"),
+                ("ph-fill ph-chart-bar", "Старые KPI измеряют занятость"),
+                ("ph-fill ph-graduation-cap", "Обучение «как раньше»"),
+                ("ph-fill ph-warning", "Размытая ответственность"),
+            ])
         + punch("Внедрение AI — это не IT-проект. Это управленческая трансформация")
     )
     return wrap(4, "Почему старые подходы не работают", body)
@@ -707,34 +844,38 @@ def s18() -> str:
 
 
 def s19() -> str:
+    # mega_stat — крупный визуальный акцент на главной мысли + 4 опоры снизу
     body = (
         H("ИИ как усилитель управляемости", "усилитель")
         + S("Больше сигналов, быстрее реакция, шире контекст для решений")
-        + grid_cards([
-            card_center("ph-fill ph-broadcast", "Больше сигналов"),
-            card_center("ph-fill ph-lightning", "Быстрее реакция"),
-            card_center("ph-fill ph-warning", "Раньше видны риски"),
-            card_center("ph-fill ph-binoculars", "Шире контекст"),
-        ], "grid-cols-2 md:grid-cols-4")
-        + emphasis_black("Не вручную собирать информацию, а видеть, где процесс идёт нормально, где появляется риск, где нужно вмешательство")
-        + punch("Команда удерживает больше процессов одновременно — без перегрева")
+        + mega_stat(
+            big_text="×10 управляемости",
+            kicker="Команда удерживает больше процессов одновременно",
+            support=[
+                ("ph-fill ph-broadcast", "Больше сигналов"),
+                ("ph-fill ph-lightning", "Быстрее реакция"),
+                ("ph-fill ph-warning", "Раньше видны риски"),
+                ("ph-fill ph-binoculars", "Шире контекст"),
+            ])
+        + punch("Не вручную собирать информацию — видеть, где процесс нормален, где риск, где нужен человек")
     )
     return wrap(18, "AI как усилитель управляемости", body)
 
 
 def s20() -> str:
+    # Flow horizontal: 6 шагов конвейера решения со стрелками. Финал — чёрный.
     body = (
         H("Как меняется управленческое решение", "управленческое решение")
         + S("От опыта и интуиции — к гипотезе, данным, моделированию")
-        + numbered([
-            "Формулируется гипотеза",
-            "Собираются данные",
-            "Моделируются варианты",
-            "AI готовит рекомендации",
-            "AI показывает риски и последствия",
-            "Человек принимает финальное решение",
-        ], "grid-cols-1 md:grid-cols-3")
-        + punch("Руководитель должен понять, на каких данных, какие ограничения у AI, какую ответственность берёт компания")
+        + flow_horizontal([
+            ("ph-fill ph-lightbulb", "Гипотеза"),
+            ("ph-fill ph-database", "Данные"),
+            ("ph-fill ph-shuffle", "Моделирование"),
+            ("ph-fill ph-list-checks", "AI: рекомендации"),
+            ("ph-fill ph-warning", "AI: риски"),
+            ("ph-fill ph-gavel", "Человек: решение"),
+        ])
+        + punch("Руководитель понимает, на каких данных, какие ограничения у AI, какую ответственность берёт компания")
     )
     return wrap(19, "Как меняется управленческое решение", body)
 
@@ -760,10 +901,11 @@ def s21() -> str:
 
 
 def s22() -> str:
+    # Concentric layers — выглядит как вложенные слои мышления (3D-эффект отступами)
     body = (
         H("ИИ как внешний слой мышления", "слой мышления")
         + S("Расширяет внимание, память и способность удерживать много процессов одновременно")
-        + pyramid([
+        + concentric_layers([
             "Удерживает контекст",
             "Сравнивает варианты",
             "Возвращает к прошлым решениям",
@@ -850,17 +992,21 @@ def s26() -> str:
 
 
 def s27() -> str:
+    # Bento: главная роль крупно + 4 маленькие
     body = (
         H("Новые роли в гибридной компании", "новые роли")
         + S("Старой ролевой модели уже недостаточно — появляются новые зоны ответственности")
-        + grid_cards([
-            card_row("ph-fill ph-flow-arrow", "Владелец гибридного процесса"),
-            card_row("ph-fill ph-blueprint", "Архитектор автоматизации"),
-            card_row("ph-fill ph-medal-military", "Бизнес-владелец результата"),
-            card_row("ph-fill ph-shield-warning", "Владелец риска"),
-            card_row("ph-fill ph-trophy", "AI-чемпион"),
-            card_row("ph-fill ph-users-three", "Команда", dark=True),
-        ], "grid-cols-1 md:grid-cols-2")
+        + bento(
+            big=("ph-fill ph-flow-arrow",
+                 "Владелец гибридного процесса",
+                 "Знает, как процесс реально работает с AI: что отдать машине, что оставить человеку, где нужен контроль и как измерить эффект.",
+                 "Ключевая роль"),
+            smalls=[
+                ("ph-fill ph-blueprint", "Архитектор автоматизации"),
+                ("ph-fill ph-medal-military", "Бизнес-владелец результата"),
+                ("ph-fill ph-shield-warning", "Владелец риска"),
+                ("ph-fill ph-trophy", "AI-чемпион"),
+            ])
         + punch("Появляются зоны ответственности, которых раньше не было явно выражено")
     )
     return wrap(26, "Новые роли в компании", body)
@@ -1048,16 +1194,21 @@ def s37() -> str:
 
 
 def s38() -> str:
+    # Bento: главная стратегическая цель крупно + 3 поменьше
     body = (
         H("ИИ как портфель изменений", "портфель")
         + S("Не хаос экспериментов — а связанная со стратегией программа")
-        + label("Каждый сценарий отвечает на стратегическую задачу")
-        + grid_cards([
-            card_row("ph-fill ph-rocket-launch", "Ускорить выход на рынок"),
-            card_row("ph-fill ph-currency-circle-dollar", "Снизить затраты"),
-            card_row("ph-fill ph-trend-up", "Масштабироваться без роста штата"),
-            card_row("ph-fill ph-smiley", "Улучшить клиентский опыт", dark=True),
-        ], "grid-cols-1 md:grid-cols-2")
+        + bento(
+            big=("ph-fill ph-strategy",
+                 "AI = инструмент достижения бизнес-целей",
+                 "Каждый сценарий должен отвечать на стратегическую задачу. Иначе компания получает витрину пилотов, а не системный эффект.",
+                 "Стратегический подход"),
+            smalls=[
+                ("ph-fill ph-rocket-launch", "Ускорить выход на рынок"),
+                ("ph-fill ph-currency-circle-dollar", "Снизить затраты"),
+                ("ph-fill ph-trend-up", "Масштабироваться без штата"),
+                ("ph-fill ph-smiley", "Улучшить клиентский опыт"),
+            ])
         + punch("Важен не сам факт эксперимента, а его вклад в стратегию")
     )
     return wrap(37, "ИИ как портфель изменений", body)
@@ -1082,17 +1233,18 @@ def s39() -> str:
 
 
 def s40() -> str:
+    # Cycle loop с иконками: 6 шагов жизненного цикла
     body = (
         H("Шесть фаз портфеля ИИ-изменений", "Шесть фаз")
         + S("Управляемый жизненный цикл — от поиска возможностей до закрытия")
-        + numbered([
-            "Поиск возможностей",
-            "Приоритизация идей",
-            "Пилот на реальном процессе",
-            "Промышленная сборка",
-            "Масштабирование",
-            "Закрытие при отсутствии эффекта",
-        ], "grid-cols-1 md:grid-cols-3")
+        + cycle_loop([
+            ("ph-fill ph-magnifying-glass", "Поиск возможностей"),
+            ("ph-fill ph-funnel", "Приоритизация идей"),
+            ("ph-fill ph-flask", "Пилот на реальном процессе"),
+            ("ph-fill ph-factory", "Промышленная сборка"),
+            ("ph-fill ph-trend-up", "Масштабирование"),
+            ("ph-fill ph-x-circle", "Закрытие без эффекта"),
+        ])
         + emphasis_black("Закрытие — не провал. Это накопленное знание о том, где AI не работает")
         + punch("Без жизненного цикла портфель превращается в витрину пилотов")
     )
@@ -1100,28 +1252,16 @@ def s40() -> str:
 
 
 def s41() -> str:
-    items = [
-        ("Каждую неделю", "Сам процесс — где AI помогает, где исключения, где обходят"),
-        ("Раз в две недели", "Пилоты — эффект, принятие пользователей, риски"),
-        ("Раз в месяц", "Портфельный совет — что масштабировать, что закрыть"),
-        ("Раз в квартал", "Стандарты, академия, регламенты, показатели"),
-    ]
-    cards = []
-    for i, (k, t) in enumerate(items):
-        is_last = (i == len(items) - 1)
-        bg = ('bg-black border-2 border-solar text-white' if is_last
-              else 'bg-white border border-grayBase')
-        kicker_cls = 'text-solar'
-        body_cls = 'text-solar' if is_last else 'text-black/80'
-        cards.append(
-            f'<div class="{bg} rounded-2xl md:rounded-3xl p-3 md:p-5 shadow-{"xl" if is_last else "sm"}">'
-            f'<p class="text-[10px] md:text-xs font-bold uppercase tracking-widest {kicker_cls} mb-1 md:mb-2">{e(k)}</p>'
-            f'<p class="font-black text-[12px] md:text-sm {body_cls}">{e(t)}</p></div>')
+    # step_progression: 4 этапа с разной периодичностью + иконкой времени
     body = (
         H("Ритм управления изменениями", "Ритм")
         + S("AI-трансформация не управляется разовыми совещаниями")
-        + ('<div class="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3 max-w-5xl mx-auto w-full mb-3 md:mb-6">'
-           + "".join(cards) + '</div>')
+        + step_progression([
+            ("Каждую неделю", "Сам процесс — где AI помогает, где исключения, где обходят", "ph-fill ph-calendar-dots"),
+            ("Раз в две недели", "Пилоты — эффект, принятие пользователей, риски", "ph-fill ph-calendar-check"),
+            ("Раз в месяц", "Портфельный совет — что масштабировать, что закрыть", "ph-fill ph-calendar-blank"),
+            ("Раз в квартал", "Стандарты, академия, регламенты, показатели", "ph-fill ph-calendar-star"),
+        ])
         + punch("Эксперименты быстрые, ошибки дешёвые, масштабирование управляемое")
     )
     return wrap(40, "Ритм управления изменениями", body)
@@ -1270,21 +1410,26 @@ def s49() -> str:
 
 
 def s50() -> str:
+    # Bento: главная мысль крупно + 7 элементов системы обучения вокруг
     body = (
         H("AI-First обучающая система компании", "AI-First")
         + S("Компания, которая быстрее работает, быстрее учится и лучше управляет сложностью")
-        + grid_cards([
-            card_center("ph-fill ph-graduation-cap", "Академия"),
-            card_center("ph-fill ph-chat-circle-text", "Обратная связь"),
-            card_center("ph-fill ph-presentation", "Вебинары"),
-            card_center("ph-fill ph-lightning", "Хакатоны"),
-            card_center("ph-fill ph-scroll", "Регламенты"),
-            card_center("ph-fill ph-brain", "Орг. память"),
-            card_center("ph-fill ph-books", "Библиотека решений"),
-            card_center("ph-fill ph-trophy", "Новая ценность человека", dark=True),
-        ], "grid-cols-2 md:grid-cols-4")
-        + emphasis_black("AI не обесценивает человека. Он забирает операционную суету")
-        + punch("Ценность человека смещается к суждению, смыслу, границам и ответственности")
+        + bento(
+            big=("ph-fill ph-infinity",
+                 "Ценность человека смещается",
+                 "К суждению, смыслу, границам и ответственности. AI не обесценивает человека — он забирает операционную суету.",
+                 "Финальный вывод"),
+            smalls=[
+                ("ph-fill ph-graduation-cap", "Академия"),
+                ("ph-fill ph-chat-circle-text", "Обратная связь"),
+                ("ph-fill ph-presentation", "Вебинары"),
+                ("ph-fill ph-lightning", "Хакатоны"),
+                ("ph-fill ph-scroll", "Регламенты"),
+                ("ph-fill ph-brain", "Орг. память"),
+                ("ph-fill ph-books", "Библиотека"),
+                ("ph-fill ph-trophy", "Новая ценность"),
+            ])
+        + punch("Зрелая AI-first компания быстрее работает, быстрее учится и лучше управляет сложностью")
     )
     return wrap(49, "AI-First обучающая система", body)
 
