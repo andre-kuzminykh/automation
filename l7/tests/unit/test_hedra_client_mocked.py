@@ -61,7 +61,8 @@ def test_upload_asset_binary(hedra_env, tmp_path: Path):
     assert "files" in call.kwargs
 
 
-# T-U-HC-3a — one-shot: type=video_with_audio, inline text+voice.
+# T-U-HC-3a — one-shot: type=video_with_audio uses video_generation_model_id
+# and video_id (different field names than type=video).
 def test_submit_generation_payload_inline_tts(hedra_env):
     session = _make_session([{"status": 200, "json": {"id": "gen_77"}}])
     client = HedraClient(session=session)
@@ -76,8 +77,10 @@ def test_submit_generation_payload_inline_tts(hedra_env):
     assert gid == "gen_77"
     body = session.request.call_args.kwargs["json"]
     assert body["type"] == "video_with_audio"
-    assert body["ai_model_id"] == "model-abc-uuid"
-    assert body["start_keyframe_id"] == "asset_x"
+    assert body["video_generation_model_id"] == "model-abc-uuid"
+    assert body["video_id"] == "asset_x"
+    assert "ai_model_id" not in body
+    assert "start_keyframe_id" not in body
     inputs = body["generated_video_inputs"]
     assert inputs["text_prompt"] == "hello world"
     assert inputs["voice_id"] == "voice-uuid"

@@ -375,21 +375,24 @@ class HedraClient:
         if audio_id:
             # Two-step path: audio was pre-generated, use type=video.
             video_inputs["audio_id"] = audio_id
-            payload_type = "video"
+            payload = {
+                "type": "video",
+                "ai_model_id": ai_model_id,
+                "start_keyframe_id": avatar_asset_id,
+                "audio_id": audio_id,
+                "generated_video_inputs": video_inputs,
+            }
         else:
-            # One-shot path: text + voice synthesised inline.
+            # One-shot path: type=video_with_audio uses different field names
+            # (video_generation_model_id, video_id) per Hedra's 422 schema.
             video_inputs["text_prompt"] = text
             video_inputs["voice_id"] = voice_id
-            payload_type = "video_with_audio"
-
-        payload = {
-            "type": payload_type,
-            "ai_model_id": ai_model_id,
-            "start_keyframe_id": avatar_asset_id,
-            "generated_video_inputs": video_inputs,
-        }
-        if audio_id:
-            payload["audio_id"] = audio_id
+            payload = {
+                "type": "video_with_audio",
+                "video_generation_model_id": ai_model_id,
+                "video_id": avatar_asset_id,
+                "generated_video_inputs": video_inputs,
+            }
         LOGGER.info("submit_generation_payload",
                     extra={"payload": payload})
         resp = self._request("POST", "/generations", json=payload)
