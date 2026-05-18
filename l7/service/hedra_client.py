@@ -284,7 +284,31 @@ class HedraClient:
     # For talking-head from text + voice clone, the right tag is
     # `video_with_audio` (single call). If Hedra rejects inline text+voice,
     # we fall back to `text_to_speech` → asset_id → `video`.
+    # Hedra confirmed (via 422):
+    #   "video_with_audio not supported, only video, image, and
+    #    text_to_speech generations are supported at this time"
+    # So talking-head requires the two-step:
+    #   1) type=text_to_speech → audio asset id
+    #   2) type=video with audio_id (+ start_keyframe_id)
+    # Body shape for text_to_speech follows the same naming convention as
+    # video_with_audio: <discriminator>_model_id + <discriminator>_inputs.
     _AUDIO_ATTEMPTS = (
+        ("/generations", {
+            "type": "text_to_speech",
+            "text_to_speech_model_id": "{model_id}",
+            "generated_audio_inputs": {
+                "text_prompt": "{text}",
+                "voice_id": "{voice_id}",
+            },
+        }),
+        ("/generations", {
+            "type": "text_to_speech",
+            "ai_model_id": "{model_id}",
+            "generated_audio_inputs": {
+                "text_prompt": "{text}",
+                "voice_id": "{voice_id}",
+            },
+        }),
         ("/generations", {
             "type": "text_to_speech",
             "generated_audio_inputs": {
@@ -297,18 +321,30 @@ class HedraClient:
             "text_prompt": "{text}",
             "voice_id": "{voice_id}",
         }),
+        ("/generations", {
+            "type": "text_to_speech",
+            "text": "{text}",
+            "voice_id": "{voice_id}",
+        }),
     )
 
     @staticmethod
-    def _fill_template(tpl: Any, *, text: str, voice_id: str) -> Any:
+    def _fill_template(tpl: Any, *, text: str, voice_id: str, model_id: str | None) -> Any:
         if isinstance(tpl, str):
-            return tpl.replace("{text}", text).replace("{voice_id}", voice_id)
+            out = tpl.replace("{text}", text).replace("{voice_id}", voice_id)
+            if model_id is not None:
+                out = out.replace("{model_id}", model_id)
+            return out
         if isinstance(tpl, dict):
-            return {k: HedraClient._fill_template(v, text=text, voice_id=voice_id)
-                    for k, v in tpl.items()}
+            return {
+                k: HedraClient._fill_template(v, text=text, voice_id=voice_id, model_id=model_id)
+                for k, v in tpl.items()
+            }
         return tpl
 
-    def submit_audio_generation(self, *, text: str, voice_id: str) -> tuple[str, str]:
+    def submit_audio_generation(
+        self, *, text: str, voice_id: str, model_id: str | None = None
+    ) -> tuple[str, str]:
         """POST audio request, return (path_that_worked, response_id).
 
         Tries multiple known shapes until one succeeds. The returned id is
@@ -317,7 +353,15 @@ class HedraClient:
         """
         last_err: HedraError | None = None
         for path, tpl in self._AUDIO_ATTEMPTS:
-            payload = self._fill_template(tpl, text=text, voice_id=voice_id)
+            payload = self._fill_template(
+                tpl, text=text, voice_id=voice_id, model_id=model_id
+            )
+            # Skip shapes that need a model_id when we don't have one.
+            if model_id is None and any(
+                isinstance(v, str) and "{model_id}" in v
+                for v in str(payload)
+            ):
+                continue
             LOGGER.info("audio_attempt",
                         extra={"path": path, "payload_keys": list(payload.keys())})
             try:
@@ -367,32 +411,24 @@ class HedraClient:
         must be FLAT — the `video` segment in the error path is the tag,
         not a nested object.
         """
+        if not audio_id:
+            raise HedraError(
+                "submit_generation requires audio_id; Hedra rejected "
+                "video_with_audio one-shot. Use submit_audio_generation first."
+            )
         video_inputs: dict[str, Any] = {
             "resolution": resolution,
             "aspect_ratio": aspect_ratio,
             "duration_ms": duration_seconds_max * 1000,
+            "audio_id": audio_id,
         }
-        if audio_id:
-            # Two-step path: audio was pre-generated, use type=video.
-            video_inputs["audio_id"] = audio_id
-            payload = {
-                "type": "video",
-                "ai_model_id": ai_model_id,
-                "start_keyframe_id": avatar_asset_id,
-                "audio_id": audio_id,
-                "generated_video_inputs": video_inputs,
-            }
-        else:
-            # One-shot path: type=video_with_audio uses different field names
-            # (video_generation_model_id, video_id) per Hedra's 422 schema.
-            video_inputs["text_prompt"] = text
-            video_inputs["voice_id"] = voice_id
-            payload = {
-                "type": "video_with_audio",
-                "video_generation_model_id": ai_model_id,
-                "video_id": avatar_asset_id,
-                "generated_video_inputs": video_inputs,
-            }
+        payload = {
+            "type": "video",
+            "ai_model_id": ai_model_id,
+            "start_keyframe_id": avatar_asset_id,
+            "audio_id": audio_id,
+            "generated_video_inputs": video_inputs,
+        }
         LOGGER.info("submit_generation_payload",
                     extra={"payload": payload})
         resp = self._request("POST", "/generations", json=payload)

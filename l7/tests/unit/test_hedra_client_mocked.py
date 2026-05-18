@@ -61,29 +61,19 @@ def test_upload_asset_binary(hedra_env, tmp_path: Path):
     assert "files" in call.kwargs
 
 
-# T-U-HC-3a — one-shot: type=video_with_audio uses video_generation_model_id
-# and video_id (different field names than type=video).
-def test_submit_generation_payload_inline_tts(hedra_env):
-    session = _make_session([{"status": 200, "json": {"id": "gen_77"}}])
+# T-U-HC-3a — submit_generation requires audio_id (Hedra dropped
+# video_with_audio in 2026; only video/image/text_to_speech are supported).
+def test_submit_generation_requires_audio_id(hedra_env):
+    session = _make_session([])
     client = HedraClient(session=session)
-    gid = client.submit_generation(
-        ai_model_id="model-abc-uuid",
-        avatar_asset_id="asset_x",
-        text="hello world",
-        voice_id="voice-uuid",
-        resolution="540p",
-        aspect_ratio="1:1",
-    )
-    assert gid == "gen_77"
-    body = session.request.call_args.kwargs["json"]
-    assert body["type"] == "video_with_audio"
-    assert body["video_generation_model_id"] == "model-abc-uuid"
-    assert body["video_id"] == "asset_x"
-    assert "ai_model_id" not in body
-    assert "start_keyframe_id" not in body
-    inputs = body["generated_video_inputs"]
-    assert inputs["text_prompt"] == "hello world"
-    assert inputs["voice_id"] == "voice-uuid"
+    with pytest.raises(HedraError) as exc:
+        client.submit_generation(
+            ai_model_id="model-abc-uuid",
+            avatar_asset_id="asset_x",
+            text="hello world",
+            voice_id="voice-uuid",
+        )
+    assert "audio_id" in str(exc.value)
 
 
 # T-U-HC-3b — with audio_id, payload references the pre-generated audio.

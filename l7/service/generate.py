@@ -93,14 +93,6 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         default=None,
         help="explicit Hedra voice_id UUID; if set, skips /voices lookup",
     )
-    p.add_argument(
-        "--two-step-audio",
-        action="store_true",
-        help=(
-            "Generate audio first via type=text_to_speech, then video. "
-            "Use this if a one-shot type=video_with_audio call fails."
-        ),
-    )
     return p.parse_args(argv)
 
 
@@ -277,37 +269,37 @@ def main(argv: Sequence[str] | None = None) -> int:
 
         try:
             audio_id: str | None = None
-            if args.two_step_audio:
-                log.info("slide_audio_submit", extra={"slide": slide.id})
-                audio_path, audio_gen_id = client.submit_audio_generation(
-                    text=slide.narration, voice_id=voice_id
-                )
-                # If the endpoint returned a generation_id (not yet ready),
-                # poll for it. Asset ids from /audio are usable immediately.
-                audio_id = audio_gen_id
-                if "/generations" in audio_path:
-                    deadline = time.monotonic() + args.poll_timeout
-                    while time.monotonic() < deadline:
-                        try:
-                            st = client.get_generation_status(audio_gen_id)
-                        except HedraError:
-                            st = client.get_generation(audio_gen_id)
-                        status = (st.get("status") or "").lower()
-                        if status in {"complete", "completed", "succeeded", "ok"}:
-                            audio_id = (
-                                st.get("asset_id")
-                                or st.get("audio_id")
-                                or st.get("output_id")
-                                or audio_gen_id
-                            )
-                            break
-                        if status in {"failed", "error"}:
-                            raise HedraError(
-                                f"audio generation failed: {st.get('error')}"
-                            )
-                        time.sleep(args.poll_interval)
-                log.info("slide_audio_ok",
-                         extra={"slide": slide.id, "audio_id": audio_id})
+            log.info("slide_audio_submit", extra={"slide": slide.id})
+            audio_path, audio_gen_id = client.submit_audio_generation(
+                text=slide.narration, voice_id=voice_id,
+                model_id=ai_model_id,
+            )
+            # If the endpoint returned a generation_id (not yet ready),
+            # poll for it. Asset ids from /audio are usable immediately.
+            audio_id = audio_gen_id
+            if "/generations" in audio_path:
+                deadline = time.monotonic() + args.poll_timeout
+                while time.monotonic() < deadline:
+                    try:
+                        st = client.get_generation_status(audio_gen_id)
+                    except HedraError:
+                        st = client.get_generation(audio_gen_id)
+                    status = (st.get("status") or "").lower()
+                    if status in {"complete", "completed", "succeeded", "ok"}:
+                        audio_id = (
+                            st.get("asset_id")
+                            or st.get("audio_id")
+                            or st.get("output_id")
+                            or audio_gen_id
+                        )
+                        break
+                    if status in {"failed", "error"}:
+                        raise HedraError(
+                            f"audio generation failed: {st.get('error')}"
+                        )
+                    time.sleep(args.poll_interval)
+            log.info("slide_audio_ok",
+                     extra={"slide": slide.id, "audio_id": audio_id})
 
             log.info("slide_submit", extra={"slide": slide.id})
             generation_id = client.submit_generation(
