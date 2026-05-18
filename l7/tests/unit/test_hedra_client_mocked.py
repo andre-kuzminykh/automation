@@ -99,6 +99,9 @@ def test_submit_generation_payload_with_audio_id(hedra_env):
     assert inputs["text_prompt"] == "hello world"
     # voice_id is omitted in the video step — TTS already happened.
     assert "voice_id" not in inputs
+    # duration_ms MUST NOT be sent — Hedra would force a 2-min video and
+    # stretch the audio with silence. Length comes from the audio asset.
+    assert "duration_ms" not in inputs
 
 
 # T-U-HC-7 — audio generation uses type=text_to_speech and tries shapes

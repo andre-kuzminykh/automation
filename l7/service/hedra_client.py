@@ -411,11 +411,14 @@ class HedraClient:
             )
         # Hedra requires text_prompt inside generated_video_inputs even
         # when audio_id is provided (used for lip-sync alignment).
+        # NB: duration_ms is omitted on purpose — when audio_id is given,
+        # Hedra MUST derive the duration from the audio asset. Passing
+        # duration_ms forces the video to that exact length and stretches
+        # audio with silence (~2 min videos for 30s narration).
         video_inputs: dict[str, Any] = {
             "text_prompt": text,
             "resolution": resolution,
             "aspect_ratio": aspect_ratio,
-            "duration_ms": duration_seconds_max * 1000,
             "audio_id": audio_id,
         }
         payload = {
