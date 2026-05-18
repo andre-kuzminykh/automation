@@ -54,12 +54,36 @@ class GitPublisher:
                 last = exc
         raise GitError(f"git push retries exhausted: {last}")
 
+    def _ensure_identity(self) -> None:
+        """Set a placeholder git identity if none is configured.
+
+        Without this, `git commit` fails on a fresh VM with
+        "Author identity unknown". User can override post-hoc.
+        """
+        try:
+            self._run("config", "user.email")
+            self._run("config", "user.name")
+            return
+        except GitError:
+            pass
+        import getpass, socket
+        email = f"{getpass.getuser()}@{socket.gethostname()}"
+        name = getpass.getuser()
+        LOGGER.warning(
+            "git_identity_autoconfig",
+            extra={"email": email, "name": name,
+                   "note": "override with: git config --global user.email/name"},
+        )
+        self._run("config", "user.email", email)
+        self._run("config", "user.name", name)
+
     def publish(self, paths: list[Path], *, commit_message: str) -> None:
         total = sum(Path(p).stat().st_size for p in paths if Path(p).exists())
         if total > MAX_BATCH_BYTES:
             raise GitError(
                 f"batch size {total} > 500MB limit (NFR-F4-1) — use Git LFS"
             )
+        self._ensure_identity()
         # Stage only the requested paths to keep blast radius small.
         rels = [str(Path(p).resolve().relative_to(self.repo_root.resolve())) for p in paths]
         self._run("add", "--", *rels)

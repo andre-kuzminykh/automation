@@ -90,11 +90,22 @@ fetch_avatar() {
   log "avatar saved to $DEST ($(stat -c %s "$DEST") bytes)"
 }
 
+configure_git_identity() {
+  # `git commit` fails with "Author identity unknown" on a fresh VM. Set
+  # placeholder identity if none is configured — user can override later.
+  if ! git config --global user.email >/dev/null 2>&1; then
+    log "setting placeholder git identity (override with: git config --global ...)"
+    git config --global user.email "$(whoami)@$(hostname)"
+    git config --global user.name  "$(whoami)"
+  fi
+}
+
 main() {
   install_packages
   clone_repo
   setup_venv
   fetch_avatar
+  configure_git_identity
 
   cat <<EOF
 [bootstrap] READY
