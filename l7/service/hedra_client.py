@@ -292,29 +292,14 @@ class HedraClient:
     #   2) type=video with audio_id (+ start_keyframe_id)
     # Body shape for text_to_speech follows the same naming convention as
     # video_with_audio: <discriminator>_model_id + <discriminator>_inputs.
+    # Discovered shape (from live runs): flat body with `text` (not
+    # `text_prompt`) and a UUID voice_id. We keep the fallbacks below in
+    # case Hedra changes — but the first one is always tried first.
     _AUDIO_ATTEMPTS = (
         ("/generations", {
             "type": "text_to_speech",
-            "text_to_speech_model_id": "{model_id}",
-            "generated_audio_inputs": {
-                "text_prompt": "{text}",
-                "voice_id": "{voice_id}",
-            },
-        }),
-        ("/generations", {
-            "type": "text_to_speech",
-            "ai_model_id": "{model_id}",
-            "generated_audio_inputs": {
-                "text_prompt": "{text}",
-                "voice_id": "{voice_id}",
-            },
-        }),
-        ("/generations", {
-            "type": "text_to_speech",
-            "generated_audio_inputs": {
-                "text_prompt": "{text}",
-                "voice_id": "{voice_id}",
-            },
+            "text": "{text}",
+            "voice_id": "{voice_id}",
         }),
         ("/generations", {
             "type": "text_to_speech",
@@ -323,6 +308,14 @@ class HedraClient:
         }),
         ("/generations", {
             "type": "text_to_speech",
+            "generated_audio_inputs": {
+                "text": "{text}",
+                "voice_id": "{voice_id}",
+            },
+        }),
+        ("/generations", {
+            "type": "text_to_speech",
+            "text_to_speech_model_id": "{model_id}",
             "text": "{text}",
             "voice_id": "{voice_id}",
         }),
@@ -416,7 +409,10 @@ class HedraClient:
                 "submit_generation requires audio_id; Hedra rejected "
                 "video_with_audio one-shot. Use submit_audio_generation first."
             )
+        # Hedra requires text_prompt inside generated_video_inputs even
+        # when audio_id is provided (used for lip-sync alignment).
         video_inputs: dict[str, Any] = {
+            "text_prompt": text,
             "resolution": resolution,
             "aspect_ratio": aspect_ratio,
             "duration_ms": duration_seconds_max * 1000,

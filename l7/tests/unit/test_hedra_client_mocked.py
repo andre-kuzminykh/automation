@@ -76,7 +76,8 @@ def test_submit_generation_requires_audio_id(hedra_env):
     assert "audio_id" in str(exc.value)
 
 
-# T-U-HC-3b — with audio_id, payload references the pre-generated audio.
+# T-U-HC-3b — with audio_id, video payload still carries text_prompt
+# (Hedra uses it for lip-sync alignment with the pre-generated audio).
 def test_submit_generation_payload_with_audio_id(hedra_env):
     session = _make_session([{"status": 200, "json": {"id": "gen_99"}}])
     client = HedraClient(session=session)
@@ -91,10 +92,12 @@ def test_submit_generation_payload_with_audio_id(hedra_env):
     )
     assert gid == "gen_99"
     body = session.request.call_args.kwargs["json"]
+    assert body["type"] == "video"
     assert body["audio_id"] == "audio-abc"
     inputs = body["generated_video_inputs"]
     assert inputs["audio_id"] == "audio-abc"
-    assert "text_prompt" not in inputs
+    assert inputs["text_prompt"] == "hello world"
+    # voice_id is omitted in the video step — TTS already happened.
     assert "voice_id" not in inputs
 
 
