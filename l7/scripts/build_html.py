@@ -397,33 +397,35 @@ def esc(text: str) -> str:
 # ---------------------------------------------------------------------------
 def render_title(slide: dict, layout: dict) -> str:
     return f"""
-        <div class="content-z text-center w-full max-w-6xl px-4 flex flex-col items-center justify-center h-full">
-            <div class="bg-gradient-to-r from-purple-50 to-orange-50 border border-purple-100 rounded-xl p-3 md:p-5 max-w-3xl w-full shadow-sm mb-6 md:mb-10">
-                <p class="text-purple-600 font-semibold uppercase tracking-widest text-[10px] md:text-xs mb-1 md:mb-1.5"><i class="ph-fill ph-book-open"></i> Лекция 7 — AI-трансформация компании</p>
-                <h2 class="text-sm md:text-xl font-bold text-gray-800 leading-tight">Как компания становится гибридной системой</h2>
+        <div class="content-z text-center w-full max-w-6xl px-2 md:px-4 flex flex-col items-center justify-center h-full">
+            <div class="bg-gradient-to-r from-purple-50 to-orange-50 border border-purple-100 rounded-xl p-2 md:p-5 max-w-3xl w-full shadow-sm mb-3 md:mb-10">
+                <p class="text-purple-600 font-semibold uppercase tracking-widest text-[9px] md:text-xs mb-0.5 md:mb-1.5"><i class="ph-fill ph-book-open"></i> Лекция 7 — AI-трансформация компании</p>
+                <h2 class="text-xs md:text-xl font-bold text-gray-800 leading-tight">Как компания становится гибридной системой</h2>
             </div>
-            <h1 class="text-4xl md:text-6xl lg:text-[70px] font-black mb-8 md:mb-12 leading-[1.2] tracking-tight text-gray-900 drop-shadow-sm flex flex-col items-center">
-                <span class="pb-1">Люди, машины</span>
-                <span class="gradient-text pb-2">и новая логика</span>
-                <span class="gradient-text pb-2">управления</span>
+            <h1 class="text-3xl md:text-6xl lg:text-[70px] font-black mb-4 md:mb-12 leading-[1.15] tracking-tight text-gray-900 drop-shadow-sm flex flex-col items-center">
+                <span class="pb-0.5 md:pb-1">Люди, машины</span>
+                <span class="gradient-text pb-1 md:pb-2">и новая логика</span>
+                <span class="gradient-text pb-1 md:pb-2">управления</span>
             </h1>
-            <div class="flex flex-col md:flex-row items-center gap-3 text-gray-600 mt-4">
-                <div class="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-xl border border-gray-200">
-                    <i class="ph-fill ph-user text-purple-500"></i>
-                    <span class="font-bold text-sm">Человеческая</span>
+            <div class="flex flex-col md:flex-row items-center gap-2 md:gap-3 text-gray-600 mt-2 md:mt-4">
+                <div class="flex items-center gap-1.5 md:gap-2 bg-gray-50 px-3 py-1.5 md:px-4 md:py-2 rounded-lg md:rounded-xl border border-gray-200">
+                    <i class="ph-fill ph-user text-purple-500 text-sm md:text-base"></i>
+                    <span class="font-bold text-xs md:text-sm">Человеческая</span>
                 </div>
-                <i class="ph-bold ph-arrow-right text-2xl text-orange-400"></i>
-                <div class="flex items-center gap-2 bg-purple-50 px-4 py-2 rounded-xl border border-purple-200">
-                    <i class="ph-fill ph-users-three text-purple-600"></i>
-                    <span class="font-bold text-sm text-purple-800">Гибридная</span>
+                <i class="ph-bold ph-arrow-right text-lg md:text-2xl text-orange-400 hidden md:inline"></i>
+                <i class="ph-bold ph-arrow-down text-lg text-orange-400 md:hidden"></i>
+                <div class="flex items-center gap-1.5 md:gap-2 bg-purple-50 px-3 py-1.5 md:px-4 md:py-2 rounded-lg md:rounded-xl border border-purple-200">
+                    <i class="ph-fill ph-users-three text-purple-600 text-sm md:text-base"></i>
+                    <span class="font-bold text-xs md:text-sm text-purple-800">Гибридная</span>
                 </div>
-                <i class="ph-bold ph-arrow-right text-2xl text-orange-400"></i>
-                <div class="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-orange-500 text-white px-4 py-2 rounded-xl shadow-md">
-                    <i class="ph-fill ph-robot"></i>
-                    <span class="font-bold text-sm">AI-First</span>
+                <i class="ph-bold ph-arrow-right text-lg md:text-2xl text-orange-400 hidden md:inline"></i>
+                <i class="ph-bold ph-arrow-down text-lg text-orange-400 md:hidden"></i>
+                <div class="flex items-center gap-1.5 md:gap-2 bg-gradient-to-r from-purple-600 to-orange-500 text-white px-3 py-1.5 md:px-4 md:py-2 rounded-lg md:rounded-xl shadow-md">
+                    <i class="ph-fill ph-robot text-sm md:text-base"></i>
+                    <span class="font-bold text-xs md:text-sm">AI-First</span>
                 </div>
             </div>
-            <p class="mt-8 font-bold text-base md:text-lg text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
+            <p class="mt-3 md:mt-8 font-bold text-sm md:text-base lg:text-lg text-gray-800 bg-white px-4 md:px-6 py-2 md:py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
                 ИИ меняет не только процессы — <span class="gradient-text">ИИ меняет саму компанию</span>
             </p>
         </div>
@@ -434,7 +436,21 @@ def _heading(slide: dict, accent: str | None = None) -> str:
     title = esc(slide["title"])
     if accent and accent in title:
         title = title.replace(accent, f'<span class="gradient-text">{accent}</span>', 1)
-    return f'<h2 class="text-3xl md:text-5xl font-black mb-8 text-center text-gray-900">{title}</h2>'
+    return (
+        '<h2 class="text-xl md:text-3xl lg:text-5xl font-black '
+        'mb-4 md:mb-8 text-center text-gray-900 leading-tight px-2">'
+        f'{title}</h2>'
+    )
+
+
+def _punch(slide: dict) -> str:
+    """Footer punchline wrapper — tighter on mobile."""
+    return (
+        '<p class="font-bold text-xs md:text-base lg:text-lg text-gray-800 '
+        'bg-white px-4 md:px-6 py-2 md:py-3 rounded-xl border border-gray-200 '
+        'shadow-sm text-center max-w-3xl">'
+        f'{_punchline(slide)}</p>'
+    )
 
 
 def _punchline(slide: dict) -> str:
@@ -463,12 +479,12 @@ _DEFAULT_RIGHT_ITEMS = [
 
 def _render_col_items(items, *, side: str) -> str:
     if side == "left":
-        item_cls = "bg-white p-3 rounded-xl shadow-sm flex items-start gap-3 border border-gray-100"
-        icon_cls = "text-gray-400 text-lg mt-0.5"
+        item_cls = "bg-white p-2 md:p-3 rounded-lg md:rounded-xl shadow-sm flex items-start gap-2 md:gap-3 border border-gray-100"
+        icon_cls = "text-gray-400 text-base md:text-lg mt-0.5"
         text_cls = "text-gray-700"
     else:
-        item_cls = "bg-white p-3 rounded-xl shadow-sm flex items-start gap-3 border border-purple-100"
-        icon_cls = "text-purple-500 text-lg mt-0.5"
+        item_cls = "bg-white p-2 md:p-3 rounded-lg md:rounded-xl shadow-sm flex items-start gap-2 md:gap-3 border border-purple-100"
+        icon_cls = "text-purple-500 text-base md:text-lg mt-0.5"
         text_cls = "text-purple-900"
     rows = []
     for icon, text in items:
@@ -484,29 +500,27 @@ def render_two_col(slide: dict, layout: dict) -> str:
     return f"""
         <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
             {_heading(slide)}
-            <div class="flex flex-col md:flex-row items-stretch gap-6 w-full max-w-5xl mb-8">
-                <div class="flex-1 bg-gray-50 border border-gray-200 p-6 rounded-3xl">
-                    <h3 class="font-bold text-gray-400 uppercase tracking-widest mb-4 text-sm text-center">{esc(layout.get('left','Было'))}</h3>
-                    <div class="h-1 w-12 bg-gradient-to-r from-gray-300 to-gray-200 mx-auto mb-4 rounded-full"></div>
-                    <ul class="text-sm flex flex-col gap-2">
+            <div class="flex flex-col md:flex-row items-stretch gap-3 md:gap-6 w-full max-w-5xl mb-3 md:mb-8">
+                <div class="flex-1 bg-gray-50 border border-gray-200 p-3 md:p-6 rounded-2xl md:rounded-3xl">
+                    <h3 class="font-bold text-gray-400 uppercase tracking-widest mb-2 md:mb-4 text-xs md:text-sm text-center">{esc(layout.get('left','Было'))}</h3>
+                    <div class="h-0.5 md:h-1 w-10 md:w-12 bg-gradient-to-r from-gray-300 to-gray-200 mx-auto mb-2 md:mb-4 rounded-full"></div>
+                    <ul class="text-xs md:text-sm flex flex-col gap-1.5 md:gap-2">
                         {_render_col_items(left_items, side="left")}
                     </ul>
                 </div>
-                <div class="flex items-center justify-center">
-                    <i class="ph-bold ph-arrow-right text-4xl text-purple-400 hidden md:block"></i>
-                    <i class="ph-bold ph-arrow-down text-4xl text-purple-400 md:hidden"></i>
+                <div class="flex items-center justify-center -my-1 md:my-0">
+                    <i class="ph-bold ph-arrow-right text-3xl md:text-4xl text-purple-400 hidden md:block"></i>
+                    <i class="ph-bold ph-arrow-down text-2xl md:text-4xl text-purple-400 md:hidden"></i>
                 </div>
-                <div class="flex-1 bg-purple-50 border border-purple-200 p-6 rounded-3xl shadow-lg">
-                    <h3 class="font-bold text-purple-600 uppercase tracking-widest mb-4 text-sm text-center">{esc(layout.get('right','Стало'))}</h3>
-                    <div class="h-1 w-12 bg-gradient-to-r from-purple-400 to-orange-400 mx-auto mb-4 rounded-full"></div>
-                    <ul class="text-sm flex flex-col gap-2">
+                <div class="flex-1 bg-purple-50 border border-purple-200 p-3 md:p-6 rounded-2xl md:rounded-3xl shadow-lg">
+                    <h3 class="font-bold text-purple-600 uppercase tracking-widest mb-2 md:mb-4 text-xs md:text-sm text-center">{esc(layout.get('right','Стало'))}</h3>
+                    <div class="h-0.5 md:h-1 w-10 md:w-12 bg-gradient-to-r from-purple-400 to-orange-400 mx-auto mb-2 md:mb-4 rounded-full"></div>
+                    <ul class="text-xs md:text-sm flex flex-col gap-1.5 md:gap-2">
                         {_render_col_items(right_items, side="right")}
                     </ul>
                 </div>
             </div>
-            <p class="font-bold text-base md:text-lg text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
-                {_punchline(slide)}
-            </p>
+            {_punch(slide)}
         </div>
     """
 
@@ -515,20 +529,18 @@ def render_numbered(slide: dict, layout: dict) -> str:
     items = layout.get("items") or []
     rows = "".join(
         f"""
-                <li class="bg-white p-3 md:p-4 rounded-2xl shadow-sm border border-purple-100 flex items-start gap-3">
-                    <div class="w-9 h-9 shrink-0 rounded-xl bg-gradient-to-br from-purple-500 to-orange-500 text-white font-black flex items-center justify-center shadow">{i+1}</div>
-                    <p class="text-sm md:text-base text-gray-800 mt-0.5">{esc(text)}</p>
+                <li class="bg-white p-2 md:p-4 rounded-xl md:rounded-2xl shadow-sm border border-purple-100 flex items-start gap-2 md:gap-3">
+                    <div class="w-7 h-7 md:w-9 md:h-9 text-xs md:text-base shrink-0 rounded-lg md:rounded-xl bg-gradient-to-br from-purple-500 to-orange-500 text-white font-black flex items-center justify-center shadow">{i+1}</div>
+                    <p class="text-xs md:text-base text-gray-800 mt-0.5 md:mt-1">{esc(text)}</p>
                 </li>"""
         for i, text in enumerate(items)
     )
     return f"""
         <div class="content-z max-w-5xl h-full flex flex-col items-center justify-center">
             {_heading(slide)}
-            <ul class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 w-full mb-8">{rows}
+            <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4 w-full mb-3 md:mb-8">{rows}
             </ul>
-            <p class="font-bold text-base md:text-lg text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
-                {_punchline(slide)}
-            </p>
+            {_punch(slide)}
         </div>
     """
 
@@ -537,21 +549,21 @@ def render_grid3(slide: dict, layout: dict) -> str:
     items = layout.get("items") or []
     cards = "".join(
         f"""
-            <div class="bg-white p-5 rounded-3xl shadow-md border border-purple-100 flex flex-col items-center text-center">
-                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-orange-500 text-white flex items-center justify-center mb-3 shadow-lg"><i class="{icon} text-xl"></i></div>
-                <h3 class="font-black text-gray-900 text-lg mb-1">{esc(title)}</h3>
-                <p class="text-sm text-gray-600">{esc(desc)}</p>
+            <div class="bg-white p-3 md:p-5 rounded-2xl md:rounded-3xl shadow-md border border-purple-100 flex flex-row md:flex-col items-center md:text-center gap-3 md:gap-0">
+                <div class="w-10 h-10 md:w-12 md:h-12 shrink-0 rounded-xl md:rounded-2xl bg-gradient-to-br from-purple-500 to-orange-500 text-white flex items-center justify-center md:mb-3 shadow-lg"><i class="{icon} text-base md:text-xl"></i></div>
+                <div>
+                  <h3 class="font-black text-gray-900 text-sm md:text-lg leading-tight md:mb-1">{esc(title)}</h3>
+                  <p class="text-xs md:text-sm text-gray-600">{esc(desc)}</p>
+                </div>
             </div>"""
         for icon, title, desc in items
     )
     return f"""
         <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
             {_heading(slide)}
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 w-full mb-8">{cards}
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-5 w-full mb-3 md:mb-8">{cards}
             </div>
-            <p class="font-bold text-base md:text-lg text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
-                {_punchline(slide)}
-            </p>
+            {_punch(slide)}
         </div>
     """
 
@@ -560,11 +572,11 @@ def render_grid4(slide: dict, layout: dict) -> str:
     items = layout.get("items") or []
     cards = "".join(
         f"""
-            <div class="bg-white p-5 rounded-3xl shadow-md border border-purple-100 flex items-start gap-4">
-                <div class="w-12 h-12 shrink-0 rounded-2xl bg-gradient-to-br from-purple-500 to-orange-500 text-white flex items-center justify-center shadow-lg"><i class="{icon} text-xl"></i></div>
+            <div class="bg-white p-3 md:p-5 rounded-2xl md:rounded-3xl shadow-md border border-purple-100 flex items-start gap-3 md:gap-4">
+                <div class="w-9 h-9 md:w-12 md:h-12 shrink-0 rounded-xl md:rounded-2xl bg-gradient-to-br from-purple-500 to-orange-500 text-white flex items-center justify-center shadow-lg"><i class="{icon} text-base md:text-xl"></i></div>
                 <div>
-                    <h3 class="font-black text-gray-900 text-base mb-0.5">{esc(title)}</h3>
-                    <p class="text-sm text-gray-600">{esc(desc)}</p>
+                    <h3 class="font-black text-gray-900 text-sm md:text-base leading-tight mb-0.5">{esc(title)}</h3>
+                    <p class="text-xs md:text-sm text-gray-600">{esc(desc)}</p>
                 </div>
             </div>"""
         for icon, title, desc in items
@@ -572,11 +584,9 @@ def render_grid4(slide: dict, layout: dict) -> str:
     return f"""
         <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
             {_heading(slide)}
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 w-full mb-8">{cards}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-5 w-full mb-3 md:mb-8">{cards}
             </div>
-            <p class="font-bold text-base md:text-lg text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
-                {_punchline(slide)}
-            </p>
+            {_punch(slide)}
         </div>
     """
 
@@ -585,16 +595,14 @@ def render_quote(slide: dict, layout: dict) -> str:
     return f"""
         <div class="content-z max-w-5xl h-full flex flex-col items-center justify-center">
             {_heading(slide)}
-            <div class="bg-gradient-to-br from-purple-600 via-pink-500 to-orange-500 p-1.5 rounded-3xl shadow-2xl w-full max-w-3xl mb-6">
-                <div class="bg-white px-6 py-8 md:px-10 md:py-12 rounded-[20px] text-center">
-                    <p class="text-purple-600 font-semibold uppercase tracking-widest text-xs mb-3">{esc(layout.get('kicker',''))}</p>
-                    <p class="text-2xl md:text-4xl font-black gradient-text leading-tight mb-4">{esc(layout.get('main',''))}</p>
-                    <p class="text-gray-700 text-base md:text-lg">{esc(layout.get('tail',''))}</p>
+            <div class="bg-gradient-to-br from-purple-600 via-pink-500 to-orange-500 p-1 md:p-1.5 rounded-2xl md:rounded-3xl shadow-2xl w-full max-w-3xl mb-3 md:mb-6">
+                <div class="bg-white px-4 py-5 md:px-10 md:py-12 rounded-2xl md:rounded-[20px] text-center">
+                    <p class="text-purple-600 font-semibold uppercase tracking-widest text-[10px] md:text-xs mb-2 md:mb-3">{esc(layout.get('kicker',''))}</p>
+                    <p class="text-lg md:text-3xl lg:text-4xl font-black gradient-text leading-tight mb-2 md:mb-4">{esc(layout.get('main',''))}</p>
+                    <p class="text-gray-700 text-sm md:text-base lg:text-lg">{esc(layout.get('tail',''))}</p>
                 </div>
             </div>
-            <p class="font-bold text-base md:text-lg text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
-                {_punchline(slide)}
-            </p>
+            {_punch(slide)}
         </div>
     """
 
@@ -607,23 +615,21 @@ def render_pyramid(slide: dict, layout: dict) -> str:
                "from-pink-100 to-orange-100", "from-orange-100 to-orange-200",
                "from-orange-200 to-orange-300"]
     for i, row in enumerate(rows):
-        width = 60 + i * (35 / max(1, n - 1))
+        width = 65 + i * (30 / max(1, n - 1))
         color = palette[i % len(palette)]
         boxes += f"""
-            <div class="bg-gradient-to-r {color} border border-purple-100 rounded-2xl shadow-sm py-3 px-5 flex items-center gap-3"
+            <div class="bg-gradient-to-r {color} border border-purple-100 rounded-xl md:rounded-2xl shadow-sm py-2 px-3 md:py-3 md:px-5 flex items-center gap-2 md:gap-3"
                  style="width:{width:.0f}%">
-                <div class="w-8 h-8 shrink-0 rounded-xl bg-white flex items-center justify-center text-purple-700 font-black border border-purple-100">{i+1}</div>
-                <p class="text-sm md:text-base font-bold text-gray-900">{esc(row)}</p>
+                <div class="w-7 h-7 md:w-8 md:h-8 shrink-0 rounded-lg md:rounded-xl bg-white flex items-center justify-center text-purple-700 font-black text-xs md:text-base border border-purple-100">{i+1}</div>
+                <p class="text-xs md:text-base font-bold text-gray-900 leading-tight">{esc(row)}</p>
             </div>"""
     return f"""
         <div class="content-z max-w-5xl h-full flex flex-col items-center justify-center">
             {_heading(slide)}
-            <p class="text-purple-600 font-semibold uppercase tracking-widest text-xs mb-4">{esc(layout.get('title',''))}</p>
-            <div class="flex flex-col items-center gap-3 w-full mb-8">{boxes}
+            <p class="text-purple-600 font-semibold uppercase tracking-widest text-[10px] md:text-xs mb-2 md:mb-4">{esc(layout.get('title',''))}</p>
+            <div class="flex flex-col items-center gap-1.5 md:gap-3 w-full mb-3 md:mb-8">{boxes}
             </div>
-            <p class="font-bold text-base md:text-lg text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
-                {_punchline(slide)}
-            </p>
+            {_punch(slide)}
         </div>
     """
 
@@ -632,21 +638,19 @@ def render_modes(slide: dict, layout: dict) -> str:
     items = layout.get("items") or []
     cards = "".join(
         f"""
-            <div class="bg-white p-5 rounded-3xl shadow-md border-2 border-purple-200 relative">
-                <div class="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-purple-600 to-orange-500 text-white rounded-2xl flex items-center justify-center text-xl font-black shadow-lg border-4 border-white">{num}</div>
-                <h3 class="font-black text-purple-900 mt-2 mb-1 text-base">{esc(title)}</h3>
-                <p class="text-sm text-gray-600">{esc(desc)}</p>
+            <div class="bg-white p-3 md:p-5 rounded-2xl md:rounded-3xl shadow-md border-2 border-purple-200 relative ml-4 md:ml-0">
+                <div class="absolute -top-3 -left-4 md:-top-4 md:-left-4 w-9 h-9 md:w-12 md:h-12 bg-gradient-to-br from-purple-600 to-orange-500 text-white rounded-xl md:rounded-2xl flex items-center justify-center text-base md:text-xl font-black shadow-lg border-2 md:border-4 border-white">{num}</div>
+                <h3 class="font-black text-purple-900 mt-1 md:mt-2 mb-0.5 md:mb-1 text-sm md:text-base leading-tight pl-6 md:pl-10">{esc(title)}</h3>
+                <p class="text-xs md:text-sm text-gray-600 pl-6 md:pl-10">{esc(desc)}</p>
             </div>"""
         for num, title, desc in items
     )
     return f"""
         <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
             {_heading(slide)}
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 w-full mb-8">{cards}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-5 w-full mb-3 md:mb-8 pl-2 md:pl-0">{cards}
             </div>
-            <p class="font-bold text-base md:text-lg text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
-                {_punchline(slide)}
-            </p>
+            {_punch(slide)}
         </div>
     """
 
@@ -656,20 +660,18 @@ def render_cycle(slide: dict, layout: dict) -> str:
     n = len(items)
     cards = "".join(
         f"""
-            <div class="bg-white p-4 rounded-2xl shadow-md border border-purple-100 flex items-center gap-3 min-w-0">
-                <div class="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-purple-500 to-orange-500 text-white flex items-center justify-center font-black shadow">{i+1}</div>
-                <p class="text-sm md:text-base font-bold text-gray-900 truncate">{esc(text)}</p>
+            <div class="bg-white p-2 md:p-4 rounded-xl md:rounded-2xl shadow-md border border-purple-100 flex items-center gap-2 md:gap-3 min-w-0">
+                <div class="w-8 h-8 md:w-10 md:h-10 text-xs md:text-base shrink-0 rounded-lg md:rounded-xl bg-gradient-to-br from-purple-500 to-orange-500 text-white flex items-center justify-center font-black shadow">{i+1}</div>
+                <p class="text-xs md:text-base font-bold text-gray-900 leading-tight">{esc(text)}</p>
             </div>"""
         for i, text in enumerate(items)
     )
     return f"""
         <div class="content-z max-w-6xl h-full flex flex-col items-center justify-center">
             {_heading(slide)}
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 w-full mb-8">{cards}
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4 w-full mb-3 md:mb-8">{cards}
             </div>
-            <p class="font-bold text-base md:text-lg text-gray-800 bg-white px-6 py-3 rounded-xl border border-gray-200 shadow-sm text-center max-w-3xl">
-                {_punchline(slide)}
-            </p>
+            {_punch(slide)}
         </div>
     """
 
@@ -730,6 +732,11 @@ HEAD = """<!DOCTYPE html>
         display: flex; flex-direction: column; justify-content: center;
         overflow-y: auto; overflow-x: hidden; background: #ffffff;
         -ms-overflow-style: none; scrollbar-width: none;
+        /* Bottom padding keeps the punchline above the fixed video bubble. */
+        padding-bottom: 168px;
+    }
+    @media (min-width: 768px) {
+        .slide-container { padding-bottom: 0; }
     }
     .slide-container::-webkit-scrollbar { display: none; }
     .content-z {
@@ -751,14 +758,17 @@ HEAD = """<!DOCTYPE html>
         background: radial-gradient(circle, rgba(249,115,22,0.04) 0%, rgba(255,255,255,0) 70%); z-index: 0; pointer-events: none;
     }
 
-    /* Video bubble (synced with current slide) — pattern from aisala/ai-agents-corp/6 */
+    /* Video bubble (synced with current slide) — pattern from aisala/ai-agents-corp/6.
+       Phone: 130×130 in lower-right with tight margin; tablet+ scales up. */
     #video-bubble {
-        position: fixed; right: 1.25rem; bottom: 2rem; width: 180px; height: 180px;
+        position: fixed; right: 12px; bottom: 16px; width: 130px; height: 130px;
         border-radius: 9999px; overflow: hidden; box-shadow: 0 14px 40px rgba(124,58,237,0.22);
         z-index: 100; cursor: grab; touch-action: none; background: #fff;
         border: 2px solid rgba(124,58,237,0.18);
     }
-    @media (min-width: 768px) { #video-bubble { width: 220px; height: 220px; } }
+    @media (min-width: 480px) { #video-bubble { width: 160px; height: 160px; right: 16px; bottom: 20px; } }
+    @media (min-width: 768px) { #video-bubble { width: 200px; height: 200px; right: 24px; bottom: 28px; } }
+    @media (min-width: 1280px){ #video-bubble { width: 220px; height: 220px; } }
     #video-bubble:active { cursor: grabbing; }
     .video-wrapper { position: relative; width: 100%; height: 100%; }
     .video-wrapper video {
