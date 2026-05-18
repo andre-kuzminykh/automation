@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import os
 import subprocess
 import time
 from pathlib import Path
@@ -15,6 +16,22 @@ MAX_BATCH_BYTES = 500 * 1024 * 1024  # 500 MB per NFR-F4-1
 
 class GitError(RuntimeError):
     pass
+
+
+_AUTH_MARKERS = (
+    "authentication failed",
+    "invalid username or token",
+    "password authentication is not supported",
+    "could not read username",
+    "could not read password",
+    "permission denied (publickey)",
+    "fatal: could not read",
+)
+
+
+def _is_auth_failure(err: "GitError") -> bool:
+    msg = str(err).lower()
+    return any(m in msg for m in _AUTH_MARKERS)
 
 
 class GitPublisher:
@@ -31,6 +48,10 @@ class GitPublisher:
                 check=True,
                 capture_output=True,
                 text=True,
+                # Make sure git won't sit on a credentials prompt forever.
+                env={**os.environ,
+                     "GIT_TERMINAL_PROMPT": "0",
+                     "GIT_ASKPASS": "/bin/true"},
             )
             return out.stdout.strip()
         except subprocess.CalledProcessError as exc:
@@ -47,6 +68,16 @@ class GitPublisher:
                 self._run("push", "-u", "origin", self.branch)
                 return
             except GitError as exc:
+                if _is_auth_failure(exc):
+                    raise GitError(
+                        "git push: authentication failed — no retry.\n"
+                        "Fix with one of:\n"
+                        "  • PAT in URL:  git remote set-url origin "
+                        "https://<USER>:<PAT>@github.com/<owner>/<repo>.git\n"
+                        "  • SSH:         git remote set-url origin "
+                        "git@github.com:<owner>/<repo>.git  (with SSH key on VM)\n"
+                        f"Original error:\n{exc}"
+                    ) from exc
                 LOGGER.warning(
                     "git_push_failed",
                     extra={"attempt": attempt, "delay": delay, "err": str(exc)},
