@@ -23,7 +23,7 @@ class GitPublisher:
         self.branch = branch
 
     def _run(self, *args: str) -> str:
-        LOGGER.info("git", extra={"args": list(args)})
+        LOGGER.info("git", extra={"cmd": list(args)})
         try:
             out = subprocess.run(
                 ("git", *args),
