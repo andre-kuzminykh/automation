@@ -58,6 +58,19 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     p.add_argument("--dry-run", action="store_true")
     p.add_argument("--no-git", action="store_true", help="skip git commit/push")
     p.add_argument(
+        "--compress",
+        action="store_true",
+        default=True,
+        help="ffmpeg re-encode each video before commit (libx264 crf 28). "
+             "Hedra returns 50+ MB mp4s; default ON to fit GitHub limits.",
+    )
+    p.add_argument(
+        "--no-compress",
+        dest="compress",
+        action="store_false",
+        help="skip ffmpeg re-encoding (raw Hedra output)",
+    )
+    p.add_argument(
         "--poll-interval", type=float, default=5.0, help="seconds between polls"
     )
     p.add_argument(
@@ -437,6 +450,39 @@ def main(argv: Sequence[str] | None = None) -> int:
     print(summary)
     if failed:
         print(f"FAILED ids: {sorted(failed)}")
+
+    # --- Compress videos (NFR-F4-1: keep batch ≤ 500 MB) ---------------------
+    if args.compress and ok:
+        for sid in sorted(ok):
+            src = paths["videos_dir"] / f"{sid}.mp4"
+            if not src.exists():
+                continue
+            size_before = src.stat().st_size
+            if size_before < 5 * 1024 * 1024:  # < 5 MB — no need
+                continue
+            tmp = src.with_suffix(".compressed.mp4")
+            log.info("compress_start",
+                     extra={"slide": sid, "size_before": size_before})
+            import subprocess
+            try:
+                subprocess.run(
+                    ["ffmpeg", "-y", "-i", str(src),
+                     "-vcodec", "libx264", "-crf", "28", "-preset", "fast",
+                     "-acodec", "aac", "-b:a", "96k", "-movflags", "+faststart",
+                     str(tmp)],
+                    check=True, capture_output=True,
+                )
+            except (subprocess.CalledProcessError, FileNotFoundError) as exc:
+                log.warning("compress_skipped",
+                            extra={"slide": sid, "err": str(exc)[:200]})
+                tmp.unlink(missing_ok=True)
+                continue
+            size_after = tmp.stat().st_size
+            tmp.replace(src)
+            log.info("compress_ok",
+                     extra={"slide": sid, "size_before": size_before,
+                            "size_after": size_after,
+                            "ratio": round(size_after / max(size_before, 1), 3)})
 
     # --- Git publish (F4) -----------------------------------------------------
     if not args.no_git and ok:
