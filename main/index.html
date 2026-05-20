@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Agents Corp — Карта курса</title>
+    <meta name="description" content="Полный курс AI-Agents Corp: от введения до экономики AI-трансформации. 8 лекций, intro, спецвыпуски и 1-day sprint.">
+    <meta name="theme-color" content="#35F0C7">
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="AI-Agents Corp — Карта курса">
+    <meta property="og:description" content="8 лекций об AI-агентах в бизнесе — от введения до экономики и governance">
+    <meta property="og:locale" content="ru_RU">
+    <meta property="og:site_name" content="AISALA AI">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="AI-Agents Corp — Карта курса">
+    <meta name="twitter:description" content="8 лекций об AI-агентах в бизнесе">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <script>
+        tailwind.config = {
+            theme: { extend: {
+                fontFamily: { sans: ['Montserrat', 'sans-serif'] },
+                colors: { solar: '#35F0C7', grayBase: '#E9E9E9', black: '#000000', white: '#FFFFFF' }
+            }}
+        }
+    </script>
+
+<style>
+    html { background: #ffffff !important; -webkit-tap-highlight-color: transparent; scroll-behavior: smooth; }
+    body { background: #ffffff !important; margin: 0; color: #000000; font-family: 'Montserrat', sans-serif; }
+
+    .bg-glow-1, .bg-glow-2 {
+        position: fixed; border-radius: 50%; filter: blur(120px);
+        z-index: 0; pointer-events: none; opacity: 0.35;
+    }
+    .bg-glow-1 { top: -15%; left: -15%; width: 60vw; height: 60vw; max-width: 800px; max-height: 800px;
+                 background: rgba(0,0,0,0.05) !important; }
+    .bg-glow-2 { bottom: -10%; right: -10%; width: 50vw; height: 50vw; max-width: 700px; max-height: 700px;
+                 background: rgba(53,240,199,0.18) !important; }
+
+    @keyframes pulse-slow { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.85; transform:scale(1.04); } }
+    .animate-pulse-slow { animation: pulse-slow 4s ease-in-out infinite; }
+
+    /* Карточка лекции — лёгкий lift + solar бордер при hover */
+    .lecture-card {
+        position: relative;
+        transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+    .lecture-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 18px 40px -16px rgba(53,240,199,0.4), 0 4px 8px -4px rgba(0,0,0,0.08);
+    }
+    .lecture-card:hover .lecture-arrow {
+        transform: translateX(4px);
+        color: #000;
+    }
+    .lecture-card.dark:hover {
+        box-shadow: 0 25px 50px -12px rgba(53,240,199,0.45);
+    }
+    .lecture-arrow { transition: transform 0.25s ease, color 0.25s ease; }
+
+    /* Заглушка для будущих лекций */
+    .lecture-card.coming-soon {
+        opacity: 0.55;
+        cursor: default;
+        pointer-events: none;
+    }
+</style>
+</head>
+<body class="font-sans selection:bg-solar selection:text-black">
+
+<div class="bg-glow-1"></div>
+<div class="bg-glow-2"></div>
+
+<div class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 md:px-12 py-8 md:py-20">
+
+    <!-- ============== HERO ============== -->
+    <header class="text-center mb-8 md:mb-16">
+        <div class="inline-flex items-center gap-2 bg-grayBase/30 border border-grayBase rounded-full px-3 py-1 md:px-4 md:py-2 shadow-sm mb-4 md:mb-8">
+            <i class="ph-fill ph-graduation-cap text-solar text-sm md:text-base"></i>
+            <p class="text-black font-bold uppercase tracking-widest text-[9px] md:text-sm m-0">AISALA AI · Программа курса</p>
+        </div>
+        <h1 class="text-3xl sm:text-5xl md:text-6xl lg:text-[72px] font-black mb-3 md:mb-6 leading-tight tracking-tight text-black">
+            AI-Agents <span class="text-solar">Corp</span>
+        </h1>
+        <p class="text-black/70 font-bold text-sm md:text-2xl mb-2 md:mb-4 max-w-3xl mx-auto">
+            Полный курс: от введения в AI-агенты до экономики трансформации
+        </p>
+        <p class="text-black/50 font-medium text-xs md:text-base max-w-2xl mx-auto">
+            8 лекций · спецвыпуски · 1-day sprint · итоговая сессия
+        </p>
+
+        <!-- Quick stats -->
+        <div class="grid grid-cols-3 gap-2 md:gap-3 max-w-2xl mx-auto mt-6 md:mt-10">
+            <div class="bg-white border border-grayBase rounded-2xl p-3 md:p-5 text-center shadow-sm">
+                <p class="text-2xl md:text-4xl font-black text-solar leading-none">8</p>
+                <p class="text-[10px] md:text-sm font-bold uppercase tracking-widest text-black/60 mt-1 md:mt-2">Лекций</p>
+            </div>
+            <div class="bg-white border border-grayBase rounded-2xl p-3 md:p-5 text-center shadow-sm">
+                <p class="text-2xl md:text-4xl font-black text-solar leading-none">50+</p>
+                <p class="text-[10px] md:text-sm font-bold uppercase tracking-widest text-black/60 mt-1 md:mt-2">Слайдов на тему</p>
+            </div>
+            <div class="bg-black border-2 border-solar rounded-2xl p-3 md:p-5 text-center shadow-xl">
+                <p class="text-2xl md:text-4xl font-black text-solar leading-none">10</p>
+                <p class="text-[10px] md:text-sm font-bold uppercase tracking-widest text-solar/70 mt-1 md:mt-2">Тестов в каждой</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- ============== ВВЕДЕНИЕ — выделенная карточка ============== -->
+    <section class="mb-6 md:mb-10">
+        <p class="text-[10px] md:text-xs font-bold uppercase tracking-widest text-black/40 mb-3 md:mb-4 text-center">Начало</p>
+        <a href="../intro/" class="lecture-card dark block bg-black border-2 border-solar rounded-[24px] md:rounded-[32px] p-5 md:p-10 text-white shadow-xl">
+            <div class="flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-6">
+                <div class="w-14 h-14 md:w-20 md:h-20 shrink-0 bg-solar rounded-full flex items-center justify-center shadow-lg animate-pulse-slow">
+                    <i class="ph-fill ph-play-circle text-black text-2xl md:text-4xl"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-[10px] md:text-sm font-bold uppercase tracking-widest text-solar/70 mb-1 md:mb-2">Введение</p>
+                    <h2 class="text-xl md:text-3xl lg:text-4xl font-black text-solar leading-tight mb-2 md:mb-3">Автоматизация бизнес-процессов с помощью ИИ-агентов</h2>
+                    <p class="text-white/70 text-[12px] md:text-base font-medium leading-snug">Что такое AI-агенты, зачем они бизнесу, и почему сегодня — самое время разбираться. Стартовая точка курса.</p>
+                </div>
+                <i class="lecture-arrow ph-bold ph-arrow-right text-2xl md:text-4xl text-solar/80 shrink-0 self-end md:self-center"></i>
+            </div>
+        </a>
+    </section>
+
+    <!-- ============== 8 ЛЕКЦИЙ — 2 столбца на десктопе ============== -->
+    <section class="mb-6 md:mb-10">
+        <p class="text-[10px] md:text-xs font-bold uppercase tracking-widest text-black/40 mb-3 md:mb-4 text-center">Восемь лекций</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-5">
+
+            <!-- Лекция 1 -->
+            <a href="../1/" class="lecture-card block bg-white border border-grayBase hover:border-solar rounded-2xl md:rounded-3xl p-4 md:p-6 shadow-sm">
+                <div class="flex items-start gap-3 md:gap-5">
+                    <div class="w-12 h-12 md:w-16 md:h-16 shrink-0 bg-solar rounded-2xl flex items-center justify-center text-black font-black text-xl md:text-3xl shadow-md">1</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1 md:mb-2">
+                            <i class="ph-fill ph-cpu text-solar text-sm md:text-base"></i>
+                            <p class="text-[10px] md:text-xs font-bold uppercase tracking-widest text-black/40">Основа</p>
+                        </div>
+                        <h3 class="font-black text-sm md:text-lg leading-tight mb-1 md:mb-2">ИИ как новое операционное ядро бизнеса</h3>
+                        <p class="text-[11px] md:text-sm text-black/60 leading-snug">AI — не модель и не чат-бот. Это новый способ работы компании.</p>
+                    </div>
+                    <i class="lecture-arrow ph-bold ph-arrow-right text-lg md:text-2xl text-solar shrink-0 self-center"></i>
+                </div>
+            </a>
+
+            <!-- Лекция 2 -->
+            <a href="../2/" class="lecture-card block bg-white border border-grayBase hover:border-solar rounded-2xl md:rounded-3xl p-4 md:p-6 shadow-sm">
+                <div class="flex items-start gap-3 md:gap-5">
+                    <div class="w-12 h-12 md:w-16 md:h-16 shrink-0 bg-solar rounded-2xl flex items-center justify-center text-black font-black text-xl md:text-3xl shadow-md">2</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1 md:mb-2">
+                            <i class="ph-fill ph-flow-arrow text-solar text-sm md:text-base"></i>
+                            <p class="text-[10px] md:text-xs font-bold uppercase tracking-widest text-black/40">Процессы</p>
+                        </div>
+                        <h3 class="font-black text-sm md:text-lg leading-tight mb-1 md:mb-2">Переход к процессному подходу</h3>
+                        <p class="text-[11px] md:text-sm text-black/60 leading-snug">Процесс, юнит, метрика — язык управления вместо «у нас сложная поддержка».</p>
+                    </div>
+                    <i class="lecture-arrow ph-bold ph-arrow-right text-lg md:text-2xl text-solar shrink-0 self-center"></i>
+                </div>
+            </a>
+
+            <!-- Лекция 3 -->
+            <a href="../3/" class="lecture-card block bg-white border border-grayBase hover:border-solar rounded-2xl md:rounded-3xl p-4 md:p-6 shadow-sm">
+                <div class="flex items-start gap-3 md:gap-5">
+                    <div class="w-12 h-12 md:w-16 md:h-16 shrink-0 bg-solar rounded-2xl flex items-center justify-center text-black font-black text-xl md:text-3xl shadow-md">3</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1 md:mb-2">
+                            <i class="ph-fill ph-magic-wand text-solar text-sm md:text-base"></i>
+                            <p class="text-[10px] md:text-xs font-bold uppercase tracking-widest text-black/40">Автоматизация</p>
+                        </div>
+                        <h3 class="font-black text-sm md:text-lg leading-tight mb-1 md:mb-2">ИИ-автоматизация процессов</h3>
+                        <p class="text-[11px] md:text-sm text-black/60 leading-snug">Классификация, извлечение, генерация, действия — что AI реально умеет в проде.</p>
+                    </div>
+                    <i class="lecture-arrow ph-bold ph-arrow-right text-lg md:text-2xl text-solar shrink-0 self-center"></i>
+                </div>
+            </a>
+
+            <!-- Лекция 4 -->
+            <a href="../4/" class="lecture-card block bg-white border border-grayBase hover:border-solar rounded-2xl md:rounded-3xl p-4 md:p-6 shadow-sm">
+                <div class="flex items-start gap-3 md:gap-5">
+                    <div class="w-12 h-12 md:w-16 md:h-16 shrink-0 bg-solar rounded-2xl flex items-center justify-center text-black font-black text-xl md:text-3xl shadow-md">4</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1 md:mb-2">
+                            <i class="ph-fill ph-robot text-solar text-sm md:text-base"></i>
+                            <p class="text-[10px] md:text-xs font-bold uppercase tracking-widest text-black/40">Агенты</p>
+                        </div>
+                        <h3 class="font-black text-sm md:text-lg leading-tight mb-1 md:mb-2">AI-агенты и мультиагентные системы</h3>
+                        <p class="text-[11px] md:text-sm text-black/60 leading-snug">Один агент, команда агентов, оркестрация — архитектуры для реального бизнеса.</p>
+                    </div>
+                    <i class="lecture-arrow ph-bold ph-arrow-right text-lg md:text-2xl text-solar shrink-0 self-center"></i>
+                </div>
+            </a>
+
+            <!-- Лекция 5 -->
+            <a href="../5/" class="lecture-card block bg-white border border-grayBase hover:border-solar rounded-2xl md:rounded-3xl p-4 md:p-6 shadow-sm">
+                <div class="flex items-start gap-3 md:gap-5">
+                    <div class="w-12 h-12 md:w-16 md:h-16 shrink-0 bg-solar rounded-2xl flex items-center justify-center text-black font-black text-xl md:text-3xl shadow-md">5</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1 md:mb-2">
+                            <i class="ph-fill ph-plugs-connected text-solar text-sm md:text-base"></i>
+                            <p class="text-[10px] md:text-xs font-bold uppercase tracking-widest text-black/40">ИИ-сервисы</p>
+                        </div>
+                        <h3 class="font-black text-sm md:text-lg leading-tight mb-1 md:mb-2">От автоматизаций к ИИ-сервисам и агентам</h3>
+                        <p class="text-[11px] md:text-sm text-black/60 leading-snug">Когда хватает workflow, когда нужен сервис, а когда — собственный агент.</p>
+                    </div>
+                    <i class="lecture-arrow ph-bold ph-arrow-right text-lg md:text-2xl text-solar shrink-0 self-center"></i>
+                </div>
+            </a>
+
+            <!-- Лекция 6 -->
+            <a href="../6/" class="lecture-card block bg-white border border-grayBase hover:border-solar rounded-2xl md:rounded-3xl p-4 md:p-6 shadow-sm">
+                <div class="flex items-start gap-3 md:gap-5">
+                    <div class="w-12 h-12 md:w-16 md:h-16 shrink-0 bg-solar rounded-2xl flex items-center justify-center text-black font-black text-xl md:text-3xl shadow-md">6</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1 md:mb-2">
+                            <i class="ph-fill ph-shield-check text-solar text-sm md:text-base"></i>
+                            <p class="text-[10px] md:text-xs font-bold uppercase tracking-widest text-black/40">Продакшен</p>
+                        </div>
+                        <h3 class="font-black text-sm md:text-lg leading-tight mb-1 md:mb-2">AI-агент в продакшене: от демо к промышленной системе</h3>
+                        <p class="text-[11px] md:text-sm text-black/60 leading-snug">Зрелость, метрики, тестирование, мониторинг, безопасность и governance.</p>
+                    </div>
+                    <i class="lecture-arrow ph-bold ph-arrow-right text-lg md:text-2xl text-solar shrink-0 self-center"></i>
+                </div>
+            </a>
+
+            <!-- Лекция 7 -->
+            <a href="../7/" class="lecture-card block bg-white border border-grayBase hover:border-solar rounded-2xl md:rounded-3xl p-4 md:p-6 shadow-sm">
+                <div class="flex items-start gap-3 md:gap-5">
+                    <div class="w-12 h-12 md:w-16 md:h-16 shrink-0 bg-solar rounded-2xl flex items-center justify-center text-black font-black text-xl md:text-3xl shadow-md">7</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1 md:mb-2">
+                            <i class="ph-fill ph-users-three text-solar text-sm md:text-base"></i>
+                            <p class="text-[10px] md:text-xs font-bold uppercase tracking-widest text-black/40">Управление</p>
+                        </div>
+                        <h3 class="font-black text-sm md:text-lg leading-tight mb-1 md:mb-2">Люди, машины и новая логика управления</h3>
+                        <p class="text-[11px] md:text-sm text-black/60 leading-snug">Гибридная организация: новые роли, ответственность, метрики, работа с сопротивлением.</p>
+                    </div>
+                    <i class="lecture-arrow ph-bold ph-arrow-right text-lg md:text-2xl text-solar shrink-0 self-center"></i>
+                </div>
+            </a>
+
+            <!-- Лекция 8 — финальная, выделяю солнечной заливкой -->
+            <a href="../8/" class="lecture-card block bg-solar rounded-2xl md:rounded-3xl p-4 md:p-6 shadow-[0_8px_25px_-8px_rgba(53,240,199,0.55)]">
+                <div class="flex items-start gap-3 md:gap-5">
+                    <div class="w-12 h-12 md:w-16 md:h-16 shrink-0 bg-black rounded-2xl flex items-center justify-center text-solar font-black text-xl md:text-3xl shadow-md">8</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1 md:mb-2">
+                            <i class="ph-fill ph-calculator text-black text-sm md:text-base"></i>
+                            <p class="text-[10px] md:text-xs font-bold uppercase tracking-widest text-black/70">Экономика</p>
+                        </div>
+                        <h3 class="font-black text-sm md:text-lg leading-tight mb-1 md:mb-2 text-black">Экономика AI-трансформации</h3>
+                        <p class="text-[11px] md:text-sm text-black/80 leading-snug">Baseline, юнит, FTE, TCO, ROI, payback — язык бизнес-кейса AI-проекта.</p>
+                    </div>
+                    <i class="lecture-arrow ph-bold ph-arrow-right text-lg md:text-2xl text-black shrink-0 self-center"></i>
+                </div>
+            </a>
+
+        </div>
+    </section>
+
+    <!-- ============== СПЕЦВЫПУСКИ ============== -->
+    <section class="mb-6 md:mb-12">
+        <p class="text-[10px] md:text-xs font-bold uppercase tracking-widest text-black/40 mb-3 md:mb-4 text-center">Спецвыпуски</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-5">
+
+            <!-- 1-day sprint -->
+            <a href="../1-day/" class="lecture-card block bg-black border-2 border-solar rounded-2xl md:rounded-3xl p-4 md:p-6 shadow-xl text-white">
+                <div class="flex items-start gap-3 md:gap-5">
+                    <div class="w-12 h-12 md:w-16 md:h-16 shrink-0 bg-solar rounded-2xl flex items-center justify-center text-black shadow-md">
+                        <i class="ph-fill ph-lightning text-xl md:text-3xl"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1 md:mb-2">
+                            <i class="ph-fill ph-rocket-launch text-solar text-sm md:text-base"></i>
+                            <p class="text-[10px] md:text-xs font-bold uppercase tracking-widest text-solar/70">Воркшоп</p>
+                        </div>
+                        <h3 class="font-black text-sm md:text-lg leading-tight mb-1 md:mb-2 text-solar">AI 1 Day Sprint — от хаоса к системе</h3>
+                        <p class="text-[11px] md:text-sm text-white/70 leading-snug">Однодневный спринт: за день — рабочая модель AI-трансформации.</p>
+                    </div>
+                    <i class="lecture-arrow ph-bold ph-arrow-right text-lg md:text-2xl text-solar shrink-0 self-center"></i>
+                </div>
+            </a>
+
+            <!-- s1 -->
+            <a href="../s1/" class="lecture-card block bg-black border-2 border-solar rounded-2xl md:rounded-3xl p-4 md:p-6 shadow-xl text-white">
+                <div class="flex items-start gap-3 md:gap-5">
+                    <div class="w-12 h-12 md:w-16 md:h-16 shrink-0 bg-solar rounded-2xl flex items-center justify-center text-black shadow-md">
+                        <i class="ph-fill ph-medal text-xl md:text-3xl"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1 md:mb-2">
+                            <i class="ph-fill ph-flag-checkered text-solar text-sm md:text-base"></i>
+                            <p class="text-[10px] md:text-xs font-bold uppercase tracking-widest text-solar/70">Сезон 1</p>
+                        </div>
+                        <h3 class="font-black text-sm md:text-lg leading-tight mb-1 md:mb-2 text-solar">AI-Agents: Трансформация бизнеса</h3>
+                        <p class="text-[11px] md:text-sm text-white/70 leading-snug">Итоговая сессия первого сезона — интеграция знаний в работающую модель.</p>
+                    </div>
+                    <i class="lecture-arrow ph-bold ph-arrow-right text-lg md:text-2xl text-solar shrink-0 self-center"></i>
+                </div>
+            </a>
+
+        </div>
+    </section>
+
+    <!-- ============== Подсказка ============== -->
+    <section class="mb-8 md:mb-12">
+        <div class="bg-solar text-black font-black text-center text-[11px] md:text-base rounded-2xl p-3 md:p-5 max-w-4xl mx-auto w-full shadow-md">
+            Нажми на любую карточку, чтобы начать слушать лекцию · Каждая лекция содержит видео и тест в конце
+        </div>
+    </section>
+
+    <!-- ============== FOOTER ============== -->
+    <footer class="text-center pt-6 md:pt-10 border-t border-grayBase">
+        <div class="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-6 mb-3 md:mb-4">
+            <a href="https://aisala.ai" class="text-black/60 hover:text-solar text-xs md:text-sm font-bold uppercase tracking-widest transition-colors">aisala.ai</a>
+            <span class="hidden md:inline text-black/30">·</span>
+            <a href="../" class="text-black/60 hover:text-solar text-xs md:text-sm font-bold uppercase tracking-widest transition-colors">Все курсы</a>
+        </div>
+        <p class="text-black/40 text-[10px] md:text-xs">© AISALA AI · AI-Agents Corp</p>
+    </footer>
+
+</div>
+
+</body>
+</html>
