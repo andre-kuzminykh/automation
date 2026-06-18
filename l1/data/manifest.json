@@ -6,9 +6,9 @@
       "duration_sec": null,
       "error": null,
       "file_sha256": "88dfafe03ee9aeb8d8b4384b832aec3fab18c08ee1c71f35f62a890bc9c83df8",
-      "generated_at": "2026-06-18T15:10:11Z",
-      "hedra_generation_id": "4f1bd294-4542-4d1d-abd8-c950be0cc4b5",
-      "status": "ok",
+      "generated_at": "2026-06-18T15:24:49Z",
+      "hedra_generation_id": "aacbc304-0603-4a38-ad9c-01e9f67179da",
+      "status": "submitted",
       "text_sha256": "7986d178ed8d17995706907c0365a536c5f2a707f8c99542b3591d4ddacc0ea5"
     }
   },
