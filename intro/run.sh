@@ -17,9 +17,25 @@ AI_MODEL_ID="26f0fc66-152b-40ab-abed-76c43df99bc8"
 VOICE_ID="8e7544c8-a37b-4315-9599-55bad6bfbb7b"
 BRANCH="claude/setup-gcloud-video-service-XKVf0"
 
-# 1) Render the 3 intro slides (ids 1..3) into intro/videos/.
+# Hedra's queue can be slow after a big batch — give each slide up to 30 min,
+# and retry each failed slide once with a fresh request.
+TIMEOUT=1800
+
+# 1) First pass — render slides 1..3 sequentially.
 python3 -m l7.service.generate --lecture intro \
-  --ai-model-id "$AI_MODEL_ID" --voice-id "$VOICE_ID" --no-git || true
+  --ai-model-id "$AI_MODEL_ID" --voice-id "$VOICE_ID" \
+  --poll-timeout "$TIMEOUT" --no-git || true
+
+# 1b) Retry pass — anything still missing gets one more attempt.
+for n in 1 2 3; do
+  if [ ! -f "intro/videos/$n.mp4" ]; then
+    echo "---- retry slide $n ----"
+    python3 -m l7.service.generate --lecture intro \
+      --regenerate "$n" --from "$n" --to "$n" \
+      --ai-model-id "$AI_MODEL_ID" --voice-id "$VOICE_ID" \
+      --poll-timeout "$TIMEOUT" --no-git || true
+  fi
+done
 
 # 2) Copy to l1/videos/_1.mp4 .. _3.mp4
 ok=1
