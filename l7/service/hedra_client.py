@@ -292,14 +292,21 @@ class HedraClient:
     #   2) type=video with audio_id (+ start_keyframe_id)
     # Body shape for text_to_speech follows the same naming convention as
     # video_with_audio: <discriminator>_model_id + <discriminator>_inputs.
-    # Discovered shape (from live runs): flat body with `text` (not
-    # `text_prompt`) and a UUID voice_id. We keep the fallbacks below in
-    # case Hedra changes — but the first one is always tried first.
+    # Discovered from a live Hedra web-app response payload (response):
+    #   generated_audio_inputs: {
+    #     text_prompt, voice_id, voice_name, ai_model_id, model_slug,
+    #     stability, speed, language, ...
+    #   }
+    # So the canonical request is nested with `text_prompt` and the voice
+    # settings live next to it. The flat variants below are kept as
+    # fallbacks for older Hedra builds.
     _AUDIO_ATTEMPTS = (
         ("/generations", {
             "type": "text_to_speech",
-            "text": "{text}",
-            "voice_id": "{voice_id}",
+            "generated_audio_inputs": {
+                "text_prompt": "{text}",
+                "voice_id": "{voice_id}",
+            },
         }),
         ("/generations", {
             "type": "text_to_speech",
@@ -308,16 +315,16 @@ class HedraClient:
         }),
         ("/generations", {
             "type": "text_to_speech",
-            "generated_audio_inputs": {
-                "text": "{text}",
-                "voice_id": "{voice_id}",
-            },
+            "text": "{text}",
+            "voice_id": "{voice_id}",
         }),
         ("/generations", {
             "type": "text_to_speech",
             "text_to_speech_model_id": "{model_id}",
-            "text": "{text}",
-            "voice_id": "{voice_id}",
+            "generated_audio_inputs": {
+                "text_prompt": "{text}",
+                "voice_id": "{voice_id}",
+            },
         }),
     )
 
@@ -341,11 +348,10 @@ class HedraClient:
         """Add TTS voice settings (speed, stability) to a text_to_speech
         payload, in place.
 
-        Hedra's TTS runs on an ElevenLabs-style engine. `speed` is a factor
-        (0.7–1.2; <1.0 = slower). `stability` is 0–1 (lower = more
-        expressive/variable, higher = more monotone/stable). We attach them
-        both at the top level and inside a `voice_settings` object, since
-        different Hedra builds read one or the other; extra keys are ignored.
+        Hedra reads `speed` and `stability` directly from
+        `generated_audio_inputs` (confirmed from a live web-app payload).
+        For the flat fallback shapes we attach them at the top level.
+        `speed` is a factor (<1.0 = slower); `stability` is 0–1.
         """
         settings: dict[str, float] = {}
         if speed != 1.0:
@@ -358,7 +364,6 @@ class HedraClient:
                   if isinstance(payload.get("generated_audio_inputs"), dict)
                   else payload)
         target.update(settings)
-        target["voice_settings"] = {**target.get("voice_settings", {}), **settings}
 
     def submit_audio_generation(
         self, *, text: str, voice_id: str, model_id: str | None = None,
