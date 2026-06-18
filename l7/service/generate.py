@@ -176,11 +176,13 @@ def main(argv: Sequence[str] | None = None) -> int:
     manifest.set_top("voice_id", config["hedra"]["voice_id"])
 
     regen = _parse_id_set(args.regenerate)
-    from_id = args.from_id or 1
-    to_id = args.to_id or len(repo)
-    slides = [
-        s for s in repo.iter_slides() if from_id <= s.id <= to_id
-    ]
+    all_slides = list(repo.iter_slides())
+    all_ids = [s.id for s in all_slides]
+    from_id = (args.from_id if args.from_id is not None
+               else (min(all_ids) if all_ids else 1))
+    to_id = (args.to_id if args.to_id is not None
+             else (max(all_ids) if all_ids else 0))
+    slides = [s for s in all_slides if from_id <= s.id <= to_id]
     if args.limit:
         slides = slides[: args.limit]
 
@@ -515,11 +517,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         paths_to_commit = [paths["videos_dir"] / f"{i}.mp4" for i in sorted(ok)]
         paths_to_commit.append(paths["manifest"])
         try:
+            lec = repo.lecture.id
             publisher.publish(
                 paths_to_commit,
                 commit_message=(
-                    "feat(l7): add hedra-generated videos for lecture 7 "
-                    f"({len(ok)} slides)"
+                    f"feat({lec}): hedra video(s) for {lec} "
+                    f"(slide{'s' if len(ok) != 1 else ''}: {sorted(ok)})"
                 ),
             )
         except GitError as exc:

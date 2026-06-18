@@ -23,7 +23,7 @@
         "type": "object",
         "required": ["id", "title", "narration"],
         "properties": {
-          "id": { "type": "integer", "minimum": 1 },
+          "id": { "type": "integer", "minimum": 0 },
           "title": { "type": "string", "minLength": 1 },
           "narration": { "type": "string", "minLength": 1 }
         },
