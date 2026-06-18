@@ -78,7 +78,13 @@ class SlideRepository:
         for idx, item in enumerate(slides_raw):
             if not isinstance(item, dict):
                 raise SlidesSchemaError(f"slide #{idx}: must be an object")
-            for field in ("id", "title", "narration"):
+            # NB: id may legitimately be 0 (course-intro slide), so check
+            # presence explicitly rather than truthiness (0 is falsy).
+            if "id" not in item or item["id"] is None or item["id"] == "":
+                raise SlidesSchemaError(
+                    f"slide #{idx}: missing/empty required field 'id'"
+                )
+            for field in ("title", "narration"):
                 if field not in item or not item[field]:
                     raise SlidesSchemaError(
                         f"slide #{idx}: missing/empty required field '{field}'"
@@ -96,11 +102,14 @@ class SlideRepository:
             )
 
         slides.sort(key=lambda s: s.id)
-        expected = list(range(1, len(slides) + 1))
         actual = [s.id for s in slides]
-        if actual != expected:
+        # Slides must be contiguous; numbering may start at 0 (course-intro
+        # slide) or 1 (regular lectures).
+        start = actual[0]
+        expected = list(range(start, start + len(slides)))
+        if start not in (0, 1) or actual != expected:
             raise SlidesSchemaError(
-                f"slide ids must be contiguous 1..N; got {actual}"
+                f"slide ids must be contiguous starting at 0 or 1; got {actual}"
             )
 
         self._slides = slides
