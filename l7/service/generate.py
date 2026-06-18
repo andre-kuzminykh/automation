@@ -473,26 +473,47 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(f"FAILED ids: {sorted(failed)}")
 
     # --- Compress videos (NFR-F4-1: keep batch ≤ 500 MB) ---------------------
+    # We also apply playback slowdown here, in sync, when speed_postprocess<1.
+    # Hedra's public TTS endpoint silently ignores the `speed` field, so a
+    # post-process pass is the reliable way to get slower speech. Lip-sync is
+    # preserved because video frames (setpts) and audio (atempo) are slowed
+    # by the same factor — atempo also keeps the pitch unchanged.
+    speed_pp = float(
+        args.speed if args.speed is not None
+        else config["hedra"].get("speed_postprocess",
+                                  config["hedra"].get("speed", 1.0))
+    )
+    log.info("compress_speed", extra={"speed_postprocess": speed_pp})
+
     if args.compress and ok:
+        import subprocess
         for sid in sorted(ok):
             src = paths["videos_dir"] / f"{sid}.mp4"
             if not src.exists():
                 continue
             size_before = src.stat().st_size
-            if size_before < 5 * 1024 * 1024:  # < 5 MB — no need
+            # Re-encode anything > 5 MB or when we need a speed change.
+            if size_before < 5 * 1024 * 1024 and speed_pp == 1.0:
                 continue
             tmp = src.with_suffix(".compressed.mp4")
             log.info("compress_start",
-                     extra={"slide": sid, "size_before": size_before})
-            import subprocess
+                     extra={"slide": sid, "size_before": size_before,
+                            "speed": speed_pp})
+            cmd = ["ffmpeg", "-y", "-i", str(src)]
+            if speed_pp != 1.0:
+                # setpts factor > 1 slows down playback; atempo factor < 1 slows audio.
+                cmd += [
+                    "-filter_complex",
+                    f"[0:v]setpts=PTS/{speed_pp}[v];[0:a]atempo={speed_pp}[a]",
+                    "-map", "[v]", "-map", "[a]",
+                ]
+            cmd += [
+                "-vcodec", "libx264", "-crf", "28", "-preset", "fast",
+                "-acodec", "aac", "-b:a", "96k", "-movflags", "+faststart",
+                str(tmp),
+            ]
             try:
-                subprocess.run(
-                    ["ffmpeg", "-y", "-i", str(src),
-                     "-vcodec", "libx264", "-crf", "28", "-preset", "fast",
-                     "-acodec", "aac", "-b:a", "96k", "-movflags", "+faststart",
-                     str(tmp)],
-                    check=True, capture_output=True,
-                )
+                subprocess.run(cmd, check=True, capture_output=True)
             except (subprocess.CalledProcessError, FileNotFoundError) as exc:
                 log.warning("compress_skipped",
                             extra={"slide": sid, "err": str(exc)[:200]})
