@@ -368,29 +368,52 @@ class HedraClient:
     def submit_audio_generation(
         self, *, text: str, voice_id: str, model_id: str | None = None,
         speed: float = 1.0, stability: float | None = None,
+        tts_model_id: str | None = None, language: str | None = None,
     ) -> tuple[str, str]:
-        """POST audio request, return (path_that_worked, response_id).
+        """POST a text_to_speech request, return (path, response_id).
 
-        Tries multiple known shapes until one succeeds. The returned id is
-        either an audio asset_id or a generation_id depending on the
-        endpoint Hedra accepts. `speed` < 1.0 slows the speech down;
-        `stability` (0–1) controls voice consistency.
+        The canonical shape (captured from the live Hedra web-app request)
+        is FLAT — speed/stability are only honoured in this form, and they
+        require the TTS `model_id`:
+
+            {"type": "text_to_speech", "voice_id": ..., "model_id": <tts>,
+             "text": ..., "stability": 0.75, "speed": 0.9,
+             "language": "Russian"}
+
+        We try that first, then fall back to the older nested/flat shapes.
         """
-        last_err: HedraError | None = None
+        canonical = {
+            "type": "text_to_speech",
+            "voice_id": voice_id,
+            "text": text,
+        }
+        if tts_model_id:
+            canonical["model_id"] = tts_model_id
+        if language:
+            canonical["language"] = language
+        if speed != 1.0:
+            canonical["speed"] = speed
+        if stability is not None:
+            canonical["stability"] = stability
+
+        attempts: list[tuple[str, dict]] = [("/generations", canonical)]
         for path, tpl in self._AUDIO_ATTEMPTS:
             payload = self._fill_template(
                 tpl, text=text, voice_id=voice_id, model_id=model_id
             )
-            self._inject_voice_settings(payload, speed, stability)
-            # Skip shapes that need a model_id when we don't have one.
             if model_id is None and any(
-                isinstance(v, str) and "{model_id}" in v
-                for v in str(payload)
+                isinstance(v, str) and "{model_id}" in v for v in str(payload)
             ):
                 continue
+            self._inject_voice_settings(payload, speed, stability)
+            attempts.append((path, payload))
+
+        last_err: HedraError | None = None
+        for path, payload in attempts:
             LOGGER.info("audio_attempt",
                         extra={"path": path, "payload_keys": list(payload.keys()),
-                               "speed": speed, "stability": stability})
+                               "speed": speed, "stability": stability,
+                               "tts_model_id": tts_model_id, "language": language})
             try:
                 resp = self._request("POST", path, json=payload)
             except HedraError as exc:

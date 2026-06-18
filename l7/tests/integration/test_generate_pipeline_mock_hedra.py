@@ -97,7 +97,8 @@ class MockHedra:
         return [{"id": "mock-voice-uuid", "name": "aisala", "language": "ru"}]
 
     def submit_audio_generation(self, *, text, voice_id, model_id=None,
-                                 speed=1.0, stability=None) -> tuple[str, str]:
+                                 speed=1.0, stability=None,
+                                 tts_model_id=None, language=None) -> tuple[str, str]:
         return "/audio", f"audio_{len(self.submitted) + 1}"
 
     def submit_generation(self, *, avatar_asset_id, text, **_kw) -> str:

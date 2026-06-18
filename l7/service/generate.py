@@ -280,8 +280,11 @@ def main(argv: Sequence[str] | None = None) -> int:
                      else config["hedra"].get("stability"))
     if tts_stability is not None:
         tts_stability = float(tts_stability)
+    tts_model_id = config["hedra"].get("tts_model_id")
+    tts_language = config["hedra"].get("language")
     log.info("voice_tuning",
-             extra={"speed": tts_speed, "stability": tts_stability})
+             extra={"speed": tts_speed, "stability": tts_stability,
+                    "tts_model_id": tts_model_id, "language": tts_language})
 
     ok, skipped, failed = [], [], []
     consecutive_failures = 0
@@ -307,6 +310,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             audio_path, audio_gen_id = client.submit_audio_generation(
                 text=slide.narration, voice_id=voice_id,
                 model_id=ai_model_id, speed=tts_speed, stability=tts_stability,
+                tts_model_id=tts_model_id, language=tts_language,
             )
             # If the endpoint returned a generation_id (not yet ready),
             # poll for it. Asset ids from /audio are usable immediately.
