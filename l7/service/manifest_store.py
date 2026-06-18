@@ -33,7 +33,9 @@ class ManifestStore:
 
     def write_atomic(self) -> None:
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        tmp = self.path.with_suffix(self.path.suffix + ".tmp")
+        # Unique tmp name per process: parallel generators must not share one
+        # manifest.json.tmp (concurrent os.replace would FileNotFoundError).
+        tmp = self.path.with_suffix(self.path.suffix + f".tmp.{os.getpid()}")
         payload = json.dumps(
             self._data, ensure_ascii=False, indent=2, sort_keys=True
         )
