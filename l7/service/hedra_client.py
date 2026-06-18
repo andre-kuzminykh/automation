@@ -408,17 +408,22 @@ class HedraClient:
             self._inject_voice_settings(payload, speed, stability)
             attempts.append((path, payload))
 
+        import json as _json
         last_err: HedraError | None = None
-        for path, payload in attempts:
+        for idx, (path, payload) in enumerate(attempts):
+            is_canonical = idx == 0
             LOGGER.info("audio_attempt",
-                        extra={"path": path, "payload_keys": list(payload.keys()),
+                        extra={"path": path, "is_canonical": is_canonical,
+                               "payload": _json.dumps(payload, ensure_ascii=False),
                                "speed": speed, "stability": stability,
                                "tts_model_id": tts_model_id, "language": language})
             try:
                 resp = self._request("POST", path, json=payload)
             except HedraError as exc:
-                LOGGER.info("audio_attempt_failed",
-                            extra={"path": path, "err": str(exc)[:200]})
+                level = LOGGER.warning if is_canonical else LOGGER.info
+                level("audio_attempt_failed",
+                      extra={"path": path, "is_canonical": is_canonical,
+                             "err": str(exc)[:300]})
                 last_err = exc
                 continue
             data = resp.json() if resp.text else {}
@@ -429,8 +434,17 @@ class HedraClient:
                 or data.get("generation_id")
             )
             if audio_id:
+                if not is_canonical:
+                    LOGGER.warning(
+                        "audio_fallback_used",
+                        extra={"path": path, "attempt_index": idx,
+                               "payload": _json.dumps(payload, ensure_ascii=False),
+                               "note": "canonical payload was rejected; voice/"
+                                       "speed may differ from Hedra UI"})
                 LOGGER.info("audio_submit_ok",
-                            extra={"path": path, "audio_id": audio_id})
+                            extra={"path": path, "is_canonical": is_canonical,
+                                   "audio_id": audio_id,
+                                   "response": _json.dumps(data, ensure_ascii=False)[:500]})
                 return path, str(audio_id)
             last_err = HedraError(
                 f"{path} accepted but returned no id: {data}"

@@ -14,7 +14,7 @@
     "voice_id_known": "119156fc-32c4-44e8-bb83-2c79d9e464b4",
     "tts_model_id": "14aeb855-72ff-4402-8f5a-8b845ee3feb4",
     "language": "Russian",
-    "speed": 0.75,
+    "speed": 0.7,
     "stability": 0.75,
     "duration_per_slide_seconds_max": 120,
     "api_key_env": "HEDRA_API_KEY"
