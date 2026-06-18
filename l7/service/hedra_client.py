@@ -335,20 +335,48 @@ class HedraClient:
             }
         return tpl
 
+    @staticmethod
+    def _inject_voice_settings(payload: dict, speed: float,
+                               stability: float | None) -> None:
+        """Add TTS voice settings (speed, stability) to a text_to_speech
+        payload, in place.
+
+        Hedra's TTS runs on an ElevenLabs-style engine. `speed` is a factor
+        (0.7–1.2; <1.0 = slower). `stability` is 0–1 (lower = more
+        expressive/variable, higher = more monotone/stable). We attach them
+        both at the top level and inside a `voice_settings` object, since
+        different Hedra builds read one or the other; extra keys are ignored.
+        """
+        settings: dict[str, float] = {}
+        if speed != 1.0:
+            settings["speed"] = speed
+        if stability is not None:
+            settings["stability"] = stability
+        if not settings:
+            return
+        target = (payload["generated_audio_inputs"]
+                  if isinstance(payload.get("generated_audio_inputs"), dict)
+                  else payload)
+        target.update(settings)
+        target["voice_settings"] = {**target.get("voice_settings", {}), **settings}
+
     def submit_audio_generation(
-        self, *, text: str, voice_id: str, model_id: str | None = None
+        self, *, text: str, voice_id: str, model_id: str | None = None,
+        speed: float = 1.0, stability: float | None = None,
     ) -> tuple[str, str]:
         """POST audio request, return (path_that_worked, response_id).
 
         Tries multiple known shapes until one succeeds. The returned id is
         either an audio asset_id or a generation_id depending on the
-        endpoint Hedra accepts.
+        endpoint Hedra accepts. `speed` < 1.0 slows the speech down;
+        `stability` (0–1) controls voice consistency.
         """
         last_err: HedraError | None = None
         for path, tpl in self._AUDIO_ATTEMPTS:
             payload = self._fill_template(
                 tpl, text=text, voice_id=voice_id, model_id=model_id
             )
+            self._inject_voice_settings(payload, speed, stability)
             # Skip shapes that need a model_id when we don't have one.
             if model_id is None and any(
                 isinstance(v, str) and "{model_id}" in v
@@ -356,7 +384,8 @@ class HedraClient:
             ):
                 continue
             LOGGER.info("audio_attempt",
-                        extra={"path": path, "payload_keys": list(payload.keys())})
+                        extra={"path": path, "payload_keys": list(payload.keys()),
+                               "speed": speed, "stability": stability})
             try:
                 resp = self._request("POST", path, json=payload)
             except HedraError as exc:

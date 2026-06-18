@@ -71,6 +71,17 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         help="skip ffmpeg re-encoding (raw Hedra output)",
     )
     p.add_argument(
+        "--speed", type=float, default=None,
+        help="TTS speech speed sent to Hedra at generation time; "
+             "0.75 = 25%% slower, 1.0 = unchanged (range ~0.7-1.2). "
+             "Overrides config.hedra.speed.",
+    )
+    p.add_argument(
+        "--stability", type=float, default=None,
+        help="TTS voice stability 0-1 (higher = steadier/less expressive). "
+             "Overrides config.hedra.stability.",
+    )
+    p.add_argument(
         "--poll-interval", type=float, default=5.0, help="seconds between polls"
     )
     p.add_argument(
@@ -262,6 +273,16 @@ def main(argv: Sequence[str] | None = None) -> int:
     log.info("voice_id_resolved",
              extra={"voice_id": voice_id, "voice_name": voice_hint})
 
+    # Voice tuning: CLI flag wins, else config.hedra, else default.
+    tts_speed = (args.speed if args.speed is not None
+                 else float(config["hedra"].get("speed", 1.0)))
+    tts_stability = (args.stability if args.stability is not None
+                     else config["hedra"].get("stability"))
+    if tts_stability is not None:
+        tts_stability = float(tts_stability)
+    log.info("voice_tuning",
+             extra={"speed": tts_speed, "stability": tts_stability})
+
     ok, skipped, failed = [], [], []
     consecutive_failures = 0
 
@@ -285,7 +306,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             log.info("slide_audio_submit", extra={"slide": slide.id})
             audio_path, audio_gen_id = client.submit_audio_generation(
                 text=slide.narration, voice_id=voice_id,
-                model_id=ai_model_id,
+                model_id=ai_model_id, speed=tts_speed, stability=tts_stability,
             )
             # If the endpoint returned a generation_id (not yet ready),
             # poll for it. Asset ids from /audio are usable immediately.
