@@ -113,11 +113,11 @@
     "7": {
       "duration_sec": null,
       "error": null,
-      "file_sha256": "14a87c77c2ae86c297d8160fe0a78e8a27fe623c8475de76a9e4922b99e833bb",
-      "generated_at": "2026-06-18T16:33:04Z",
-      "hedra_generation_id": "35df2e07-8998-4f00-ad75-d57742fcb3d8",
+      "file_sha256": "fb85ec692a19922ab7f388fb3d8a4523b56b57abc306368c572bc330e2a4a29c",
+      "generated_at": "2026-06-19T20:13:44Z",
+      "hedra_generation_id": "67bb158a-d292-40bf-a0c0-9d23c557ebbd",
       "status": "ok",
-      "text_sha256": "57e3929ca359986120d910591003e0cd8f4f935e01a2b2fd7ab571ba0ac399c3"
+      "text_sha256": "a3dfe1dd6ace9e74af4e44eacbe9ce25c6018276b9ef056608be0179818a87ab"
     }
   },
   "voice_id": "Andre [RUS]",
