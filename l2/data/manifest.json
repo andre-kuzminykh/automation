@@ -1,7 +1,17 @@
 {
   "avatar_asset_id": "a082e5a2-8f3f-4efa-9d30-594d00a600ae",
   "lecture_id": "l2",
-  "slides": {},
+  "slides": {
+    "4": {
+      "duration_sec": null,
+      "error": null,
+      "file_sha256": "6945d8ac3d2cf6cd7bf3c5881bd9d6f0848e4c557d79ac8bb8421344315eaa3a",
+      "generated_at": "2026-06-19T18:50:02Z",
+      "hedra_generation_id": "2214a2ea-35c0-48d2-93f7-149c95777f6f",
+      "status": "ok",
+      "text_sha256": "2eed539587686efe451b5f95f2451969a871f98a15d28ac220472f2b3220febd"
+    }
+  },
   "voice_id": "Andre [RUS]",
   "voice_id_uuid": "8e7544c8-a37b-4315-9599-55bad6bfbb7b",
   "voice_name": "Andre [RUS]"
