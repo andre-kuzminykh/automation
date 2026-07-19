@@ -1,7 +1,17 @@
 {
   "avatar_asset_id": "a082e5a2-8f3f-4efa-9d30-594d00a600ae",
   "lecture_id": "mt",
-  "slides": {},
+  "slides": {
+    "1": {
+      "duration_sec": null,
+      "error": null,
+      "file_sha256": "81fdc217a1cd9c4b8234867710202773fe8b49cb92afa7ec492e3ef9b867d06e",
+      "generated_at": "2026-07-19T18:27:37Z",
+      "hedra_generation_id": "82168b3c-db93-45c6-b55e-38dd9cd43290",
+      "status": "ok",
+      "text_sha256": "c1ebc6e745d30fb3b0a031d33fd0a406d274a50d7508fb3f8c4e4558db4fe9ab"
+    }
+  },
   "voice_id": "Andre [RUS]",
   "voice_id_uuid": "8e7544c8-a37b-4315-9599-55bad6bfbb7b",
   "voice_name": "Andre [RUS]"
