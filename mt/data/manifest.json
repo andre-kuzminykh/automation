@@ -10,6 +10,15 @@
       "hedra_generation_id": "82168b3c-db93-45c6-b55e-38dd9cd43290",
       "status": "ok",
       "text_sha256": "c1ebc6e745d30fb3b0a031d33fd0a406d274a50d7508fb3f8c4e4558db4fe9ab"
+    },
+    "7": {
+      "duration_sec": null,
+      "error": null,
+      "file_sha256": "985de69e12d18028ba33b3e719cc04b8a90f4a5de8c8739a47dc44242a20b805",
+      "generated_at": "2026-07-19T18:36:25Z",
+      "hedra_generation_id": "4b49098f-dddc-4857-9c48-c7bb522bc913",
+      "status": "ok",
+      "text_sha256": "171f69dc42d14d34eb42200ba852b548bc3211bc70e524720cc129b13550969a"
     }
   },
   "voice_id": "Andre [RUS]",
