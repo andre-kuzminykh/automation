@@ -1,7 +1,44 @@
 {
   "avatar_asset_id": "a082e5a2-8f3f-4efa-9d30-594d00a600ae",
   "lecture_id": "levels",
-  "slides": {},
+  "slides": {
+    "1": {
+      "duration_sec": null,
+      "error": null,
+      "file_sha256": "677bc4a10976a26eb49d1759c210a5280da3acaf891cf60f9bd10f0e3f1b7521",
+      "generated_at": "2026-07-20T11:02:33Z",
+      "hedra_generation_id": "d9563435-59a7-4f17-81ec-9d89e3b605b5",
+      "status": "ok",
+      "text_sha256": "2b299a16b559a33027e725fae1fbee3801d93568723b65fb1347da32178eaa3e"
+    },
+    "2": {
+      "duration_sec": null,
+      "error": null,
+      "file_sha256": "eb3d65fd0ca5349ffba94d437f87b76553666b45ddeddd14c1d6f95b8c527e8a",
+      "generated_at": "2026-07-20T11:10:01Z",
+      "hedra_generation_id": "0a2057ba-6038-4d0b-83b1-3add17c02fc1",
+      "status": "ok",
+      "text_sha256": "e166d62961b13fcb0ded3171bd94cad7e98dd44e7f130a3673b36bf933af61db"
+    },
+    "3": {
+      "duration_sec": null,
+      "error": null,
+      "file_sha256": "47b464e858bf5350bf578d77c0110c3ec034cb4418f0ebad0b9e5d62cb1dbfee",
+      "generated_at": "2026-07-20T11:20:19Z",
+      "hedra_generation_id": "91f1e8e4-56eb-41fe-ad7d-576e3c0a1b61",
+      "status": "ok",
+      "text_sha256": "e6eeda526f1b96d3fda5a2bb394b9bf02d08b460caa6e64f71e6c3dc5b72f39f"
+    },
+    "4": {
+      "duration_sec": null,
+      "error": null,
+      "file_sha256": "845c50e06f1ec4836387f62d407a5d89b91a158a8f906740f3291d26ea3417d0",
+      "generated_at": "2026-07-20T11:24:51Z",
+      "hedra_generation_id": "2620c5a3-6e71-4997-ad1f-bed858c4fee5",
+      "status": "ok",
+      "text_sha256": "8fcd151db7b6cd0d344ebfdfe3959cc7c54df259f3caa1f6dcc3f8769c1b06e4"
+    }
+  },
   "voice_id": "Andre [RUS]",
   "voice_id_uuid": "8e7544c8-a37b-4315-9599-55bad6bfbb7b",
   "voice_name": "Andre [RUS]"
