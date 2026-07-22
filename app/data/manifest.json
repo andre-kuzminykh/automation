@@ -1,7 +1,26 @@
 {
   "avatar_asset_id": "a082e5a2-8f3f-4efa-9d30-594d00a600ae",
   "lecture_id": "app",
-  "slides": {},
+  "slides": {
+    "1": {
+      "duration_sec": null,
+      "error": "submit_audio_generation: no endpoint accepted the request. Last error: POST /generations → 422: {\"code\":422,\"messages\":[\"Field required (type=missing at body.text_to_speech.voice_id)\",\"Field required (type=missing at body.text_to_speech.text)\"],\"request_id\":\"req_3GpqGbKbtYIcysZImxPsGrEH35l\",\"trace_id\":\"c07a8f28c1a367b981c497e828833ecf\"}",
+      "file_sha256": null,
+      "generated_at": "2026-07-22T00:06:03Z",
+      "hedra_generation_id": null,
+      "status": "failed",
+      "text_sha256": "9b07372eb7229d9ee675f8ed0e847a4503a2ebfce2c79f78120f2219a7648a22"
+    },
+    "2": {
+      "duration_sec": null,
+      "error": "submit_audio_generation: no endpoint accepted the request. Last error: POST /generations → 422: {\"code\":422,\"messages\":[\"Field required (type=missing at body.text_to_speech.voice_id)\",\"Field required (type=missing at body.text_to_speech.text)\"],\"request_id\":\"req_3GpqIel1ZMxO0jrCu06gxlTvJHO\",\"trace_id\":\"d3613e0ad05a2db466224000a4563ca5\"}",
+      "file_sha256": null,
+      "generated_at": "2026-07-22T00:06:19Z",
+      "hedra_generation_id": null,
+      "status": "failed",
+      "text_sha256": "f728fc75b4d1957f84668a43f4d31dc901e8db596e9695895a3dabc7bb85542f"
+    }
+  },
   "voice_id": "Andre [RUS]",
   "voice_id_uuid": "8e7544c8-a37b-4315-9599-55bad6bfbb7b",
   "voice_name": "Andre [RUS]"
