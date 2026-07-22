@@ -82,6 +82,11 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
              "Overrides config.hedra.stability.",
     )
     p.add_argument(
+        "--workspace-id", default=None,
+        help="Hedra workspace_id to bill credits against (routes to the "
+             "funded workspace). Overrides config.hedra.workspace_id.",
+    )
+    p.add_argument(
         "--poll-interval", type=float, default=5.0, help="seconds between polls"
     )
     p.add_argument(
@@ -284,9 +289,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         tts_stability = float(tts_stability)
     tts_model_id = config["hedra"].get("tts_model_id")
     tts_language = config["hedra"].get("language")
+    workspace_id = args.workspace_id or config["hedra"].get("workspace_id")
     log.info("voice_tuning",
              extra={"speed": tts_speed, "stability": tts_stability,
-                    "tts_model_id": tts_model_id, "language": tts_language})
+                    "tts_model_id": tts_model_id, "language": tts_language,
+                    "workspace_id": workspace_id})
 
     ok, skipped, failed = [], [], []
     consecutive_failures = 0
@@ -313,6 +320,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 text=slide.narration, voice_id=voice_id,
                 model_id=ai_model_id, speed=tts_speed, stability=tts_stability,
                 tts_model_id=tts_model_id, language=tts_language,
+                workspace_id=workspace_id,
             )
             # If the endpoint returned a generation_id (not yet ready),
             # poll for it. Asset ids from /audio are usable immediately.
@@ -350,6 +358,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 audio_id=audio_id,
                 resolution=config["hedra"]["resolution"],
                 aspect_ratio=config["hedra"]["aspect_ratio"],
+                workspace_id=workspace_id,
             )
         except HedraError as exc:
             log.error("slide_submit_failed", extra={"slide": slide.id, "err": str(exc)})

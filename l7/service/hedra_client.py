@@ -369,6 +369,7 @@ class HedraClient:
         self, *, text: str, voice_id: str, model_id: str | None = None,
         speed: float = 1.0, stability: float | None = None,
         tts_model_id: str | None = None, language: str | None = None,
+        workspace_id: str | None = None,
     ) -> tuple[str, str]:
         """POST a text_to_speech request, return (path, response_id).
 
@@ -381,6 +382,9 @@ class HedraClient:
              "language": "Russian"}
 
         We try that first, then fall back to the older nested/flat shapes.
+        NB: `workspace_id` routes billing/credits to a specific Hedra
+        workspace. Without it Hedra uses a default workspace, which may be a
+        different (empty) credit pool than the one the web app uses.
         """
         canonical = {
             "type": "text_to_speech",
@@ -407,6 +411,11 @@ class HedraClient:
                 continue
             self._inject_voice_settings(payload, speed, stability)
             attempts.append((path, payload))
+
+        # Route every attempt to the funded workspace when provided.
+        if workspace_id:
+            for _path, _payload in attempts:
+                _payload["workspace_id"] = workspace_id
 
         import json as _json
         last_err: HedraError | None = None
@@ -466,6 +475,7 @@ class HedraClient:
         resolution: str = "540p",
         aspect_ratio: str = "1:1",
         duration_seconds_max: int = 120,
+        workspace_id: str | None = None,
     ) -> str:
         """POST /generations — submit a generation job, return generation_id.
 
@@ -499,6 +509,8 @@ class HedraClient:
             "audio_id": audio_id,
             "generated_video_inputs": video_inputs,
         }
+        if workspace_id:
+            payload["workspace_id"] = workspace_id
         LOGGER.info("submit_generation_payload",
                     extra={"payload": payload})
         resp = self._request("POST", "/generations", json=payload)
