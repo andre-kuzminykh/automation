@@ -4,18 +4,18 @@
   "slides": {
     "1": {
       "duration_sec": null,
-      "error": "submit_audio_generation: no endpoint accepted the request. Last error: POST /generations → 422: {\"code\":422,\"messages\":[\"Field required (type=missing at body.text_to_speech.voice_id)\",\"Field required (type=missing at body.text_to_speech.text)\"],\"request_id\":\"req_3GpvQh55pW7UKYNautH1wBGyLFz\",\"trace_id\":\"73ac13208298f59c35e6d6f9da1f91f5\"}",
+      "error": "submit_audio_generation: no endpoint accepted the request. Last error: POST /generations → 422: {\"code\":422,\"messages\":[\"Field required (type=missing at body.text_to_speech.voice_id)\",\"Field required (type=missing at body.text_to_speech.text)\"],\"request_id\":\"req_3GpwGuZiW2d8VxAPp57UKKDC4zM\",\"trace_id\":\"0e3c8dbd515c2aaff436715b264c92f7\"}",
       "file_sha256": null,
-      "generated_at": "2026-07-22T00:48:30Z",
+      "generated_at": "2026-07-22T00:55:25Z",
       "hedra_generation_id": null,
       "status": "failed",
       "text_sha256": "9b07372eb7229d9ee675f8ed0e847a4503a2ebfce2c79f78120f2219a7648a22"
     },
     "2": {
       "duration_sec": null,
-      "error": "submit_audio_generation: no endpoint accepted the request. Last error: POST /generations → 422: {\"code\":422,\"messages\":[\"Field required (type=missing at body.text_to_speech.voice_id)\",\"Field required (type=missing at body.text_to_speech.text)\"],\"request_id\":\"req_3GpvSvFhwHtkSEXSerrX9QF3lK6\",\"trace_id\":\"73468364ba75513ca69e57d9549f985d\"}",
+      "error": "submit_audio_generation: no endpoint accepted the request. Last error: POST /generations → 422: {\"code\":422,\"messages\":[\"Field required (type=missing at body.text_to_speech.voice_id)\",\"Field required (type=missing at body.text_to_speech.text)\"],\"request_id\":\"req_3GpwJAQ5I4EFZ9cryZfajDm3L5e\",\"trace_id\":\"e99eb263efa82e00ac7b8acc03c98192\"}",
       "file_sha256": null,
-      "generated_at": "2026-07-22T00:48:48Z",
+      "generated_at": "2026-07-22T00:55:43Z",
       "hedra_generation_id": null,
       "status": "failed",
       "text_sha256": "f728fc75b4d1957f84668a43f4d31dc901e8db596e9695895a3dabc7bb85542f"
