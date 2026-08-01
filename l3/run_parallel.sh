@@ -37,6 +37,11 @@ export AI_MODEL_ID VOICE_ID
 push_chunk() {
   local label="$1"
   git add l3/videos/ l3/data/manifest.json 2>/dev/null
+  # Other lectures' manifests may be dirty from earlier runs; a dirty tree
+  # blocks `git pull --rebase` and would strand this chunk locally.
+  for m in intro l1 l2 mt mte levels app; do
+    git checkout -- "$m/data/manifest.json" 2>/dev/null || true
+  done
   if git diff --cached --quiet; then
     echo "[push] nothing to commit ($label)"
     return
