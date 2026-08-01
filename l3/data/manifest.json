@@ -65,6 +65,15 @@
       "status": "failed",
       "text_sha256": "cd1bdba75cd813a82acb739350fd3728f6478aef8002be8a903f3e5764cd097c"
     },
+    "34": {
+      "duration_sec": null,
+      "error": "submit_audio_generation: no endpoint accepted the request. Last error: POST /generations → 422: {\"code\":422,\"error_code\":null,\"messages\":[\"Field required (type=missing at body.text_to_speech.voice_id)\",\"Field required (type=missing at body.text_to_speech.text)\"],\"credits_needed\":null,\"credits_available\":null,\"request_id\":\"req_3HKLXHFODSZ9glKdqmwYY9P4VDh\",\"trace_id\":\"49ce6202d109cd4ab62727dd98d20fcc\"}",
+      "file_sha256": null,
+      "generated_at": "2026-08-01T19:17:31Z",
+      "hedra_generation_id": null,
+      "status": "failed",
+      "text_sha256": "f0b51f40943dadc85f987b9deb33c716a73fd3675cd9b9c6f6ea03a1f411e00b"
+    },
     "8": {
       "duration_sec": null,
       "error": null,
