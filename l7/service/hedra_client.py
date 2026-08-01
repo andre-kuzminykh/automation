@@ -21,6 +21,10 @@ class HedraError(RuntimeError):
     pass
 
 
+class HedraInsufficientBalance(HedraError):
+    """402 from Hedra. No payload shape fixes this — only money does."""
+
+
 class HedraClient:
     def __init__(
         self,
@@ -105,9 +109,10 @@ class HedraClient:
         )
         if not (200 <= resp.status_code < 300):
             body = resp.text[:500] if resp.text else ""
-            raise HedraError(
-                f"{method} {path} → {resp.status_code}: {body}"
-            )
+            msg = f"{method} {path} → {resp.status_code}: {body}"
+            if resp.status_code == 402:
+                raise HedraInsufficientBalance(msg)
+            raise HedraError(msg)
         return resp
 
     # ----------------------------------------------------------------- models
@@ -494,6 +499,13 @@ class HedraClient:
                                "tts_model_id": tts_model_id, "language": language})
             try:
                 resp = self._request("POST", path, json=payload)
+            except HedraInsufficientBalance:
+                # Out of credits. Walking the remaining payload variants can
+                # only produce 422s that then mask the real cause in the
+                # manifest, so surface the 402 as-is.
+                LOGGER.error("audio_attempt_no_balance",
+                             extra={"path": path, "attempt_index": idx})
+                raise
             except HedraError as exc:
                 level = LOGGER.warning if is_canonical else LOGGER.info
                 level("audio_attempt_failed",

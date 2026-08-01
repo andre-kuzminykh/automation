@@ -135,6 +135,12 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
              "(GET /billing/credits) and exit — use this when generations "
              "fail with 402 while the web UI shows credits",
     )
+    p.add_argument(
+        "--credits-available",
+        action="store_true",
+        help="print just the available credit count for this lecture's "
+             "workspace and exit, for shell preflight checks",
+    )
     return p.parse_args(argv)
 
 
@@ -238,10 +244,27 @@ def main(argv: Sequence[str] | None = None) -> int:
             print(f"workspace {ws_id}: available={pool.get('available')} "
                   f"api_credits={pool.get('api_credits')} "
                   f"api_wallet_usd={usd}")
-        print("\nNB: Hedra debits programmatic usage from the segregated API "
-              "wallet (api_usd_micros), NOT from subscription credits. "
-              "If that is 0/None while 'remaining' is large, fund the API "
-              "wallet: Profile -> API -> Auto recharge / top-up.")
+        print("\nNB: on this account api_usd_micros is null and programmatic "
+              "usage is debited from the subscription pool of the workspace "
+              "named in workspace_id (58237). A run costs ~273 credits per "
+              "slide. If 'available' here is low, the top-up did not reach "
+              "this workspace.")
+        return 0
+
+    if args.credits_available:
+        # Machine-readable single number, so shell preflights can gate a run.
+        try:
+            data = client.get_credits()
+        except HedraError as exc:
+            log.error("check_credits_failed", extra={"err": str(exc)})
+            return 2
+        ws = config["hedra"].get("workspace_id")
+        pools = data.get("workspace_credit_pool") or {}
+        pool = pools.get(str(ws)) if ws else None
+        if pool is not None:
+            print(int(pool.get("available") or 0))
+        else:
+            print(int(data.get("remaining") or 0))
         return 0
 
     if args.list_models:

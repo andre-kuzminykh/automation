@@ -78,6 +78,25 @@ push_chunk() {
   echo "[push] FAILED ($label) — videos still on disk, push manually later"
 }
 
+# Preflight: a run that cannot afford a single slide should not submit anything.
+# Observed cost is ~273 credits/slide (5189 credits bought slides 1..19).
+COST_PER_SLIDE=273
+want=$(( (END - START + 1) * COST_PER_SLIDE ))
+have="$(python3 -m l7.service.generate --lecture l3 --credits-available 2>/dev/null | tail -1)"
+case "$have" in
+  ''|*[!0-9]*)
+    echo "[preflight] could not read credit balance — continuing anyway" ;;
+  *)
+    echo "[preflight] credits available: $have | needed for $((END - START + 1)) slides: ~$want"
+    if [ "$have" -lt "$COST_PER_SLIDE" ]; then
+      echo "[preflight] ABORT: not enough for even one slide. Top up workspace 58237 first."
+      exit 2
+    fi
+    if [ "$have" -lt "$want" ]; then
+      echo "[preflight] WARNING: enough for roughly $((have / COST_PER_SLIDE)) of $((END - START + 1)) slides."
+    fi ;;
+esac
+
 i=$START
 while [ "$i" -le "$END" ]; do
   chunk_end=$(( i + PAR - 1 ))

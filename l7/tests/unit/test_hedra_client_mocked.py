@@ -8,7 +8,11 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from l7.service.hedra_client import HedraClient, HedraError
+from l7.service.hedra_client import (
+    HedraClient,
+    HedraError,
+    HedraInsufficientBalance,
+)
 
 
 def _make_session(responses):
@@ -196,8 +200,11 @@ def test_get_generation_status(hedra_env):
 
 
 # T-U-HC-5 — missing API key fails fast; key never appears in error text.
-def test_missing_api_key_fails_fast(monkeypatch):
+def test_missing_api_key_fails_fast(monkeypatch, tmp_path):
     monkeypatch.delenv("HEDRA_API_KEY", raising=False)
+    # Also hide any real ~/.hedra_key — otherwise this passes or fails
+    # depending on whether the machine running the tests has a key on disk.
+    monkeypatch.setattr(HedraClient, "_KEY_FILES", (str(tmp_path / "absent"),))
     with pytest.raises(HedraError) as exc:
         HedraClient()
     assert "HEDRA_API_KEY" in str(exc.value)
@@ -212,3 +219,28 @@ def test_error_response_raises(hedra_env):
     with pytest.raises(HedraError) as exc:
         client.create_image_asset("x")
     assert "400" in str(exc.value)
+
+
+# A 402 means no credits; walking the remaining payload variants can only
+# produce 422s that then mask the real cause. Fail fast on the 402 instead.
+def test_insufficient_balance_stops_variant_walk(hedra_env):
+    session = _make_session([
+        {"status": 402, "json": {"error_code": "INSUFFICIENT_BALANCE",
+                                 "credits_needed": 12, "credits_available": 5}},
+        # Any further variant would 422 — must never be reached.
+        {"status": 422, "json": {"messages": ["Field required"]}},
+    ])
+    client = HedraClient(session=session)
+    with pytest.raises(HedraInsufficientBalance) as exc:
+        client.submit_audio_generation(
+            text="привет", voice_id="v1",
+            tts_model_slug="elevenlabs/elevenlabs-v3",
+            workspace_id="58237",
+        )
+    assert "INSUFFICIENT_BALANCE" in str(exc.value)
+    # Exactly one POST: the walk stopped instead of burning the fallbacks.
+    assert session.request.call_count == 1
+
+
+def test_insufficient_balance_is_a_hedra_error(hedra_env):
+    assert issubclass(HedraInsufficientBalance, HedraError)
