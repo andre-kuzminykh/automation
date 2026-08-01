@@ -369,7 +369,7 @@ class HedraClient:
         self, *, text: str, voice_id: str, model_id: str | None = None,
         speed: float = 1.0, stability: float | None = None,
         tts_model_id: str | None = None, language: str | None = None,
-        workspace_id: str | None = None,
+        workspace_id: str | None = None, tts_model_slug: str | None = None,
     ) -> tuple[str, str]:
         """POST a text_to_speech request, return (path, response_id).
 
@@ -381,26 +381,45 @@ class HedraClient:
              "text": ..., "stability": 0.75, "speed": 0.9,
              "language": "Russian"}
 
-        We try that first, then fall back to the older nested/flat shapes.
+        Hedra resolves `model_id` to a `model_slug` (e.g.
+        "elevenlabs/elevenlabs-v3-331"). Pinned variants like `-331` may be
+        entitled/priced differently and can fail with 402 even when the
+        account has credits, so `tts_model_slug` lets us request the plain
+        model ("elevenlabs/elevenlabs-v3") explicitly. When a slug is given
+        it is tried FIRST, without model_id.
+
+        We then fall back to the older nested/flat shapes.
         NB: `workspace_id` routes billing/credits to a specific Hedra
-        workspace. Without it Hedra uses a default workspace, which may be a
-        different (empty) credit pool than the one the web app uses.
+        workspace when the account uses more than one.
         """
-        canonical = {
-            "type": "text_to_speech",
-            "voice_id": voice_id,
-            "text": text,
-        }
+        def _base() -> dict:
+            payload = {
+                "type": "text_to_speech",
+                "voice_id": voice_id,
+                "text": text,
+            }
+            if language:
+                payload["language"] = language
+            if speed != 1.0:
+                payload["speed"] = speed
+            if stability is not None:
+                payload["stability"] = stability
+            return payload
+
+        attempts: list[tuple[str, dict]] = []
+
+        # 1) Preferred: explicit model_slug (plain model, no pinned variant).
+        if tts_model_slug:
+            by_slug = _base()
+            by_slug["model_slug"] = tts_model_slug
+            attempts.append(("/generations", by_slug))
+
+        # 2) Canonical web-app shape via model_id.
+        canonical = _base()
         if tts_model_id:
             canonical["model_id"] = tts_model_id
-        if language:
-            canonical["language"] = language
-        if speed != 1.0:
-            canonical["speed"] = speed
-        if stability is not None:
-            canonical["stability"] = stability
+        attempts.append(("/generations", canonical))
 
-        attempts: list[tuple[str, dict]] = [("/generations", canonical)]
         for path, tpl in self._AUDIO_ATTEMPTS:
             payload = self._fill_template(
                 tpl, text=text, voice_id=voice_id, model_id=model_id
@@ -418,11 +437,16 @@ class HedraClient:
                 _payload["workspace_id"] = workspace_id
 
         import json as _json
+        # The slug attempt (when present) and the model_id attempt are both
+        # "primary" — anything after them is a legacy-shape fallback.
+        n_primary = 2 if tts_model_slug else 1
         last_err: HedraError | None = None
         for idx, (path, payload) in enumerate(attempts):
-            is_canonical = idx == 0
+            is_canonical = idx < n_primary
             LOGGER.info("audio_attempt",
                         extra={"path": path, "is_canonical": is_canonical,
+                               "variant": payload.get("model_slug")
+                                          or payload.get("model_id") or "legacy",
                                "payload": _json.dumps(payload, ensure_ascii=False),
                                "speed": speed, "stability": stability,
                                "tts_model_id": tts_model_id, "language": language})

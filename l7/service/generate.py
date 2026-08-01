@@ -87,6 +87,12 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
              "funded workspace). Overrides config.hedra.workspace_id.",
     )
     p.add_argument(
+        "--tts-model-slug", default=None,
+        help="TTS model slug, e.g. 'elevenlabs/elevenlabs-v3'. Tried before "
+             "model_id; use it to avoid pinned variants (…-331) that may be "
+             "priced/entitled differently. Overrides config.hedra.tts_model_slug.",
+    )
+    p.add_argument(
         "--poll-interval", type=float, default=5.0, help="seconds between polls"
     )
     p.add_argument(
@@ -290,10 +296,13 @@ def main(argv: Sequence[str] | None = None) -> int:
     tts_model_id = config["hedra"].get("tts_model_id")
     tts_language = config["hedra"].get("language")
     workspace_id = args.workspace_id or config["hedra"].get("workspace_id")
+    tts_model_slug = (args.tts_model_slug
+                      or config["hedra"].get("tts_model_slug"))
     log.info("voice_tuning",
              extra={"speed": tts_speed, "stability": tts_stability,
                     "tts_model_id": tts_model_id, "language": tts_language,
-                    "workspace_id": workspace_id})
+                    "workspace_id": workspace_id,
+                    "tts_model_slug": tts_model_slug})
 
     ok, skipped, failed = [], [], []
     consecutive_failures = 0
@@ -320,7 +329,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 text=slide.narration, voice_id=voice_id,
                 model_id=ai_model_id, speed=tts_speed, stability=tts_stability,
                 tts_model_id=tts_model_id, language=tts_language,
-                workspace_id=workspace_id,
+                workspace_id=workspace_id, tts_model_slug=tts_model_slug,
             )
             # If the endpoint returned a generation_id (not yet ready),
             # poll for it. Asset ids from /audio are usable immediately.

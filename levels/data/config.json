@@ -8,6 +8,7 @@
     "voice_id": "Andre [RUS]",
     "voice_id_known": "8e7544c8-a37b-4315-9599-55bad6bfbb7b",
     "tts_model_id": "14aeb855-72ff-4402-8f5a-8b845ee3feb4",
+    "tts_model_slug": "elevenlabs/elevenlabs-v3",
     "language": "Russian",
     "speed": 0.75,
     "stability": 0.75,
