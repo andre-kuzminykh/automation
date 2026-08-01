@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Regenerate specific lecture-2 slides by id (non-contiguous allowed), pushing each.
+# Regenerate specific lecture-3 slides by id (non-contiguous allowed), pushing each.
 # Usage:
 #   git pull --rebase origin claude/setup-gcloud-video-service-XKVf0
 #   bash l3/run_ids.sh 3 7 12

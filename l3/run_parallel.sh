@@ -2,11 +2,13 @@
 # Parallel lecture-3 head generation (chunked, with batched push).
 # Renders PAR slides concurrently, pushes the chunk, repeats.
 #
-# Usage (on human-1, venv active, HEDRA_API_KEY exported):
+# Usage (on human-1, venv active, key in ~/.hedra_key or HEDRA_API_KEY exported):
 #   git pull --rebase origin claude/setup-gcloud-video-service-XKVf0
 #   bash l3/run_parallel.sh                  # all slides 1..40, 3 in parallel
 #   PAR=4 bash l3/run_parallel.sh            # 4 in parallel
-#   bash l3/run_parallel.sh 10 20            # subset
+#   bash l3/run_parallel.sh 20 40            # subset
+#
+# Exits non-zero if any slide failed, and prints the exact ids to re-run.
 set -u
 
 cd "$(dirname "$0")/.."   # repo root
@@ -19,8 +21,15 @@ PAR="${PAR:-3}"
 START="${1:-1}"
 END="${2:-40}"
 
+# Per-slide outcome markers: the previous version printed "ALL DONE" even when
+# every slide in the run had failed, which hid 21 missing videos last time.
+STATUS_DIR="$(mktemp -d)"
+trap 'rm -rf "$STATUS_DIR"' EXIT
+export STATUS_DIR
+
 render_one() {
   local i="$1"
+  local log="$STATUS_DIR/$i.log"
   echo "---- start slide $i ----"
   python3 -m l7.service.generate --lecture l3 \
     --regenerate "$i" --from "$i" --to "$i" \
@@ -28,7 +37,19 @@ render_one() {
     --voice-id "$VOICE_ID" \
     --poll-timeout 1800 \
     --no-git \
-    2>&1 | sed -u "s/^/[s$i] /"
+    > "$log" 2>&1
+  local rc=$?
+  sed -u "s/^/[s$i] /" "$log"
+
+  # The generator exits 0 even when a slide fails, so trust the artifact.
+  if [ "$rc" -eq 0 ] && [ -s "l3/videos/$i.mp4" ]; then
+    echo "ok" > "$STATUS_DIR/$i.status"
+  else
+    echo "fail" > "$STATUS_DIR/$i.status"
+    if grep -q "INSUFFICIENT_BALANCE" "$log"; then
+      touch "$STATUS_DIR/BROKE"
+    fi
+  fi
   echo "---- done slide $i ----"
 }
 export -f render_one
@@ -74,6 +95,25 @@ while [ "$i" -le "$END" ]; do
 
   push_chunk "slides $i..$chunk_end"
   i=$(( chunk_end + 1 ))
+
+  # Out of credits: every remaining slide would fail the same way and each one
+  # still burns a submit + poll cycle. Stop and report instead of grinding on.
+  if [ -e "$STATUS_DIR/BROKE" ]; then
+    echo "!!! Hedra returned INSUFFICIENT_BALANCE — stopping at slide $((i - 1))."
+    break
+  fi
 done
 
-echo "================ ALL DONE ($START..$END) ================"
+failed=()
+for s in $(seq "$START" "$END"); do
+  [ "$(cat "$STATUS_DIR/$s.status" 2>/dev/null)" = "ok" ] || failed+=("$s")
+done
+
+echo "================ SUMMARY ($START..$END) ================"
+if [ "${#failed[@]}" -eq 0 ]; then
+  echo "all $((END - START + 1)) slides OK"
+  exit 0
+fi
+echo "OK: $((END - START + 1 - ${#failed[@]}))   MISSING: ${#failed[@]} -> ${failed[*]}"
+echo "re-run with:  bash l3/run_ids.sh ${failed[*]}"
+exit 1
