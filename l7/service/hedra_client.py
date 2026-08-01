@@ -151,6 +151,23 @@ class HedraClient:
             f"{all_names}"
         )
 
+    # ---------------------------------------------------------------- billing
+    def get_credits(self) -> dict[str, Any]:
+        """GET /billing/credits — the balance the API actually debits.
+
+        Hedra bills programmatic usage from a *segregated API wallet* that is
+        separate from the subscription/Studio credits shown in the web UI.
+        Per Hedra's OpenAPI schema (WorkspaceCreditUsage):
+          api_usd_micros  — API wallet balance in micro-dollars; "only present
+                            while the API wallet is enabled and funded; spent
+                            exclusively by programmatic API usage"
+          api_credits     — display view of the same wallet
+        So `remaining` can look healthy while generations still 402 — check
+        workspace_credit_pool[*].api_usd_micros to see the real API balance.
+        """
+        resp = self._request("GET", "/billing/credits")
+        return resp.json()
+
     # ----------------------------------------------------------------- voices
     _VOICES_ATTEMPTS = (
         # (path, params) — covering known Hedra variants where user-owned

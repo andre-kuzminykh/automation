@@ -128,6 +128,13 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         default=None,
         help="explicit Hedra voice_id UUID; if set, skips /voices lookup",
     )
+    p.add_argument(
+        "--check-credits",
+        action="store_true",
+        help="print the Hedra balance the API actually debits "
+             "(GET /billing/credits) and exit — use this when generations "
+             "fail with 402 while the web UI shows credits",
+    )
     return p.parse_args(argv)
 
 
@@ -211,6 +218,31 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     # --- Hedra setup ----------------------------------------------------------
     client = HedraClient()
+
+    if args.check_credits:
+        try:
+            data = client.get_credits()
+        except HedraError as exc:
+            log.error("check_credits_failed", extra={"err": str(exc)})
+            return 2
+        print(json.dumps(data, ensure_ascii=False, indent=2))
+        print("\n--- what matters ---")
+        print(f"remaining (subscription/Studio view): {data.get('remaining')}")
+        pools = data.get("workspace_credit_pool") or {}
+        if not pools:
+            print("workspace_credit_pool: (empty — personal account, no "
+                  "per-workspace API wallet reported)")
+        for ws_id, pool in pools.items():
+            micros = pool.get("api_usd_micros")
+            usd = None if micros is None else micros / 1_000_000
+            print(f"workspace {ws_id}: available={pool.get('available')} "
+                  f"api_credits={pool.get('api_credits')} "
+                  f"api_wallet_usd={usd}")
+        print("\nNB: Hedra debits programmatic usage from the segregated API "
+              "wallet (api_usd_micros), NOT from subscription credits. "
+              "If that is 0/None while 'remaining' is large, fund the API "
+              "wallet: Profile -> API -> Auto recharge / top-up.")
+        return 0
 
     if args.list_models:
         try:
