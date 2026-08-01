@@ -2,6 +2,15 @@
   "avatar_asset_id": "a082e5a2-8f3f-4efa-9d30-594d00a600ae",
   "lecture_id": "l3",
   "slides": {
+    "10": {
+      "duration_sec": null,
+      "error": null,
+      "file_sha256": "abfb4c0b0515f5cd9cecd878a3c153bcaf29928aa118c6703bc9b40ef91f8590",
+      "generated_at": "2026-08-01T19:05:49Z",
+      "hedra_generation_id": "3179707f-b885-4f39-84fc-9afabcdb4747",
+      "status": "ok",
+      "text_sha256": "4734a2ad49bee99ce20849c1558b205054d878c41137c00b2bff78d367292247"
+    },
     "2": {
       "duration_sec": null,
       "error": null,
