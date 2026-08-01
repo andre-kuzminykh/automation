@@ -33,5 +33,17 @@
     "repo": "andre-kuzminykh/automation",
     "branch": "claude/setup-gcloud-video-service-XKVf0",
     "videos_dir_in_repo": "l3/videos"
+  },
+  "elevenlabs": {
+    "provider": "elevenlabs",
+    "voice_id": "7xxG1HweS4PIsATG1xua",
+    "model_id": "eleven_multilingual_v2",
+    "stability": "robust",
+    "similarity_boost": 0.75,
+    "speed": 0.75,
+    "use_speaker_boost": true,
+    "output_format": "mp3_44100_128",
+    "api_key_env": "ELEVENLABS_API_KEY",
+    "_note": "API key is NEVER stored here — see ~/.elevenlabs_key"
   }
 }

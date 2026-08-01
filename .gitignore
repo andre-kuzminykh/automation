@@ -29,8 +29,9 @@ htmlcov/
 *.json.tmp
 *.broken.json
 
-# Hedra API key — never commit
+# Provider API keys — never commit
 .hedra_key
+.elevenlabs_key
 
 # Manifest write-lock sidecar (runtime only)
 *.json.lock

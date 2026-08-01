@@ -215,3 +215,122 @@ def test_manifest_atomic_across_interruption(fake_pipeline):
     tmp.write_text("{garbage", encoding="utf-8")
     # The main manifest is still valid:
     assert json.loads((l7 / "data/manifest.json").read_text(encoding="utf-8"))
+
+
+class MockEleven:
+    """Records what the pipeline asked ElevenLabs to synthesise."""
+
+    def __init__(self) -> None:
+        self.calls = []
+
+    def synthesize(self, *, text, **settings) -> bytes:
+        self.calls.append({"text": text, **settings})
+        return b"ID3" + text.encode("utf-8")
+
+
+def _add_eleven_config(l7: Path, **overrides) -> None:
+    cfg_path = l7 / "data/config.json"
+    cfg = json.loads(cfg_path.read_text(encoding="utf-8"))
+    cfg["elevenlabs"] = {
+        "provider": "elevenlabs",
+        "voice_id": "el-voice-1",
+        "model_id": "eleven_multilingual_v2",
+        "stability": "robust",
+        "speed": 0.75,
+        **overrides,
+    }
+    cfg_path.write_text(json.dumps(cfg), encoding="utf-8")
+
+
+def test_elevenlabs_provider_uploads_asset_and_skips_hedra_tts(fake_pipeline):
+    """Hedra must lip-sync a pre-made asset, never run its own TTS."""
+    auto, l7 = fake_pipeline
+    _add_eleven_config(l7)
+
+    mock = MockHedra()
+    audio_assets = []
+    uploaded = []
+
+    def create_audio_asset(name):
+        audio_assets.append(name)
+        return f"audio_asset_{len(audio_assets)}"
+
+    def upload_asset_binary(asset_id, path, content_type=None):
+        uploaded.append((asset_id, Path(path).read_bytes()))
+
+    mock.create_audio_asset = create_audio_asset
+    mock.upload_asset_binary = upload_asset_binary
+
+    def _no_hedra_tts(**_kw):
+        raise AssertionError("Hedra TTS must not be called for elevenlabs")
+
+    mock.submit_audio_generation = _no_hedra_tts
+
+    eleven = MockEleven()
+    with patch("l7.service.generate.HedraClient", return_value=mock), \
+         patch("l7.service.generate.ElevenLabsClient", return_value=eleven):
+        code = gen_mod.main([
+            "--lecture", "l7", "--no-git",
+            "--config", str(l7 / "data/config.json"),
+        ])
+
+    assert code == 0
+    assert [c["text"] for c in eleven.calls] == [
+        "narration one", "narration two", "narration three",
+    ]
+    assert eleven.calls[0]["voice_id"] == "el-voice-1"
+    # "robust" resolved to the numeric stability the API takes.
+    assert eleven.calls[0]["stability"] == 1.0
+    assert eleven.calls[0]["speed"] == 0.75
+    # Each narration became a Hedra audio asset, uploaded with real bytes.
+    # (uploaded also carries the avatar image, hence the filter.)
+    audio_uploads = [u for u in uploaded if u[0].startswith("audio_asset_")]
+    assert len(audio_uploads) == 3
+    assert audio_uploads[0][1] == b"ID3" + "narration one".encode("utf-8")
+    for sid in (1, 2, 3):
+        assert (l7 / f"videos/{sid}.mp4").exists()
+
+
+def test_elevenlabs_temp_audio_not_left_in_videos_dir(fake_pipeline):
+    """videos/ is `git add`-ed wholesale; no stray mp3 may survive there."""
+    auto, l7 = fake_pipeline
+    _add_eleven_config(l7)
+
+    mock = MockHedra()
+    mock.create_audio_asset = lambda name: "audio_asset_1"
+    mock.upload_asset_binary = lambda asset_id, path, content_type=None: None
+
+    eleven = MockEleven()
+    with patch("l7.service.generate.HedraClient", return_value=mock), \
+         patch("l7.service.generate.ElevenLabsClient", return_value=eleven):
+        gen_mod.main([
+            "--lecture", "l7", "--no-git",
+            "--config", str(l7 / "data/config.json"),
+        ])
+
+    leftovers = [p.name for p in (l7 / "videos").iterdir()
+                 if p.suffix != ".mp4"]
+    assert leftovers == []
+
+
+def test_hedra_remains_default_when_no_elevenlabs_config(fake_pipeline):
+    """Lectures already rendered with Hedra TTS must not silently switch."""
+    auto, l7 = fake_pipeline
+    mock = MockHedra()
+    code = _run_pipeline(fake_pipeline, mock)
+    assert code == 0
+    assert len(mock.submitted) == 3
+
+
+def test_tts_provider_flag_overrides_config(fake_pipeline):
+    auto, l7 = fake_pipeline
+    _add_eleven_config(l7)
+    mock = MockHedra()
+    with patch("l7.service.generate.HedraClient", return_value=mock):
+        code = gen_mod.main([
+            "--lecture", "l7", "--no-git", "--tts-provider", "hedra",
+            "--config", str(l7 / "data/config.json"),
+        ])
+    assert code == 0
+    # Fell back to Hedra's own TTS despite the elevenlabs block.
+    assert len(mock.submitted) == 3

@@ -24,11 +24,17 @@ import json
 import logging
 import os
 import sys
+import tempfile
 import time
 from pathlib import Path
 from typing import Sequence
 
 from .git_publisher import GitError, GitPublisher
+from .elevenlabs_client import (
+    ElevenLabsClient,
+    ElevenLabsError,
+    resolve_stability,
+)
 from .hedra_client import HedraClient, HedraError
 from .logging_setup import setup_logging
 from .manifest_store import ManifestStore
@@ -134,6 +140,13 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         help="print the Hedra balance the API actually debits "
              "(GET /billing/credits) and exit — use this when generations "
              "fail with 402 while the web UI shows credits",
+    )
+    p.add_argument(
+        "--tts-provider", choices=("hedra", "elevenlabs"), default=None,
+        help="who synthesises the narration. 'elevenlabs' generates the audio "
+             "externally and gives Hedra a finished asset to lip-sync, which "
+             "avoids Hedra's text_to_speech charge. Overrides "
+             "config.elevenlabs.provider.",
     )
     p.add_argument(
         "--credits-available",
@@ -377,6 +390,43 @@ def main(argv: Sequence[str] | None = None) -> int:
                     "workspace_id": workspace_id,
                     "tts_model_slug": tts_model_slug})
 
+    # --- TTS provider ---------------------------------------------------------
+    el_cfg = config.get("elevenlabs") or {}
+    provider = (args.tts_provider
+                or el_cfg.get("provider")
+                or ("elevenlabs" if el_cfg.get("voice_id") else "hedra"))
+    eleven = None
+    eleven_settings: dict[str, object] = {}
+    if provider == "elevenlabs":
+        if not el_cfg.get("voice_id"):
+            log.error("elevenlabs_not_configured",
+                      extra={"note": "set elevenlabs.voice_id in config.json "
+                                     "or pass --tts-provider hedra"})
+            return 2
+        try:
+            eleven = ElevenLabsClient()
+            stability = resolve_stability(el_cfg.get("stability"))
+        except ElevenLabsError as exc:
+            log.error("elevenlabs_init_failed", extra={"err": str(exc)})
+            return 2
+        eleven_settings = {
+            "voice_id": el_cfg["voice_id"],
+            "model_id": el_cfg.get("model_id", "eleven_multilingual_v2"),
+            "stability": stability,
+            "similarity_boost": el_cfg.get("similarity_boost"),
+            "style": el_cfg.get("style"),
+            "speed": el_cfg.get("speed"),
+            "use_speaker_boost": el_cfg.get("use_speaker_boost"),
+            "output_format": el_cfg.get("output_format", "mp3_44100_128"),
+            "language_code": el_cfg.get("language_code"),
+        }
+        log.info("tts_provider",
+                 extra={"provider": "elevenlabs",
+                        "settings": {k: v for k, v in eleven_settings.items()
+                                     if v is not None}})
+    else:
+        log.info("tts_provider", extra={"provider": "hedra"})
+
     ok, skipped, failed = [], [], []
     consecutive_failures = 0
 
@@ -397,13 +447,34 @@ def main(argv: Sequence[str] | None = None) -> int:
 
         try:
             audio_id: str | None = None
-            log.info("slide_audio_submit", extra={"slide": slide.id})
-            audio_path, audio_gen_id = client.submit_audio_generation(
-                text=slide.narration, voice_id=voice_id,
-                model_id=ai_model_id, speed=tts_speed, stability=tts_stability,
-                tts_model_id=tts_model_id, language=tts_language,
-                workspace_id=workspace_id, tts_model_slug=tts_model_slug,
-            )
+            if eleven is not None:
+                # ElevenLabs synthesises, Hedra only lip-syncs. Skips Hedra's
+                # text_to_speech charge, which is the expensive half.
+                log.info("slide_audio_elevenlabs", extra={"slide": slide.id})
+                audio_bytes = eleven.synthesize(
+                    text=slide.narration, **eleven_settings
+                )
+                # Kept out of videos_dir on purpose: that whole directory is
+                # `git add`-ed, and a stray .mp3 from a crashed run would be
+                # committed alongside the videos.
+                with tempfile.TemporaryDirectory() as tmpdir:
+                    audio_file = Path(tmpdir) / f"{repo.lecture.id}-{slide.id}.mp3"
+                    audio_file.write_bytes(audio_bytes)
+                    asset_id = client.create_audio_asset(audio_file.name)
+                    client.upload_asset_binary(asset_id, audio_file)
+                audio_path, audio_gen_id = "/assets", asset_id
+                log.info("slide_audio_uploaded",
+                         extra={"slide": slide.id, "asset_id": asset_id,
+                                "bytes": len(audio_bytes)})
+            else:
+                log.info("slide_audio_submit", extra={"slide": slide.id})
+                audio_path, audio_gen_id = client.submit_audio_generation(
+                    text=slide.narration, voice_id=voice_id,
+                    model_id=ai_model_id, speed=tts_speed,
+                    stability=tts_stability,
+                    tts_model_id=tts_model_id, language=tts_language,
+                    workspace_id=workspace_id, tts_model_slug=tts_model_slug,
+                )
             # If the endpoint returned a generation_id (not yet ready),
             # poll for it. Asset ids from /audio are usable immediately.
             audio_id = audio_gen_id

@@ -79,8 +79,13 @@ push_chunk() {
 }
 
 # Preflight: a run that cannot afford a single slide should not submit anything.
-# Observed cost is ~273 credits/slide (5189 credits bought slides 1..19).
-COST_PER_SLIDE=273
+# 273 credits/slide was measured with Hedra doing the TTS too (5189 credits
+# bought slides 1..19). With ElevenLabs synthesising, Hedra only renders video,
+# so the real figure is lower but not yet measured — override once it is known:
+#   COST_PER_SLIDE=120 PAR=4 bash l3/run_parallel.sh 20 40
+COST_PER_SLIDE="${COST_PER_SLIDE:-273}"
+# Below this, no slide can succeed regardless of the estimate.
+MIN_CREDITS="${MIN_CREDITS:-20}"
 want=$(( (END - START + 1) * COST_PER_SLIDE ))
 have="$(python3 -m l7.service.generate --lecture l3 --credits-available 2>"$STATUS_DIR/preflight.err" | tail -1)"
 [ -s "$STATUS_DIR/preflight.err" ] && sed 's/^/[preflight] /' "$STATUS_DIR/preflight.err"
@@ -88,13 +93,14 @@ case "$have" in
   ''|*[!0-9]*)
     echo "[preflight] could not read credit balance — continuing anyway" ;;
   *)
-    echo "[preflight] credits available: $have | needed for $((END - START + 1)) slides: ~$want"
-    if [ "$have" -lt "$COST_PER_SLIDE" ]; then
-      echo "[preflight] ABORT: not enough for even one slide. Top up workspace 58237 first."
+    echo "[preflight] credits available: $have | rough need for $((END - START + 1)) slides: ~$want (at $COST_PER_SLIDE/slide)"
+    if [ "$have" -lt "$MIN_CREDITS" ]; then
+      echo "[preflight] ABORT: $have credits cannot render anything. Top up the workspace first."
       exit 2
     fi
     if [ "$have" -lt "$want" ]; then
-      echo "[preflight] WARNING: enough for roughly $((have / COST_PER_SLIDE)) of $((END - START + 1)) slides."
+      echo "[preflight] WARNING: estimate covers roughly $((have / COST_PER_SLIDE)) of $((END - START + 1)) slides."
+      echo "[preflight] The run stops by itself on the first INSUFFICIENT_BALANCE."
     fi ;;
 esac
 

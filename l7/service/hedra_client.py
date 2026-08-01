@@ -335,11 +335,36 @@ class HedraClient:
             raise HedraError(f"create_image_asset: no 'id' in response: {data}")
         return str(asset_id)
 
-    def upload_asset_binary(self, asset_id: str, path: Path) -> None:
+    def create_audio_asset(self, name: str) -> str:
+        """POST /assets — create audio asset metadata, return asset_id.
+
+        Used when the narration was synthesised elsewhere (ElevenLabs) and
+        Hedra only has to lip-sync it.
+        """
+        payload = {"name": name, "type": "audio"}
+        resp = self._request("POST", "/assets", json=payload)
+        data: dict[str, Any] = resp.json()
+        asset_id = data.get("id") or data.get("asset_id")
+        if not asset_id:
+            raise HedraError(f"create_audio_asset: no 'id' in response: {data}")
+        return str(asset_id)
+
+    _CONTENT_TYPES = {
+        ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png",
+        ".mp3": "audio/mpeg", ".wav": "audio/wav", ".m4a": "audio/mp4",
+        ".ogg": "audio/ogg", ".flac": "audio/flac",
+    }
+
+    def upload_asset_binary(
+        self, asset_id: str, path: Path, content_type: str | None = None
+    ) -> None:
         """POST /assets/{id}/upload — multipart binary upload."""
         path = Path(path)
+        ctype = (content_type
+                 or self._CONTENT_TYPES.get(path.suffix.lower())
+                 or "application/octet-stream")
         with path.open("rb") as fh:
-            files = {"file": (path.name, fh, "image/jpeg")}
+            files = {"file": (path.name, fh, ctype)}
             # NB: requests will set Content-Type with boundary on multipart.
             self._request(
                 "POST",
