@@ -4,20 +4,20 @@
   "slides": {
     "1": {
       "duration_sec": null,
-      "error": "submit_audio_generation: no endpoint accepted the request. Last error: POST /generations → 422: {\"code\":422,\"messages\":[\"Field required (type=missing at body.text_to_speech.voice_id)\",\"Field required (type=missing at body.text_to_speech.text)\"],\"request_id\":\"req_3Gpwz2IGfKaWIReN5MYO5LegEch\",\"trace_id\":\"3bcc97d6189b728a7f801ee3c12113ca\"}",
-      "file_sha256": null,
-      "generated_at": "2026-07-22T01:01:16Z",
-      "hedra_generation_id": null,
-      "status": "failed",
+      "error": null,
+      "file_sha256": "70b2531e3007536e573eb25489b5f7b81012f55870e3d7fd559ebc943220cee6",
+      "generated_at": "2026-08-01T17:58:11Z",
+      "hedra_generation_id": "9cad7ace-c54b-4227-a75d-17192831bdcf",
+      "status": "ok",
       "text_sha256": "9b07372eb7229d9ee675f8ed0e847a4503a2ebfce2c79f78120f2219a7648a22"
     },
     "2": {
       "duration_sec": null,
-      "error": "submit_audio_generation: no endpoint accepted the request. Last error: POST /generations → 422: {\"code\":422,\"messages\":[\"Field required (type=missing at body.text_to_speech.voice_id)\",\"Field required (type=missing at body.text_to_speech.text)\"],\"request_id\":\"req_3Gpx1H0GPlekaGl8R6rYojpnnAW\",\"trace_id\":\"f46b9ee313adc195e2dce8961a23a733\"}",
-      "file_sha256": null,
-      "generated_at": "2026-07-22T01:01:34Z",
-      "hedra_generation_id": null,
-      "status": "failed",
+      "error": null,
+      "file_sha256": "2e7cbfb17eca83b61c85b2bc812014fa6fc6478b96a2809152d025d50137bdb9",
+      "generated_at": "2026-08-01T18:01:04Z",
+      "hedra_generation_id": "dbc198fa-18e7-4f0b-b5d0-7d41d5c2f87a",
+      "status": "ok",
       "text_sha256": "f728fc75b4d1957f84668a43f4d31dc901e8db596e9695895a3dabc7bb85542f"
     }
   },
