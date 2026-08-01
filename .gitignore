@@ -31,3 +31,6 @@ htmlcov/
 
 # Hedra API key — never commit
 .hedra_key
+
+# Manifest write-lock sidecar (runtime only)
+*.json.lock

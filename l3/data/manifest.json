@@ -2,6 +2,15 @@
   "avatar_asset_id": "a082e5a2-8f3f-4efa-9d30-594d00a600ae",
   "lecture_id": "l3",
   "slides": {
+    "1": {
+      "duration_sec": null,
+      "error": null,
+      "file_sha256": "52ddb51ca56cb0cb8c1b1a52acc1828c9babb4529cb1774e496ab3137728d42e",
+      "generated_at": "2026-08-01T20:30:05Z",
+      "hedra_generation_id": null,
+      "status": "ok",
+      "text_sha256": "4491b69c92ae742c188c6919821289e8980f20bb8a41e302a4f766cdc39d3341"
+    },
     "10": {
       "duration_sec": null,
       "error": null,
@@ -10,6 +19,42 @@
       "hedra_generation_id": "3179707f-b885-4f39-84fc-9afabcdb4747",
       "status": "ok",
       "text_sha256": "4734a2ad49bee99ce20849c1558b205054d878c41137c00b2bff78d367292247"
+    },
+    "11": {
+      "duration_sec": null,
+      "error": null,
+      "file_sha256": "e7d8f6b4d69a37eb9acb3edf9bb46d3c13ca224ed8689f7c01b8cbd022c99544",
+      "generated_at": "2026-08-01T20:30:05Z",
+      "hedra_generation_id": null,
+      "status": "ok",
+      "text_sha256": "df112ce304d0667fdcadab71469c310b6d950a5cc97626cc2b525decb161f846"
+    },
+    "12": {
+      "duration_sec": null,
+      "error": null,
+      "file_sha256": "2ebc13c639898d08dc576bf0658e6c3c62dae87d39332c150a22de7e89be977b",
+      "generated_at": "2026-08-01T20:30:05Z",
+      "hedra_generation_id": null,
+      "status": "ok",
+      "text_sha256": "6cda8444e141b14fed1ec953fe67b047dcbcaf787f93a00f3f05426084208833"
+    },
+    "13": {
+      "duration_sec": null,
+      "error": null,
+      "file_sha256": "e8bd92ff1256e0a2fd42b86f33cccb21354557f42b80bf7a0059e7bb147c22b8",
+      "generated_at": "2026-08-01T20:30:05Z",
+      "hedra_generation_id": null,
+      "status": "ok",
+      "text_sha256": "64dfa4e6bb59073c04f9137f358db1e47dd04d5e27cd2d042f264fc2664ef4f8"
+    },
+    "14": {
+      "duration_sec": null,
+      "error": null,
+      "file_sha256": "282c3938d5e44c77b688e8ce2581d2599f9f86566a7e177166c3b504bcca4744",
+      "generated_at": "2026-08-01T20:30:05Z",
+      "hedra_generation_id": null,
+      "status": "ok",
+      "text_sha256": "e1ed72fef057a54b8632c7b7e28ff47a872d428081eb381e4c45ef978f5e8ed2"
     },
     "15": {
       "duration_sec": null,
@@ -20,6 +65,24 @@
       "status": "ok",
       "text_sha256": "0bdcdeb31a21f1860abf13cfe18667b9dbf16c1503d5019301d647a06ca2bbb6"
     },
+    "16": {
+      "duration_sec": null,
+      "error": null,
+      "file_sha256": "2db598e3b83e038da9d53d075155c9a3c0c5bfc0b18c373a6dc814c868b13aaa",
+      "generated_at": "2026-08-01T20:30:05Z",
+      "hedra_generation_id": null,
+      "status": "ok",
+      "text_sha256": "e3b962ab39ac22606b22e94968b3611b4778b81ab269ccfad3495362bb473915"
+    },
+    "17": {
+      "duration_sec": null,
+      "error": null,
+      "file_sha256": "012a2c3bd1df16299ec3dbefe52288bd4d7d01be4390ff23e539daa05546b710",
+      "generated_at": "2026-08-01T20:30:05Z",
+      "hedra_generation_id": null,
+      "status": "ok",
+      "text_sha256": "ab4f09146b081e5b7be010475dec4d16c17bb6a8ce54d766e4a8f6a2de3979cc"
+    },
     "18": {
       "duration_sec": null,
       "error": null,
@@ -28,6 +91,15 @@
       "hedra_generation_id": "19a92f5a-a75d-4363-83b6-3b6f8769ba28",
       "status": "ok",
       "text_sha256": "783088e0b28ca97c2667bfc2e66d0d8adc4c7e9a46ddf81f0a8080df5f5169e3"
+    },
+    "19": {
+      "duration_sec": null,
+      "error": null,
+      "file_sha256": "1a36452b51f97cda740abf05f98e0ade0c546eecb1c8ab50883d192d1eb8bfcc",
+      "generated_at": "2026-08-01T20:30:05Z",
+      "hedra_generation_id": null,
+      "status": "ok",
+      "text_sha256": "0f5e77eea23d5f276a532fd19960d199659aa0c45408bc4dc961484eebd07bc4"
     },
     "2": {
       "duration_sec": null,
@@ -38,50 +110,50 @@
       "status": "ok",
       "text_sha256": "1700c1bdc260a7799f21bec2562b854bc9bb2a5e2937c8e955cb3e74b3b9b7b3"
     },
-    "24": {
+    "3": {
       "duration_sec": null,
-      "error": "submit_audio_generation: no endpoint accepted the request. Last error: POST /generations → 422: {\"code\":422,\"error_code\":null,\"messages\":[\"Field required (type=missing at body.text_to_speech.voice_id)\",\"Field required (type=missing at body.text_to_speech.text)\"],\"credits_needed\":null,\"credits_available\":null,\"request_id\":\"req_3HKLR1q4kcgsb753IP9ZfDrcAVM\",\"trace_id\":\"beec9e2a973488237c83911c0a394c8e\"}",
-      "file_sha256": null,
-      "generated_at": "2026-08-01T19:16:41Z",
+      "error": null,
+      "file_sha256": "6afcbcbbfa6bb15ae4b7b6417b3ceb281772186b1a99aa9f575ef619a5beeff7",
+      "generated_at": "2026-08-01T20:30:05Z",
       "hedra_generation_id": null,
-      "status": "failed",
-      "text_sha256": "51e87d2645cdd0f2b878b96d8844a0ce70d7a08fd3f6524295ebd8f1dec2664e"
+      "status": "ok",
+      "text_sha256": "e847a813968e4397cb299cb0ef258183ae845ba0855cc90e92ddcf7f91b4ee11"
     },
-    "26": {
+    "4": {
       "duration_sec": null,
-      "error": "submit_audio_generation: no endpoint accepted the request. Last error: POST /generations → 422: {\"code\":422,\"error_code\":null,\"messages\":[\"Field required (type=missing at body.text_to_speech.voice_id)\",\"Field required (type=missing at body.text_to_speech.text)\"],\"credits_needed\":null,\"credits_available\":null,\"request_id\":\"req_3HKLTAVlomtLcKMybpzUeq198WO\",\"trace_id\":\"6cd231a70d13bf1875749c111bdac796\"}",
-      "file_sha256": null,
-      "generated_at": "2026-08-01T19:16:58Z",
+      "error": null,
+      "file_sha256": "b68ec58833b26613a6a1ea1cb9cd030ca643ff2969aeaf62ec9bb5c82a4e4987",
+      "generated_at": "2026-08-01T20:30:05Z",
       "hedra_generation_id": null,
-      "status": "failed",
-      "text_sha256": "b22be935ba054721c60b2c5ae83250dbc6637d593401c05e6da8c60129c2a4a6"
+      "status": "ok",
+      "text_sha256": "63d71bbe3e1b921129dc8c74e17764e2ebc12e1e345346d1db325d66fa30ae48"
     },
-    "29": {
+    "5": {
       "duration_sec": null,
-      "error": "submit_audio_generation: no endpoint accepted the request. Last error: POST /generations → 422: {\"code\":422,\"error_code\":null,\"messages\":[\"Field required (type=missing at body.text_to_speech.voice_id)\",\"Field required (type=missing at body.text_to_speech.text)\"],\"credits_needed\":null,\"credits_available\":null,\"request_id\":\"req_3HKLVO0uDNjd9qbKAR3jhj5Tn70\",\"trace_id\":\"ce21b2bf34950c079a0c71b2e9d6542a\"}",
-      "file_sha256": null,
-      "generated_at": "2026-08-01T19:17:16Z",
+      "error": null,
+      "file_sha256": "e07d343831983766f49c1f794086ff3ce016c4b7fb31da27f10d333b6227dfcd",
+      "generated_at": "2026-08-01T20:30:05Z",
       "hedra_generation_id": null,
-      "status": "failed",
-      "text_sha256": "cd1bdba75cd813a82acb739350fd3728f6478aef8002be8a903f3e5764cd097c"
+      "status": "ok",
+      "text_sha256": "d2b14bd4cc92ed4f6c4af921dce64711d76120cb4b647eef0d38db7722fd18b7"
     },
-    "34": {
+    "6": {
       "duration_sec": null,
-      "error": "submit_audio_generation: no endpoint accepted the request. Last error: POST /generations → 422: {\"code\":422,\"error_code\":null,\"messages\":[\"Field required (type=missing at body.text_to_speech.voice_id)\",\"Field required (type=missing at body.text_to_speech.text)\"],\"credits_needed\":null,\"credits_available\":null,\"request_id\":\"req_3HKLXHFODSZ9glKdqmwYY9P4VDh\",\"trace_id\":\"49ce6202d109cd4ab62727dd98d20fcc\"}",
-      "file_sha256": null,
-      "generated_at": "2026-08-01T19:17:31Z",
+      "error": null,
+      "file_sha256": "58527956682879c1478fbc934291ecf402d3a9c727cd062b115045931beddbfb",
+      "generated_at": "2026-08-01T20:30:05Z",
       "hedra_generation_id": null,
-      "status": "failed",
-      "text_sha256": "f0b51f40943dadc85f987b9deb33c716a73fd3675cd9b9c6f6ea03a1f411e00b"
+      "status": "ok",
+      "text_sha256": "cfd3722b7b28f0712e3ae0dc12153f39d2985598b1cb22117cca3c8cad032d52"
     },
-    "38": {
+    "7": {
       "duration_sec": null,
-      "error": "submit_audio_generation: no endpoint accepted the request. Last error: POST /generations → 422: {\"code\":422,\"error_code\":null,\"messages\":[\"Field required (type=missing at body.text_to_speech.voice_id)\",\"Field required (type=missing at body.text_to_speech.text)\"],\"credits_needed\":null,\"credits_available\":null,\"request_id\":\"req_3HKLZnBg1irlUkHVOjOuSoHLl4y\",\"trace_id\":\"48a2a31cbb798d67c072e7b74401623c\"}",
-      "file_sha256": null,
-      "generated_at": "2026-08-01T19:17:51Z",
+      "error": null,
+      "file_sha256": "f8238bf9ffa57368919f92cd118bac9d2fdcab220211923883186c33ea287294",
+      "generated_at": "2026-08-01T20:30:05Z",
       "hedra_generation_id": null,
-      "status": "failed",
-      "text_sha256": "1336fa90f83c707d1e281e1ad5a0507b050272ade2c2dfb6b94c539e0561d782"
+      "status": "ok",
+      "text_sha256": "607ef82eb84ca90cf10ca5faa4a92c3a6edafb8eeb672fa6dc9368ffd57f0c60"
     },
     "8": {
       "duration_sec": null,
@@ -91,6 +163,15 @@
       "hedra_generation_id": "bb2f4870-561a-4d03-96d5-fbec0f533d38",
       "status": "ok",
       "text_sha256": "6fe2a1620980a03a8c9e1286f9c827c69506fe8ff4aa02d7c33ffe8483297883"
+    },
+    "9": {
+      "duration_sec": null,
+      "error": null,
+      "file_sha256": "e8d1ff2b0c5e4e106aa3fc7b5420ba7997e77acdad7f8e2fad3319aabb10a681",
+      "generated_at": "2026-08-01T20:30:05Z",
+      "hedra_generation_id": null,
+      "status": "ok",
+      "text_sha256": "7012a869def6deda9a62d4343d6f73c631ad68ee4e5ad7b448198ee1de4aaf2d"
     }
   },
   "voice_id": "Andre [RUS]",
