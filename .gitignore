@@ -28,3 +28,6 @@ htmlcov/
 # Manifest staging artefacts
 *.json.tmp
 *.broken.json
+
+# Hedra API key — never commit
+.hedra_key

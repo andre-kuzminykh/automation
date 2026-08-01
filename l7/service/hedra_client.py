@@ -31,12 +31,37 @@ class HedraClient:
     ) -> None:
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
-        self.api_key = api_key or os.environ.get("HEDRA_API_KEY")
+        self.api_key = (
+            api_key
+            or os.environ.get("HEDRA_API_KEY")
+            or self._key_from_file()
+        )
         if not self.api_key:
             raise HedraError(
-                "HEDRA_API_KEY is required (env var) — refusing to start"
+                "HEDRA_API_KEY not found. Either export it:\n"
+                "  export HEDRA_API_KEY=sk_hedra_...\n"
+                "or store it once so every new shell picks it up:\n"
+                f"  echo 'sk_hedra_...' > {self._KEY_FILES[0]} && "
+                f"chmod 600 {self._KEY_FILES[0]}"
             )
         self.session = session or requests.Session()
+
+    # Checked in order when HEDRA_API_KEY is not exported. Keep these OUT of
+    # git — a leaked key is a billable secret.
+    _KEY_FILES = ("~/.hedra_key", ".hedra_key")
+
+    @classmethod
+    def _key_from_file(cls) -> str | None:
+        for candidate in cls._KEY_FILES:
+            path = Path(candidate).expanduser()
+            try:
+                key = path.read_text(encoding="utf-8").strip()
+            except OSError:
+                continue
+            if key:
+                LOGGER.info("api_key_from_file", extra={"path": str(path)})
+                return key
+        return None
 
     # ------------------------------------------------------------------ utils
     def _headers(self, extra: dict[str, str] | None = None) -> dict[str, str]:
