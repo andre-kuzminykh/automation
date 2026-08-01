@@ -82,7 +82,8 @@ push_chunk() {
 # Observed cost is ~273 credits/slide (5189 credits bought slides 1..19).
 COST_PER_SLIDE=273
 want=$(( (END - START + 1) * COST_PER_SLIDE ))
-have="$(python3 -m l7.service.generate --lecture l3 --credits-available 2>/dev/null | tail -1)"
+have="$(python3 -m l7.service.generate --lecture l3 --credits-available 2>"$STATUS_DIR/preflight.err" | tail -1)"
+[ -s "$STATUS_DIR/preflight.err" ] && sed 's/^/[preflight] /' "$STATUS_DIR/preflight.err"
 case "$have" in
   ''|*[!0-9]*)
     echo "[preflight] could not read credit balance — continuing anyway" ;;

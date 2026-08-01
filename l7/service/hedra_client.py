@@ -25,6 +25,13 @@ class HedraInsufficientBalance(HedraError):
     """402 from Hedra. No payload shape fixes this — only money does."""
 
 
+def _mask_key(key: str) -> str:
+    """Enough to tell two keys apart in a log, not enough to use one."""
+    if len(key) <= 14:
+        return "sk_hedra_***"
+    return f"{key[:12]}…{key[-4:]}"
+
+
 class HedraClient:
     def __init__(
         self,
@@ -35,11 +42,30 @@ class HedraClient:
     ) -> None:
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
-        self.api_key = (
-            api_key
-            or os.environ.get("HEDRA_API_KEY")
-            or self._key_from_file()
-        )
+        env_key = os.environ.get("HEDRA_API_KEY")
+        file_key = self._key_from_file()
+        self.api_key = api_key or env_key or file_key
+        if api_key:
+            source = "argument"
+        elif env_key:
+            source = "HEDRA_API_KEY env var"
+        else:
+            source = "key file"
+        if self.api_key:
+            # Which key is in play, in the clear, every run. A stale exported
+            # key silently shadowing a freshly written ~/.hedra_key cost a
+            # whole debugging round once — never again without it being visible.
+            LOGGER.info("api_key_source",
+                        extra={"source": source,
+                               "key": _mask_key(self.api_key)})
+        if env_key and file_key and env_key != file_key:
+            LOGGER.warning(
+                "api_key_conflict",
+                extra={"note": "HEDRA_API_KEY and the key file hold DIFFERENT "
+                               "keys; the env var wins. Run "
+                               "`unset HEDRA_API_KEY` to use the file.",
+                       "env_key": _mask_key(env_key),
+                       "file_key": _mask_key(file_key)})
         if not self.api_key:
             raise HedraError(
                 "HEDRA_API_KEY not found. Either export it:\n"
@@ -63,9 +89,11 @@ class HedraClient:
             except OSError:
                 continue
             if key:
-                LOGGER.info("api_key_from_file", extra={"path": str(path)})
+                cls._key_file_used = str(path)
                 return key
         return None
+
+    _key_file_used: str | None = None
 
     # ------------------------------------------------------------------ utils
     def _headers(self, extra: dict[str, str] | None = None) -> dict[str, str]:

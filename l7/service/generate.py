@@ -244,11 +244,19 @@ def main(argv: Sequence[str] | None = None) -> int:
             print(f"workspace {ws_id}: available={pool.get('available')} "
                   f"api_credits={pool.get('api_credits')} "
                   f"api_wallet_usd={usd}")
+        cfg_ws = config["hedra"].get("workspace_id")
+        print(f"\nconfigured workspace_id: {cfg_ws}")
+        if cfg_ws and str(cfg_ws) not in {str(k) for k in pools}:
+            print(f"  !! this key's account has no workspace {cfg_ws}. "
+                  f"It has: {', '.join(str(k) for k in pools) or '(none)'}")
+            print(f"  !! generations would bill the wrong pool. Set "
+                  f"workspace_id in <lecture>/data/config.json to one of the "
+                  f"above, or pass --workspace-id.")
         print("\nNB: on this account api_usd_micros is null and programmatic "
               "usage is debited from the subscription pool of the workspace "
-              "named in workspace_id (58237). A run costs ~273 credits per "
-              "slide. If 'available' here is low, the top-up did not reach "
-              "this workspace.")
+              "named in workspace_id. A run costs ~273 credits per slide. "
+              "If 'available' here is low, the top-up did not reach this "
+              "workspace — or this key belongs to a different account.")
         return 0
 
     if args.credits_available:
@@ -260,6 +268,16 @@ def main(argv: Sequence[str] | None = None) -> int:
             return 2
         ws = config["hedra"].get("workspace_id")
         pools = data.get("workspace_credit_pool") or {}
+        if ws and str(ws) not in {str(k) for k in pools}:
+            # Reporting the account-wide 'remaining' here would green-light a
+            # run that then bills a workspace this key cannot reach.
+            print(
+                f"configured workspace_id={ws} not in this account "
+                f"({', '.join(str(k) for k in pools) or 'no workspaces'})",
+                file=sys.stderr,
+            )
+            print(0)
+            return 0
         pool = pools.get(str(ws)) if ws else None
         if pool is not None:
             print(int(pool.get("available") or 0))

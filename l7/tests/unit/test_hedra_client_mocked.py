@@ -244,3 +244,48 @@ def test_insufficient_balance_stops_variant_walk(hedra_env):
 
 def test_insufficient_balance_is_a_hedra_error(hedra_env):
     assert issubclass(HedraInsufficientBalance, HedraError)
+
+
+# A stale exported key silently shadowing a freshly written key file is the
+# single most expensive failure mode here — it must be logged, not guessed at.
+def test_env_key_wins_but_conflict_is_logged(monkeypatch, tmp_path, caplog):
+    key_file = tmp_path / "hedra_key"
+    key_file.write_text("sk_hedra_FILEKEY_bbbbbbbbbbbbbbbbbbbbbbbbbbbb", encoding="utf-8")
+    monkeypatch.setattr(HedraClient, "_KEY_FILES", (str(key_file),))
+    monkeypatch.setenv("HEDRA_API_KEY", "sk_hedra_ENVKEY_aaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+
+    with caplog.at_level("INFO", logger="l7.hedra"):
+        client = HedraClient()
+
+    assert client.api_key.startswith("sk_hedra_ENVKEY")
+    msgs = [r.msg for r in caplog.records]
+    assert "api_key_source" in msgs
+    assert "api_key_conflict" in msgs
+    conflict = next(r for r in caplog.records if r.msg == "api_key_conflict")
+    assert "unset HEDRA_API_KEY" in conflict.note
+    # Neither full key may appear in the log.
+    blob = "".join(str(r.__dict__) for r in caplog.records)
+    assert "sk_hedra_ENVKEY_aaaaaaaaaaaaaaaaaaaaaaaaaaaa" not in blob
+    assert "sk_hedra_FILEKEY_bbbbbbbbbbbbbbbbbbbbbbbbbbbb" not in blob
+
+
+def test_no_conflict_logged_when_only_file_key(monkeypatch, tmp_path, caplog):
+    key_file = tmp_path / "hedra_key"
+    key_file.write_text("sk_hedra_FILEKEY_bbbbbbbbbbbbbbbbbbbbbbbbbbbb", encoding="utf-8")
+    monkeypatch.setattr(HedraClient, "_KEY_FILES", (str(key_file),))
+    monkeypatch.delenv("HEDRA_API_KEY", raising=False)
+
+    with caplog.at_level("INFO", logger="l7.hedra"):
+        client = HedraClient()
+
+    assert client.api_key.startswith("sk_hedra_FILEKEY")
+    src = next(r for r in caplog.records if r.msg == "api_key_source")
+    assert src.source == "key file"
+    assert "api_key_conflict" not in [r.msg for r in caplog.records]
+
+
+def test_mask_key_reveals_little():
+    from l7.service.hedra_client import _mask_key
+    masked = _mask_key("sk_hedra_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+    assert masked == "sk_hedra_ABC…6789"
+    assert _mask_key("short") == "sk_hedra_***"
