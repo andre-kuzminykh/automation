@@ -1,0 +1,35 @@
+{
+  "lecture": {
+    "id": "levels_en",
+    "title": "AI Maturity Levels (test conclusion)",
+    "subtitle": "AI-Enabled, AI-Driven, AI-First, AI-Native",
+    "course": "AI-Agents-Corp",
+    "language": "en"
+  },
+  "slides": [
+    {
+      "id": 1,
+      "slug": "01_level_ai_enabled",
+      "title": "AI-Enabled",
+      "narration": "AI-Enabled is the earliest stage of maturity. The company has already adopted AI tools, but uses them on top of its existing management architecture. Processes, roles, and decision-making logic stay the same, while AI becomes just an add-on: it answers questions, generates texts, prepares data, and improves individual operations. The human role does not change — people work as before, and AI simply speeds up familiar tasks. That is exactly why most companies get stuck at this stage: the tools have arrived, but the way of working has stayed the same. The good news: you have already taken the first step. What matters next is not adding new tools, but mapping out a strategy for moving to the AI-Driven level, where AI is built into processes and makes forecasts on its own. Start simple: choose the processes you will strengthen first."
+    },
+    {
+      "id": 2,
+      "slug": "02_level_ai_driven",
+      "title": "AI-Driven",
+      "narration": "AI-Driven is the level where artificial intelligence is already built into your processes, but remains a tool in human hands. It analyzes data, builds forecasts, suggests decisions, and takes over some of the routine work. Unlike AI-Enabled, where AI worked on top of the old architecture, here it amplifies your every action. But final decisions and responsibility still rest with you: AI suggests, and you choose. This is a strong position — and at the same time a point of growth. The next level, AI-First, begins when AI starts acting on its own, and you become a manager of AI employees. To get there, it is worth mapping out a strategy: which processes to hand over to AI, and how to redesign roles around that. Start planning this transition now."
+    },
+    {
+      "id": 3,
+      "slug": "03_level_ai_first",
+      "title": "AI-First",
+      "narration": "AI-First. Here artificial intelligence stops being an assistant and becomes part of the operating model. It acts on its own: it runs processes, assigns tasks, interacts with other employees, and maintains consistent quality. The human role truly changes — you become a manager of AI employees: you set goals, design processes, review results, and train the system on your own data. This is a level few companies reach. One step remains — AI-Native, where AI becomes the very essence of the business. To take it deliberately, map out a strategy: where AI can not just execute, but create value, and how to build it into the core of your product. You already manage AI — now it is time to plan how to build the business around it."
+    },
+    {
+      "id": 4,
+      "slug": "04_level_ai_native",
+      "title": "AI-Native",
+      "narration": "AI-Native is the summit. Here artificial intelligence is no longer a tool or an operating model — it is the very essence of the business. You do not just use AI — you create it. The product, the infrastructure, the business model, the entire value chain are built around AI. The human is no longer an operator or a manager, but an architect: you design systems that learn and create value on their own. This is not the next step of digitalization, but a different type of organization, where the ability to create and scale AI is the main asset. There is no next level — but there is a new challenge: holding on to leadership. Build your strategy to set industry standards, not to chase them. You are not moving to a new stage — you are defining what it will be for everyone else."
+    }
+  ]
+}

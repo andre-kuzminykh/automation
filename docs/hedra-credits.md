@@ -21,14 +21,25 @@ render. Budget on 3.74 — the published rate has consistently under-predicted.
 
 ### Estimating before you spend
 
-Russian narration at speed 0.75 runs **13.9 characters per second**
-(14,780 chars → 1,062 s across l3 slides 1-19).
+Speech rate differs by language — do not use the Russian figure for English:
+
+| Language | chars/sec | measured over |
+|---|---|---|
+| Russian, speed 0.75 | **13.9** | 23 videos (l3 1-19, levels), 17,812 chars → 1,286 s |
+| English, speed 0.75 | **17.2** | 36 videos (mte), 28,285 chars → 1,648 s |
+
+English runs ~24% faster per character, so the same word count yields a video
+about a fifth shorter. A Russian narration of ~780 chars lands at ~56 s; its
+English translation of the same length lands at ~45 s.
 
 ```
-seconds  ≈ characters / 14
-credits  ≈ characters / 14 * 3.74     ≈ characters * 0.27
-dollars  ≈ characters * 0.0014        (~$1.40 per 1000 characters)
+seconds  ≈ characters / 13.9   (ru)   |   characters / 17.2   (en)
+credits  ≈ seconds * 3.74
+dollars  ≈ credits * 0.00521
 ```
+
+Per 1000 characters: ~269 credits / $1.40 in Russian, ~218 credits / $1.13 in
+English.
 
 Check any lecture before running it:
 
@@ -36,8 +47,10 @@ Check any lecture before running it:
 python3 - <<'PY'
 import sys; sys.path.insert(0,'.')
 from l7.service.slide_repository import SlideRepository
-c = sum(len(s.narration) for s in SlideRepository("l3/data/slides.json").iter_slides())
-print(f"{c} chars -> ~{c/14:.0f} s -> ~{c*0.27:.0f} credits -> ${c*0.0014:.2f}")
+LECTURE, RATE = "l3/data/slides.json", 13.9   # 17.2 for English
+c = sum(len(s.narration) for s in SlideRepository(LECTURE).iter_slides())
+sec = c / RATE
+print(f"{c} chars -> ~{sec:.0f} s -> ~{sec*3.74:.0f} credits -> ${sec*3.74*75/14400:.2f}")
 PY
 ```
 

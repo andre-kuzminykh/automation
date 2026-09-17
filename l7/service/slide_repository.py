@@ -18,10 +18,19 @@ class Slide:
     id: int
     title: str
     narration: str
+    slug: str = ""
 
     @property
     def text_sha256(self) -> str:
         return hashlib.sha256(self.narration.encode("utf-8")).hexdigest()
+
+    def filename(self, pattern: str = "{id}.mp4") -> str:
+        """Render this slide's output filename from config.filename_pattern.
+
+        `{slug}` falls back to the id when a dataset doesn't define slugs, so
+        the default `{id}.mp4` and a slug-less dataset behave identically.
+        """
+        return pattern.format(id=self.id, slug=self.slug or self.id)
 
 
 @dataclass(frozen=True)
@@ -98,6 +107,7 @@ class SlideRepository:
                     id=sid,
                     title=str(item["title"]),
                     narration=str(item["narration"]),
+                    slug=str(item.get("slug", "")),
                 )
             )
 

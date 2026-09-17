@@ -212,6 +212,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     manifest.set_top("lecture_id", repo.lecture.id)
     manifest.set_top("voice_id", config["hedra"]["voice_id"])
 
+    # config.output.filename_pattern was accepted but never read until now;
+    # every existing dataset sets "{id}.mp4", so honouring it changes nothing
+    # for them and lets a dataset name its files (levels_en uses "{slug}.mp4").
+    filename_pattern = config["output"].get("filename_pattern", "{id}.mp4")
+
     regen = _parse_id_set(args.regenerate)
     all_slides = list(repo.iter_slides())
     all_ids = [s.id for s in all_slides]
@@ -431,7 +436,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     consecutive_failures = 0
 
     for slide in slides:
-        target_file = paths["videos_dir"] / f"{slide.id}.mp4"
+        target_file = paths["videos_dir"] / slide.filename(filename_pattern)
         prev = manifest.get_slide(slide.id)
 
         # Idempotency check (NR-F1-9)
