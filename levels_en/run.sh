@@ -51,10 +51,11 @@ done
 
 echo
 echo "================ RESULT ================"
-missing=()
+missing=(); produced=0
 for f in 01_level_ai_enabled 02_level_ai_driven 03_level_ai_first 04_level_ai_native; do
   if [ -s "levels_en/videos/$f.mp4" ]; then
     echo "  ok      $f.mp4  ($(du -h "levels_en/videos/$f.mp4" | cut -f1))"
+    produced=$((produced + 1))
   else
     echo "  MISSING $f.mp4"
     missing+=("$f")
@@ -63,6 +64,16 @@ done
 
 if [ "${#missing[@]}" -gt 0 ]; then
   echo "${#missing[@]} missing — not pushing. Fix and re-run."
+# A run that produced nothing leaves only status="failed" rows in the manifest.
+# Those are worthless (the console already showed the errors) and they dirty the
+# tree, which makes the NEXT `git pull --rebase` refuse to start — that is how
+# this VM stayed on stale code across three runs against a dead workspace.
+if git diff --quiet -- levels_en/data/manifest.json; then :; else
+  if [ "$produced" -eq 0 ]; then
+    echo "[cleanup] nothing rendered; reverting manifest so the next pull is not blocked"
+    git checkout -- levels_en/data/manifest.json
+  fi
+fi
   exit 1
 fi
 

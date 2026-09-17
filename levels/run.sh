@@ -78,6 +78,17 @@ sys.exit(1 if stale else 0)
 PY
 if [ $? -ne 0 ]; then
   echo "Some slides still carry the old wording — not pushing."
+  produced=$(git diff --name-only -- levels/videos/ | wc -l)
+# A run that produced nothing leaves only status="failed" rows in the manifest.
+# Those are worthless (the console already showed the errors) and they dirty the
+# tree, which makes the NEXT `git pull --rebase` refuse to start — that is how
+# this VM stayed on stale code across three runs against a dead workspace.
+if git diff --quiet -- levels/data/manifest.json; then :; else
+  if [ "$produced" -eq 0 ]; then
+    echo "[cleanup] nothing rendered; reverting manifest so the next pull is not blocked"
+    git checkout -- levels/data/manifest.json
+  fi
+fi
   exit 1
 fi
 
