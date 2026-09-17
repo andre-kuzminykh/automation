@@ -395,23 +395,37 @@ def main(argv: Sequence[str] | None = None) -> int:
     # Resolve the voice id (UUID). Hedra rejects display-name `voice_id`
     # values with "video generation without valid audio input".
     # Precedence: --voice-id > manifest cache > config.voice_id_known > /voices lookup.
-    voice_id = (
-        args.voice_id
-        or manifest.data.get("voice_id_uuid")
-        or config["hedra"].get("voice_id_known")
-    )
+    # --- TTS provider ---------------------------------------------------------
+    el_cfg = config.get("elevenlabs") or {}
+    provider = (args.tts_provider
+                or el_cfg.get("provider")
+                or ("elevenlabs" if el_cfg.get("voice_id") else "hedra"))
+
     voice_hint = config["hedra"].get("voice_id", "aisala")
-    if not voice_id:
-        try:
-            voice_id = client.resolve_voice_id(name_hint=voice_hint)
-        except HedraError as exc:
-            log.error("voice_resolution_failed", extra={"err": str(exc)})
-            return 2
-    manifest.set_top("voice_id_uuid", voice_id)
-    manifest.set_top("voice_name", voice_hint)
-    manifest.write_atomic()
-    log.info("voice_id_resolved",
-             extra={"voice_id": voice_id, "voice_name": voice_hint})
+    voice_id = ""
+    if provider == "elevenlabs":
+        # ElevenLabs synthesises the narration and Hedra only lip-syncs a
+        # finished audio asset, so no Hedra voice is involved. Resolving one
+        # here would fail outright on an account that has no such clone.
+        log.info("voice_resolution_skipped",
+                 extra={"reason": "tts_provider=elevenlabs"})
+    else:
+        voice_id = (
+            args.voice_id
+            or manifest.data.get("voice_id_uuid")
+            or config["hedra"].get("voice_id_known")
+        )
+        if not voice_id:
+            try:
+                voice_id = client.resolve_voice_id(name_hint=voice_hint)
+            except HedraError as exc:
+                log.error("voice_resolution_failed", extra={"err": str(exc)})
+                return 2
+        manifest.set_top("voice_id_uuid", voice_id)
+        manifest.set_top("voice_name", voice_hint)
+        manifest.write_atomic()
+        log.info("voice_id_resolved",
+                 extra={"voice_id": voice_id, "voice_name": voice_hint})
 
     # Voice tuning: CLI flag wins, else config.hedra, else default.
     tts_speed = (args.speed if args.speed is not None
@@ -431,11 +445,6 @@ def main(argv: Sequence[str] | None = None) -> int:
                     "workspace_id": workspace_id,
                     "tts_model_slug": tts_model_slug})
 
-    # --- TTS provider ---------------------------------------------------------
-    el_cfg = config.get("elevenlabs") or {}
-    provider = (args.tts_provider
-                or el_cfg.get("provider")
-                or ("elevenlabs" if el_cfg.get("voice_id") else "hedra"))
     eleven = None
     eleven_settings: dict[str, object] = {}
     if provider == "elevenlabs":

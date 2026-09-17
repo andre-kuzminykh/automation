@@ -334,3 +334,53 @@ def test_tts_provider_flag_overrides_config(fake_pipeline):
     assert code == 0
     # Fell back to Hedra's own TTS despite the elevenlabs block.
     assert len(mock.submitted) == 3
+
+
+def test_elevenlabs_path_never_resolves_a_hedra_voice(fake_pipeline):
+    """A Hedra account without the voice clone must still render.
+
+    Voice ids are per-account. On the ElevenLabs path Hedra only lip-syncs a
+    finished audio asset, so resolving a Hedra voice is both unnecessary and
+    fatal when the clone lives in a different account.
+    """
+    auto, l7 = fake_pipeline
+    _add_eleven_config(l7)
+
+    mock = MockHedra()
+    mock.create_audio_asset = lambda name: "audio_asset_1"
+    mock.upload_asset_binary = lambda asset_id, path, content_type=None: None
+
+    def _boom(**_kw):
+        raise AssertionError("resolve_voice_id must not be called")
+
+    def _boom_tts(**_kw):
+        raise AssertionError("Hedra TTS must not be called")
+
+    mock.resolve_voice_id = _boom
+    mock.submit_audio_generation = _boom_tts
+    mock.list_voices = _boom
+
+    eleven = MockEleven()
+    with patch("l7.service.generate.HedraClient", return_value=mock), \
+         patch("l7.service.generate.ElevenLabsClient", return_value=eleven):
+        code = gen_mod.main([
+            "--lecture", "l7", "--no-git",
+            "--config", str(l7 / "data/config.json"),
+        ])
+
+    assert code == 0
+    assert len(eleven.calls) == 3
+    for sid in (1, 2, 3):
+        assert (l7 / f"videos/{sid}.mp4").exists()
+
+
+def test_hedra_path_still_resolves_its_voice(fake_pipeline):
+    """The guard must not disable voice resolution for the Hedra path."""
+    auto, l7 = fake_pipeline
+    mock = MockHedra()
+    resolved = []
+    mock.resolve_voice_id = lambda *, name_hint="": (
+        resolved.append(name_hint) or "mock-voice-uuid")
+    code = _run_pipeline(fake_pipeline, mock)
+    assert code == 0
+    assert resolved, "Hedra path must still look the voice up"
