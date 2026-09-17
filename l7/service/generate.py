@@ -26,6 +26,8 @@ import os
 import sys
 import tempfile
 import time
+import requests
+
 from pathlib import Path
 from typing import Sequence
 
@@ -163,6 +165,35 @@ def _file_sha256(path: Path) -> str:
         for chunk in iter(lambda: fh.read(64 * 1024), b""):
             h.update(chunk)
     return h.hexdigest()
+
+
+
+def _ensure_avatar_file(path: Path, source_url: str, log) -> bool:
+    """Make sure the avatar image exists locally, fetching it if it does not.
+
+    Most datasets never kept a local copy: they relied on avatar_asset_id
+    already being in the manifest. That id is per-account, so switching Hedra
+    accounts invalidates it and the re-upload has nothing to upload.
+    """
+    if path.exists() and path.stat().st_size > 0:
+        return True
+    if not source_url:
+        log.error("avatar_missing_no_source", extra={"path": str(path)})
+        return False
+    log.info("avatar_download",
+             extra={"url": source_url, "dest": str(path)})
+    try:
+        resp = requests.get(source_url, timeout=60)
+        resp.raise_for_status()
+    except requests.RequestException as exc:
+        log.error("avatar_download_failed",
+                  extra={"url": source_url, "err": str(exc)})
+        return False
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(resp.content)
+    log.info("avatar_downloaded",
+             extra={"path": str(path), "bytes": len(resp.content)})
+    return True
 
 
 def _resolve_paths(lecture_root: Path, config: dict) -> dict[str, Path]:
@@ -330,17 +361,22 @@ def main(argv: Sequence[str] | None = None) -> int:
             print(f"{vid}\t{lang:8s}\t{name}")
         print(f"\nTotal: {len(voices)} voices")
         return 0
+    avatar_source = (config.get("avatar_image") or {}).get("source_url", "")
     avatar_asset_id = manifest.data.get("avatar_asset_id")
     if not avatar_asset_id:
-        if not paths["avatar"].exists():
+        if not _ensure_avatar_file(paths["avatar"], avatar_source, log):
             log.error("avatar_missing", extra={"path": str(paths["avatar"])})
             return 2
         try:
-            avatar_asset_id = client.create_image_asset(name="lecture7-avatar")
+            avatar_asset_id = client.create_image_asset(
+                name=f"{repo.lecture.id}-avatar")
             client.upload_asset_binary(avatar_asset_id, paths["avatar"])
         except HedraError as exc:
             log.error("avatar_upload_failed", extra={"err": str(exc)})
             return 2
+        log.info("avatar_uploaded",
+                 extra={"asset_id": avatar_asset_id,
+                        "workspace_id": config["hedra"].get("workspace_id")})
         manifest.set_top("avatar_asset_id", avatar_asset_id)
         manifest.write_atomic()
 

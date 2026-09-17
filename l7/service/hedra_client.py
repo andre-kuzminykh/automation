@@ -25,6 +25,14 @@ class HedraInsufficientBalance(HedraError):
     """402 from Hedra. No payload shape fixes this — only money does."""
 
 
+class HedraAssetNotFound(HedraError):
+    """404 from Hedra: a voice or asset id that this account does not own.
+
+    Assets are per-account. When the API key changes accounts, every id
+    cached from the old one (voice clones, uploaded avatars) stops resolving.
+    """
+
+
 def _mask_key(key: str) -> str:
     """Enough to tell two keys apart in a log, not enough to use one."""
     if len(key) <= 14:
@@ -140,6 +148,8 @@ class HedraClient:
             msg = f"{method} {path} → {resp.status_code}: {body}"
             if resp.status_code == 402:
                 raise HedraInsufficientBalance(msg)
+            if resp.status_code == 404:
+                raise HedraAssetNotFound(msg)
             raise HedraError(msg)
         return resp
 
@@ -558,6 +568,17 @@ class HedraClient:
                 # manifest, so surface the 402 as-is.
                 LOGGER.error("audio_attempt_no_balance",
                              extra={"path": path, "attempt_index": idx})
+                raise
+            except HedraAssetNotFound:
+                # The voice id is not in this account. Same reasoning as the
+                # 402: no payload shape conjures a missing asset, and the
+                # trailing 422s would hide why the run really stopped.
+                LOGGER.error("audio_attempt_voice_missing",
+                             extra={"path": path, "attempt_index": idx,
+                                    "voice_id": voice_id,
+                                    "note": "voice belongs to another Hedra "
+                                            "account; list this account's "
+                                            "voices with --list-voices"})
                 raise
             except HedraError as exc:
                 level = LOGGER.warning if is_canonical else LOGGER.info

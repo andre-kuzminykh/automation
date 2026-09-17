@@ -12,7 +12,10 @@ set -u
 cd "$(dirname "$0")/.."   # repo root
 
 AI_MODEL_ID="26f0fc66-152b-40ab-abed-76c43df99bc8"
-VOICE_ID="8e7544c8-a37b-4315-9599-55bad6bfbb7b"
+# Voice ids are per-account. Leave this empty to let the run resolve the voice
+# by name against whatever account the key belongs to; set it only to pin a
+# specific uuid you have confirmed exists there.
+VOICE_ID="${VOICE_ID:-}"
 BRANCH="claude/setup-gcloud-video-service-XKVf0"
 
 FROM="${1:-1}"
@@ -43,7 +46,7 @@ for i in $(seq "$FROM" "$TO"); do
   python3 -m l7.service.generate --lecture levels_en \
     --regenerate "$i" --from "$i" --to "$i" \
     --ai-model-id "$AI_MODEL_ID" \
-    --voice-id "$VOICE_ID" \
+    ${VOICE_ID:+--voice-id "$VOICE_ID"} \
     --poll-timeout 1800 \
     --no-git \
     || echo ">>> SLIDE $i FAILED (continuing)"

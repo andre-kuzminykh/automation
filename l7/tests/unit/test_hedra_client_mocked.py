@@ -9,6 +9,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from l7.service.hedra_client import (
+    HedraAssetNotFound,
     HedraClient,
     HedraError,
     HedraInsufficientBalance,
@@ -289,3 +290,27 @@ def test_mask_key_reveals_little():
     masked = _mask_key("sk_hedra_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
     assert masked == "sk_hedra_ABC…6789"
     assert _mask_key("short") == "sk_hedra_***"
+
+
+# Assets are per-account. After an account switch every cached voice/avatar id
+# 404s, and walking the payload variants buries that under 422s — which is
+# exactly how a run reported "Field required" when the real cause was a voice
+# belonging to the old account.
+def test_asset_not_found_stops_variant_walk(hedra_env):
+    session = _make_session([
+        {"status": 404, "json": {"error_code": "NOT_FOUND",
+                                 "messages": ["voice asset 8e7544c8 not found"]}},
+        {"status": 422, "json": {"messages": ["Field required"]}},
+    ])
+    client = HedraClient(session=session)
+    with pytest.raises(HedraAssetNotFound) as exc:
+        client.submit_audio_generation(
+            text="hi", voice_id="8e7544c8",
+            tts_model_slug="elevenlabs/elevenlabs-v3",
+        )
+    assert "not found" in str(exc.value)
+    assert session.request.call_count == 1
+
+
+def test_asset_not_found_is_a_hedra_error(hedra_env):
+    assert issubclass(HedraAssetNotFound, HedraError)
