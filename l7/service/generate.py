@@ -733,8 +733,15 @@ def main(argv: Sequence[str] | None = None) -> int:
     # --- Compress videos (NFR-F4-1: keep batch ≤ 500 MB) ---------------------
     if args.compress and ok:
         import subprocess
+        # Must honour filename_pattern like the download step does. Looking for
+        # "{id}.mp4" under a "{slug}.mp4" dataset silently found nothing and
+        # left four 30+ MB videos uncompressed.
+        by_id = {s.id: s for s in all_slides}
         for sid in sorted(ok):
-            src = paths["videos_dir"] / f"{sid}.mp4"
+            slide_obj = by_id.get(sid)
+            name = (slide_obj.filename(filename_pattern) if slide_obj
+                    else f"{sid}.mp4")
+            src = paths["videos_dir"] / name
             if not src.exists():
                 continue
             size_before = src.stat().st_size
