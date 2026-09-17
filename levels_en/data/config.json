@@ -43,9 +43,6 @@
     "use_speaker_boost": true,
     "output_format": "mp3_44100_128",
     "api_key_env": "ELEVENLABS_API_KEY",
-    "_note": "API key is NEVER stored here — see ~/.elevenlabs_key",
-    "max_duration_sec": 58,
-    "chars_per_sec": 14.9,
-    "_calibration": "chars_per_sec measured at elevenlabs.speed; EN from 840 chars -> 56.3 s at 0.9. RU is an estimate until a Russian render is measured."
+    "_note": "API key is NEVER stored here — see ~/.elevenlabs_key"
   }
 }
