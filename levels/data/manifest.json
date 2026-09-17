@@ -1,41 +1,42 @@
 {
+  "avatar_asset_id": "20879451-ab7c-482d-bead-4e8c9137d4f1",
   "lecture_id": "levels",
   "slides": {
     "1": {
       "duration_sec": null,
       "error": null,
-      "file_sha256": "677bc4a10976a26eb49d1759c210a5280da3acaf891cf60f9bd10f0e3f1b7521",
-      "generated_at": "2026-07-20T11:02:33Z",
-      "hedra_generation_id": "d9563435-59a7-4f17-81ec-9d89e3b605b5",
+      "file_sha256": "acc019889f0d74e2a17651bce6e268357dd1c1e10f4b4a89b9d7cce6e7bce475",
+      "generated_at": "2026-09-17T23:14:29Z",
+      "hedra_generation_id": "878ed766-28d3-477c-b7d5-3b18e3ecd702",
       "status": "ok",
-      "text_sha256": "2b299a16b559a33027e725fae1fbee3801d93568723b65fb1347da32178eaa3e"
+      "text_sha256": "c10dbd99b90938ef85ae8132d20cd7e0110121e511ecdedea74b4dabd9749db7"
     },
     "2": {
       "duration_sec": null,
       "error": null,
-      "file_sha256": "eb3d65fd0ca5349ffba94d437f87b76553666b45ddeddd14c1d6f95b8c527e8a",
-      "generated_at": "2026-07-20T11:10:01Z",
-      "hedra_generation_id": "0a2057ba-6038-4d0b-83b1-3add17c02fc1",
+      "file_sha256": "942707ef4413a9ff08c86a3697d3ec1415199d12c6f0353d2f7dece448c7d6c8",
+      "generated_at": "2026-09-17T23:16:43Z",
+      "hedra_generation_id": "9286471d-ffad-46ee-bc7b-346a664f9755",
       "status": "ok",
-      "text_sha256": "e166d62961b13fcb0ded3171bd94cad7e98dd44e7f130a3673b36bf933af61db"
+      "text_sha256": "f6e8182c8b4d33d1673f496a2be21bb80ab5efdb76a413d31bcfa366d22ebb7b"
     },
     "3": {
       "duration_sec": null,
       "error": null,
-      "file_sha256": "47b464e858bf5350bf578d77c0110c3ec034cb4418f0ebad0b9e5d62cb1dbfee",
-      "generated_at": "2026-07-20T11:20:19Z",
-      "hedra_generation_id": "91f1e8e4-56eb-41fe-ad7d-576e3c0a1b61",
+      "file_sha256": "38d0d10e50da60619d4d23e38ec16d7e532de487b08c03e1e142b505bde58806",
+      "generated_at": "2026-09-17T23:18:48Z",
+      "hedra_generation_id": "f2a181fc-15c8-48af-9e36-695bfb9e3021",
       "status": "ok",
-      "text_sha256": "e6eeda526f1b96d3fda5a2bb394b9bf02d08b460caa6e64f71e6c3dc5b72f39f"
+      "text_sha256": "dceb41212422eaf98f92a4acaa026c50718c4ff5dc7bd31f26947d49cc5f3320"
     },
     "4": {
       "duration_sec": null,
       "error": null,
-      "file_sha256": "845c50e06f1ec4836387f62d407a5d89b91a158a8f906740f3291d26ea3417d0",
-      "generated_at": "2026-07-20T11:24:51Z",
-      "hedra_generation_id": "2620c5a3-6e71-4997-ad1f-bed858c4fee5",
+      "file_sha256": "3645021170398efa9f9215f73022b84d035b09f0ad350bf37c75560b3f3b2765",
+      "generated_at": "2026-09-17T23:20:54Z",
+      "hedra_generation_id": "ae62940f-272f-427d-bd4b-5049dc2db205",
       "status": "ok",
-      "text_sha256": "8fcd151db7b6cd0d344ebfdfe3959cc7c54df259f3caa1f6dcc3f8769c1b06e4"
+      "text_sha256": "797bdef4e453964f46a519c2acb2bcafd19cf1af5b6b676a2613694764a5298b"
     }
   },
   "voice_id": "Andre [RUS]",
