@@ -130,10 +130,25 @@ after.
 ```bash
 cd ~/automation
 unset HEDRA_API_KEY
+bash sync.sh                        # pulls, clearing manifests left by a failed run
+bash l3/run_one.sh 20               # one slide, listen to it
+PAR=4 bash l3/run_parallel.sh 20 40 # then the rest
+```
+
+Use `sync.sh` rather than `git pull --rebase` directly. A failed slide writes
+`status="failed"` into the lecture manifest, and a dirty tree makes the plain
+pull abort with "You have unstaged changes" — which strands the VM on old code
+while it keeps failing the same way. The runners revert their own manifest when
+a run produces nothing, so this should no longer arise, but `sync.sh` also
+prints the `workspace_id` that ended up in effect, which is the one line worth
+reading before spending anything.
+
+If `sync.sh` itself is missing, it is inside the commit the blocked pull is
+trying to fetch. Break the loop by hand:
+
+```bash
+git checkout -- '*/data/manifest.json'
 git pull --rebase origin claude/setup-gcloud-video-service-XKVf0
-python3 -m l7.service.generate --lecture l3 --check-credits | tail -25   # right account?
-bash l3/run_one.sh 20                                                   # one slide, listen
-PAR=4 bash l3/run_parallel.sh 20 40                                     # then the rest
 ```
 
 `run_parallel.sh` reads the balance up front and refuses to start when it cannot
