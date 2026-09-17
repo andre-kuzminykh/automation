@@ -23,6 +23,23 @@ TO="${2:-${1:-4}}"
 echo "[preflight] credits:"
 python3 -m l7.service.generate --lecture levels --check-credits 2>&1 | tail -12
 
+# The mismatch warning above is not enough on its own: the previous run printed
+# it and then submitted 5 doomed requests anyway. --credits-available reports 0
+# when this config's workspace_id is not one the key's account owns, so gate on it.
+have="$(python3 -m l7.service.generate --lecture levels --credits-available 2>/dev/null | tail -1)"
+case "$have" in
+  ''|*[!0-9]*)
+    echo "[preflight] could not read the balance — continuing anyway" ;;
+  *)
+    if [ "$have" -lt 20 ]; then
+      echo "[preflight] ABORT: $have credits usable for workspace_id in levels/data/config.json."
+      echo "            Either the money is in a different workspace or the key is for a"
+      echo "            different account. See the mismatch note above; nothing was submitted."
+      exit 2
+    fi
+    echo "[preflight] $have credits available" ;;
+esac
+
 for i in $(seq "$FROM" "$TO"); do
   echo "================ SLIDE $i ================"
   python3 -m l7.service.generate --lecture levels \
