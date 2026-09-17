@@ -35,7 +35,7 @@
   },
   "elevenlabs": {
     "provider": "elevenlabs",
-    "voice_id": "7xxG1HweS4PIsATG1xua",
+    "voice_id": "Ob6Igh1Td3rQNTmh6wfF",
     "model_id": "eleven_multilingual_v2",
     "stability": "robust",
     "similarity_boost": 0.75,
