@@ -439,11 +439,20 @@ def main(argv: Sequence[str] | None = None) -> int:
     workspace_id = args.workspace_id or config["hedra"].get("workspace_id")
     tts_model_slug = (args.tts_model_slug
                       or config["hedra"].get("tts_model_slug"))
-    log.info("voice_tuning",
-             extra={"speed": tts_speed, "stability": tts_stability,
-                    "tts_model_id": tts_model_id, "language": tts_language,
-                    "workspace_id": workspace_id,
-                    "tts_model_slug": tts_model_slug})
+    # These are Hedra's own TTS knobs. On the ElevenLabs path they are not sent
+    # anywhere, and logging them next to a different real speed reads as a lie —
+    # the tts_provider line below carries the settings actually in force.
+    if provider != "elevenlabs":
+        log.info("voice_tuning",
+                 extra={"speed": tts_speed, "stability": tts_stability,
+                        "tts_model_id": tts_model_id, "language": tts_language,
+                        "workspace_id": workspace_id,
+                        "tts_model_slug": tts_model_slug})
+    else:
+        log.info("hedra_render_target",
+                 extra={"language": tts_language, "workspace_id": workspace_id,
+                        "resolution": config["hedra"]["resolution"],
+                        "aspect_ratio": config["hedra"]["aspect_ratio"]})
 
     eleven = None
     eleven_settings: dict[str, object] = {}

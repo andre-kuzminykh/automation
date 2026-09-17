@@ -50,7 +50,7 @@
     "model_id": "eleven_multilingual_v2",
     "stability": "robust",
     "similarity_boost": 0.75,
-    "speed": 0.75,
+    "speed": 0.9,
     "use_speaker_boost": true,
     "output_format": "mp3_44100_128",
     "api_key_env": "ELEVENLABS_API_KEY",
