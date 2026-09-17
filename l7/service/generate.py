@@ -36,6 +36,7 @@ from .elevenlabs_client import (
     ElevenLabsClient,
     ElevenLabsError,
     resolve_stability,
+    speed_for_duration,
 )
 from .hedra_client import HedraClient, HedraError
 from .logging_setup import setup_logging
@@ -479,8 +480,12 @@ def main(argv: Sequence[str] | None = None) -> int:
             "output_format": el_cfg.get("output_format", "mp3_44100_128"),
             "language_code": el_cfg.get("language_code"),
         }
+        el_max_seconds = el_cfg.get("max_duration_sec")
+        el_chars_per_sec = el_cfg.get("chars_per_sec")
         log.info("tts_provider",
                  extra={"provider": "elevenlabs",
+                        "max_duration_sec": el_max_seconds,
+                        "chars_per_sec": el_chars_per_sec,
                         "settings": {k: v for k, v in eleven_settings.items()
                                      if v is not None}})
     else:
@@ -510,8 +515,34 @@ def main(argv: Sequence[str] | None = None) -> int:
                 # ElevenLabs synthesises, Hedra only lip-syncs. Skips Hedra's
                 # text_to_speech charge, which is the expensive half.
                 log.info("slide_audio_elevenlabs", extra={"slide": slide.id})
+                call = dict(eleven_settings)
+                if el_max_seconds and el_chars_per_sec:
+                    # Keep every circle under the cap by speaking faster, not
+                    # by cutting the author's text.
+                    spd, predicted, fits = speed_for_duration(
+                        chars=len(slide.narration),
+                        max_seconds=float(el_max_seconds),
+                        base_speed=float(call.get("speed") or 1.0),
+                        chars_per_sec_at_base=float(el_chars_per_sec),
+                    )
+                    call["speed"] = spd
+                    log.info("speed_fitted",
+                             extra={"slide": slide.id,
+                                    "chars": len(slide.narration),
+                                    "speed": spd,
+                                    "predicted_sec": round(predicted, 1),
+                                    "max_sec": el_max_seconds})
+                    if not fits:
+                        log.warning(
+                            "duration_cap_unreachable",
+                            extra={"slide": slide.id,
+                                   "predicted_sec": round(predicted, 1),
+                                   "max_sec": el_max_seconds,
+                                   "note": "already at the fastest speed "
+                                           "ElevenLabs accepts; the narration "
+                                           "has to get shorter"})
                 audio_bytes = eleven.synthesize(
-                    text=slide.narration, **eleven_settings
+                    text=slide.narration, **call
                 )
                 # Kept out of videos_dir on purpose: that whole directory is
                 # `git add`-ed, and a stray .mp3 from a crashed run would be

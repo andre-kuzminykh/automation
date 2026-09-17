@@ -7,9 +7,12 @@ from unittest.mock import MagicMock
 import pytest
 
 from l7.service.elevenlabs_client import (
+    SPEED_MAX,
+    SPEED_MIN,
     ElevenLabsClient,
     ElevenLabsError,
     resolve_stability,
+    speed_for_duration,
 )
 
 
@@ -155,3 +158,35 @@ def test_list_voices(el_env):
     client = ElevenLabsClient(session=session)
     voices = client.list_voices()
     assert voices == [{"voice_id": "v1", "name": "Andre"}]
+
+
+# Every circle must come in under a minute. Speech rate is linear in speed, so
+# the cap is met by speaking faster rather than by cutting the author's text.
+def test_speed_left_alone_when_already_short_enough():
+    spd, sec, fits = speed_for_duration(
+        chars=750, max_seconds=58, base_speed=0.9, chars_per_sec_at_base=14.9)
+    assert spd == 0.9 and fits
+    assert 50 < sec < 51
+
+
+def test_speed_raised_to_meet_the_cap():
+    spd, sec, fits = speed_for_duration(
+        chars=797, max_seconds=58, base_speed=0.9, chars_per_sec_at_base=12.0)
+    assert fits
+    assert spd > 0.9
+    assert abs(sec - 58) < 0.1
+
+
+def test_speed_never_exceeds_what_elevenlabs_accepts():
+    # Absurdly long narration: clamped to SPEED_MAX and reported as not fitting.
+    spd, sec, fits = speed_for_duration(
+        chars=5000, max_seconds=58, base_speed=0.9, chars_per_sec_at_base=12.0)
+    assert spd == SPEED_MAX
+    assert not fits
+    assert sec > 58
+
+
+def test_speed_never_drops_below_minimum():
+    spd, _, _ = speed_for_duration(
+        chars=10, max_seconds=58, base_speed=0.7, chars_per_sec_at_base=12.0)
+    assert spd >= SPEED_MIN

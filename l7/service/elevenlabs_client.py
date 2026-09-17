@@ -27,6 +27,37 @@ DEFAULT_TIMEOUT = (10.0, 300.0)
 STABILITY_PRESETS = {"creative": 0.0, "natural": 0.5, "robust": 1.0}
 
 
+# ElevenLabs clamps voice_settings.speed to this range; outside it the request
+# is rejected outright.
+SPEED_MIN, SPEED_MAX = 0.7, 1.2
+
+
+def speed_for_duration(
+    *,
+    chars: int,
+    max_seconds: float,
+    base_speed: float,
+    chars_per_sec_at_base: float,
+) -> tuple[float, float, bool]:
+    """Pick the speed that keeps a narration under `max_seconds`.
+
+    Speech rate is linear in `speed` (measured: the same 840-character English
+    narration ran 67.8 s at 0.75 and 56.3 s at 0.9, a ratio of 1.204 against
+    the 1.2 asked for). So the speed needed is just the base scaled by how much
+    too long the narration would otherwise be.
+
+    Returns (speed, predicted_seconds, fits) — `fits` is False when even
+    SPEED_MAX leaves it over the limit, which means the text has to get shorter.
+    """
+    at_base = chars / chars_per_sec_at_base
+    if at_base <= max_seconds:
+        return base_speed, at_base, True
+    needed = base_speed * (at_base / max_seconds)
+    speed = min(max(needed, SPEED_MIN), SPEED_MAX)
+    predicted = at_base * (base_speed / speed)
+    return round(speed, 3), predicted, predicted <= max_seconds + 0.5
+
+
 class ElevenLabsError(RuntimeError):
     pass
 
