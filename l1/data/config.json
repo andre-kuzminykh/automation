@@ -4,9 +4,9 @@
     "model": "Hedra Avatar",
     "model_id_known": "26f0fc66-152b-40ab-abed-76c43df99bc8",
     "model_alternatives": {
-      "Hedra Avatar":      "26f0fc66-152b-40ab-abed-76c43df99bc8",
+      "Hedra Avatar": "26f0fc66-152b-40ab-abed-76c43df99bc8",
       "Hedra Character 3": "d1dd37a3-e39a-4854-a298-6510289f9cf2",
-      "Hedra Omnia":       "ab372b84-432f-44f5-bacc-c2542465f712"
+      "Hedra Omnia": "ab372b84-432f-44f5-bacc-c2542465f712"
     },
     "resolution": "540p",
     "aspect_ratio": "1:1",
@@ -14,7 +14,7 @@
     "voice_id_known": "8e7544c8-a37b-4315-9599-55bad6bfbb7b",
     "tts_model_id": "14aeb855-72ff-4402-8f5a-8b845ee3feb4",
     "tts_model_slug": "elevenlabs/elevenlabs-v3",
-    "workspace_id": "58237",
+    "workspace_id": "340608",
     "language": "Russian",
     "speed": 0.75,
     "stability": 0.75,

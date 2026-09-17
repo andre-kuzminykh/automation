@@ -13,7 +13,7 @@ Where a published figure disagrees, the measured one is what actually got billed
 | A ~55 s circle | **~207 credits ≈ $1.08** |
 | Credit price | $0.00521 (Professional: $75 = 14,400 credits) |
 
-Derived from: workspace 58237 went 5189 → 5 credits while producing 25 videos
+Derived from: workspace 58237 (the original account) went 5189 → 5 credits while producing 25 videos
 (app 1-2, l1 3/4/5/32, l3 1-19) totalling 1387 s.
 
 Hedra publishes 3.00 credits/s for 540p Character-3. We measure 3.52 for the
@@ -62,7 +62,12 @@ dashboard shows thousands of credits. This cost a full debugging session.
 
 It lives in `<lecture>/data/config.json` under `hedra.workspace_id`, or
 `--workspace-id`. It must name a workspace the API key's account actually owns —
-`--check-credits` now says so explicitly when it does not.
+`--check-credits` now says so explicitly when it does not, and a mismatch is a
+`403 PERMISSION_DENIED: "User does not have access to workspace"`, not a 402.
+
+The workspace changed once already: the original account's pool was 58237; the
+account funded in Sept 2026 uses **340608**. When the key changes, the workspace
+almost certainly changes with it — check both together, never one alone.
 
 **An exported `HEDRA_API_KEY` beats `~/.hedra_key`.** Writing a new key to the
 file while a stale one is still exported is a silent no-op: the run keeps

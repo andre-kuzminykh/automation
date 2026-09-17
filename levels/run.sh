@@ -37,7 +37,9 @@ done
 echo
 echo "================ RESULT ================"
 # A stale text_sha256 in the manifest means that slide still holds the old
-# ИИ wording, whatever is on disk.
+# ИИ wording, whatever is on disk. status must be checked too: a failed slide
+# records the NEW text_sha256 alongside status="failed", so matching hashes
+# alone would report a slide that never rendered as fresh.
 python3 - <<'PY'
 import json, sys, os
 sys.path.insert(0, '.')
@@ -48,8 +50,11 @@ stale = []
 for s in SlideRepository("levels/data/slides.json").iter_slides():
     rec = man.get(str(s.id), {})
     path = f"levels/videos/{s.id}.mp4"
-    fresh = rec.get("text_sha256") == s.text_sha256 and os.path.exists(path)
-    print(f"  {'ok     ' if fresh else 'STALE  '} {path}  ({s.title})")
+    fresh = (rec.get("status") == "ok"
+             and rec.get("text_sha256") == s.text_sha256
+             and os.path.exists(path) and os.path.getsize(path) > 0)
+    why = "" if fresh else f"  [status={rec.get('status')!r}]"
+    print(f"  {'ok     ' if fresh else 'STALE  '} {path}  ({s.title}){why}")
     if not fresh:
         stale.append(s.id)
 sys.exit(1 if stale else 0)
