@@ -35,3 +35,6 @@ htmlcov/
 
 # Manifest write-lock sidecar (runtime only)
 *.json.lock
+
+# Detached run logs
+logs/
